@@ -1,4 +1,4 @@
-# README.md — Gestión de Reservas Turísticas
+Gestión de Reservas Turísticas
 
 ## Descripción
 Herramienta digital para **centralizar y organizar reservas** de pequeños operadores turísticos, reduciendo cruces, pérdidas de información y problemas de coordinación.
