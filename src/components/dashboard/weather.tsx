@@ -83,7 +83,7 @@ export function WeatherLine({ tour, startsAt, className }: { tour: Tour | undefi
   if (!f) {
     return (
       <div className={cn("flex h-6 items-center gap-3 text-[14px] text-ink-soft", className)} aria-busy="true">
-        <span className="h-3 w-40 animate-pulse bg-ink/10" />
+        <span className="h-3 w-40 rounded-full bg-ink/10" />
       </div>
     );
   }

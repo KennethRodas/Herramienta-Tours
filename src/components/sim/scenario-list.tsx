@@ -27,7 +27,7 @@ export function ScenarioList({ className }: { className?: string }) {
   return (
     <ul className={cn("space-y-2 font-sans", className)}>
       {SCENARIOS.map((s) => (
-        <li key={s.id} className="bg-cobalt-900 p-4">
+        <li key={s.id} className="rounded-ticket bg-cobalt-900 p-4">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="text-[17px] font-semibold leading-tight">{s.title}</p>
@@ -47,7 +47,7 @@ export function ScenarioList({ className }: { className?: string }) {
               <motion.p
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
+                exit={{ opacity: 0, height: 0, transition: { duration: 0.12 } }}
                 transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
                 className="overflow-hidden"
               >

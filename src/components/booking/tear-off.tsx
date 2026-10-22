@@ -44,15 +44,19 @@ export function TearOff({ play, capacity, othersTaken, mine, onReveal, onDone, c
       const torn = strip.current!.querySelectorAll("[data-tear='mine']");
       gsap.set(ticket.current, { opacity: 0, y: -36, rotate: -1.6, transformOrigin: "50% 0%" });
       const tl = gsap.timeline({ defaults: { overwrite: "auto" }, onComplete: () => done.current() });
-      tl.from(strip.current, { opacity: 0, y: -12, duration: 0.28, ease: "power2.out" })
-        .to(torn, { y: -10, rotate: (i: number) => (i % 2 ? 8 : -7), duration: 0.2, ease: "back.out(3)", stagger: 0.035 }, "+=0.12")
-        .to(torn, { y: 120, x: (i: number) => (i - (torn.length - 1) / 2) * -6, opacity: 0, scale: 0.6, duration: 0.42, ease: "power2.in", stagger: 0.035 })
-        .to(ticket.current, { opacity: 1, y: 0, rotate: 0, duration: 0.6, ease: "expo.out" }, "-=0.3")
+      // Lift (a quick overshoot, the tug), fall (gravity: accelerating), then the
+      // ticket settles with a long ease-out. The stagger stays tight so 25 seats
+      // tear in under half a second.
+      const stagger = Math.min(0.03, 0.4 / Math.max(1, torn.length));
+      tl.from(strip.current, { opacity: 0, y: -12, duration: 0.22, ease: "power2.out" })
+        .to(torn, { y: -10, rotate: (i: number) => (i % 2 ? 8 : -7), duration: 0.16, ease: "back.out(2.4)", stagger }, "+=0.06")
+        .to(torn, { y: 120, x: (i: number) => (i - (torn.length - 1) / 2) * -6, opacity: 0, scale: 0.6, duration: 0.36, ease: "power2.in", stagger })
+        .to(ticket.current, { opacity: 1, y: 0, rotate: 0, duration: 0.5, ease: "expo.out" }, "-=0.28")
         .add(() => {
           reveal.current();
           void chads(ticket.current!);
-        }, "-=0.42")
-        .to(strip.current, { opacity: 0, y: -8, duration: 0.32, ease: "power1.out" }, "+=0.2");
+        }, "-=0.36")
+        .to(strip.current, { opacity: 0, y: -8, duration: 0.28, ease: "power1.out" }, "+=0.1");
     }, stage);
     return () => ctx.revert();
   }, [play]);
@@ -70,7 +74,7 @@ export function TearOff({ play, capacity, othersTaken, mine, onReveal, onDone, c
                 key={i}
                 data-tear={c === "selected" ? "mine" : c}
                 className={cx(
-                  "ticket-notch block h-[46px] w-[30px]",
+                  "ticket-notch block h-[46px] w-[30px] rounded-stub",
                   c === "taken" && "bg-cobalt-600 opacity-20",
                   c === "selected" && "bg-cobalt-950",
                   c === "free" && "bg-cobalt-800",

@@ -41,7 +41,7 @@ export function RealWhatsAppPanel({ className }: { className?: string }) {
           onChange={(e) => setPhone(e.target.value)}
           onBlur={() => phone !== null && void sim.updateSettings({ testPhone: phone.replace(/\D/g, "") })}
           placeholder="50370000000"
-          className="h-11 w-full rounded-md bg-sand-50 px-3 text-[16px] text-cobalt-900 outline-none ring-cobalt-800 focus-visible:ring-2"
+          className="h-11 w-full rounded-field bg-sand-50 px-4 text-[16px] text-cobalt-900 outline-none ring-cobalt-800 transition-shadow focus-visible:ring-2"
         />
       </label>
       <div className="flex items-center justify-between gap-4">

@@ -59,7 +59,7 @@ function Chip({ d, data, onOpen }: { d: DepartureView; data: CalendarData; onOpe
       }}
       title={`${data.refs.get(d.id)} · ${tour?.name} · ${d.seatsTaken}/${d.capacity}`}
       className={cn(
-        "pressable relative flex w-full flex-col gap-1 bg-ink/8 px-1.5 pt-1 pb-1.5 text-left hover:bg-ink/15",
+        "pressable relative flex w-full flex-col gap-1 rounded-stub bg-ink/8 px-1.5 pt-1 pb-1.5 text-left hover:bg-ink/15",
         cancelled && "opacity-55",
         crossed && "bg-destructive/12 hover:bg-destructive/20",
       )}
@@ -109,7 +109,7 @@ export function MonthGrid({
     <div className="overflow-hidden">
       <div className="grid grid-cols-7 gap-1 pb-1">
         {WEEKDAY_MON_FIRST.map((w) => (
-          <span key={w} className="px-1 text-[12px] font-semibold uppercase text-ink-soft">
+          <span key={w} className="px-1 text-[13px] font-semibold text-ink-soft">
             {w}
           </span>
         ))}
@@ -142,7 +142,7 @@ export function MonthGrid({
                   aria-pressed={on}
                   aria-label={`${dayLabelLong(key)}: ${plural(list.length, "salida", "salidas")}`}
                   className={cn(
-                    "pressable relative flex h-[62px] flex-col items-stretch gap-1 px-1 pt-1 pb-1.5 text-left transition-colors duration-150",
+                    "pressable relative flex h-[62px] flex-col items-stretch gap-1 rounded-field px-1 pt-1 pb-1.5 text-left transition-colors duration-150",
                     on ? "bg-ink text-paper" : inMonth ? "bg-paper text-paper-ink" : "bg-transparent text-ink-soft",
                     past && !on && "opacity-60",
                   )}
@@ -150,7 +150,7 @@ export function MonthGrid({
                   <span className="flex items-center justify-between">
                     <span
                       className={cn(
-                        "grid size-6 place-items-center text-[14px] font-bold tabular leading-none",
+                        "grid size-6 place-items-center rounded-full text-[14px] font-bold tabular leading-none",
                         isToday && !on && "bg-ink text-paper",
                       )}
                     >
@@ -160,9 +160,9 @@ export function MonthGrid({
                   </span>
                   <span className="mt-auto flex flex-col gap-[3px]">
                     {list.slice(0, max).map((d) => (
-                      <span key={d.id} className={cn("relative block h-[5px] overflow-hidden", on ? "bg-paper/25" : "bg-ink/15", d.status === "cancelada" && "opacity-30")}>
+                      <span key={d.id} className={cn("relative block h-[5px] overflow-hidden rounded-full", on ? "bg-paper/25" : "bg-ink/15", d.status === "cancelada" && "opacity-30")}>
                         <span
-                          className={cn("absolute inset-y-0 left-0", d.state === "llena" ? "bg-destructive" : on ? "bg-paper" : "bg-ink")}
+                          className={cn("absolute inset-y-0 left-0 rounded-full", d.state === "llena" ? "bg-destructive" : on ? "bg-paper" : "bg-ink")}
                           style={{ width: `${d.capacity ? Math.round((d.seatsTaken / d.capacity) * 100) : 0}%` }}
                         />
                       </span>
@@ -175,19 +175,19 @@ export function MonthGrid({
               <div
                 key={key}
                 className={cn(
-                  "group relative flex min-h-[132px] flex-col gap-1 p-1.5",
+                  "group relative flex min-h-[132px] flex-col gap-1 rounded-field p-1.5",
                   inMonth ? "bg-paper text-paper-ink" : "bg-ink/4 text-ink-soft",
                   past && "opacity-70",
                 )}
               >
                 <div className="flex items-center justify-between">
-                  <span className={cn("grid h-7 min-w-7 place-items-center px-1 text-[14px] font-bold tabular", isToday && "bg-ink text-paper")}>{p.day}</span>
+                  <span className={cn("grid h-7 min-w-7 place-items-center rounded-full px-1 text-[14px] font-bold tabular", isToday && "bg-ink text-paper")}>{p.day}</span>
                   {!past ? (
                     <button
                       type="button"
                       onClick={() => onNew(key)}
                       aria-label={`Nueva salida el ${dayLabelLong(key)}`}
-                      className="pressable grid size-7 place-items-center text-ink-soft opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-ink/10 hover:text-ink focus-visible:opacity-100"
+                      className="pressable grid size-7 place-items-center rounded-full text-ink-soft opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-ink/10 hover:text-ink focus-visible:opacity-100"
                     >
                       <Plus className="size-4" />
                     </button>
@@ -251,9 +251,9 @@ export function WeekGrid({
             const past = key < data.today;
             const people = list.filter((d) => d.status !== "cancelada").reduce((n, d) => n + d.seatsTaken, 0);
             return (
-              <div key={key} className={cn("flex flex-col gap-1.5 bg-paper p-2 text-paper-ink md:min-h-[420px]", past && "opacity-70")}>
+              <div key={key} className={cn("flex flex-col gap-1.5 rounded-ticket bg-paper p-2 text-paper-ink md:min-h-[420px]", past && "opacity-70")}>
                 <div className="flex items-center justify-between gap-2 px-0.5">
-                  <span className={cn("px-1.5 py-1 text-[14px] font-bold", isToday && "bg-ink text-paper")}>{dayLabelLong(key)}</span>
+                  <span className={cn("rounded-full px-2 py-1 text-[14px] font-bold", isToday && "bg-ink text-paper")}>{dayLabelLong(key)}</span>
                   <span className="text-[12px] font-medium text-ink-soft">{list.length ? `${people} pers.` : ""}</span>
                 </div>
                 {list.map((d) => {
@@ -269,7 +269,7 @@ export function WeekGrid({
                       type="button"
                       onClick={() => onOpen(d.id)}
                       className={cn(
-                        "pressable relative flex flex-col gap-1.5 bg-ink/7 px-2.5 py-2 text-left hover:bg-ink/14",
+                        "pressable relative flex flex-col gap-1.5 rounded-field bg-ink/7 px-2.5 py-2 text-left hover:bg-ink/14",
                         crossed && "bg-destructive/12 hover:bg-destructive/20",
                         cancelled && "opacity-55",
                       )}
@@ -286,11 +286,11 @@ export function WeekGrid({
                         {d.status === "cerrada" ? <Lock className="size-3 shrink-0" aria-label="Cerrada" /> : null}
                       </span>
                       <span className="flex gap-1.5 text-[12px] font-semibold">
-                        <span className={cn("px-1 py-0.5", guide ? "bg-ink/10" : "bg-destructive/15 text-destructive")} title={guide?.name ?? "Sin guía"}>
+                        <span className={cn("rounded-full px-1.5 py-0.5", guide ? "bg-ink/10" : "bg-destructive/15 text-destructive")} title={guide?.name ?? "Sin guía"}>
                           {guide ? initials(guide.name) : "Sin guía"}
                         </span>
                         <span
-                          className={cn("truncate px-1 py-0.5", vehicle || !(tour && needsTransport(tour)) ? "bg-ink/10" : "bg-destructive/15 text-destructive")}
+                          className={cn("truncate rounded-full px-1.5 py-0.5", vehicle || !(tour && needsTransport(tour)) ? "bg-ink/10" : "bg-destructive/15 text-destructive")}
                           title={vehicle?.name ?? "Sin vehículo"}
                         >
                           {vehicle ? vehicleShort(vehicle.name) : tour && !needsTransport(tour) ? "En el lugar" : "Sin vehículo"}
@@ -304,7 +304,7 @@ export function WeekGrid({
                   <button
                     type="button"
                     onClick={() => onNew(key)}
-                    className="pressable mt-auto flex h-9 items-center justify-center gap-1 text-[13px] font-semibold text-ink-soft hover:bg-ink/8 hover:text-ink"
+                    className="pressable mt-auto flex h-9 items-center justify-center gap-1 rounded-full text-[13px] font-semibold text-ink-soft hover:bg-ink/8 hover:text-ink"
                   >
                     <Plus className="size-4" /> Salida
                   </button>

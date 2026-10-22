@@ -6,15 +6,20 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useClock, useHydrated, useNow } from "@/lib/sim/hooks";
+import { useScrollAway } from "@/lib/use-scroll-away";
 import { sim } from "@/lib/sim/store";
 import { DAY, HOUR, formatDayShort, formatTime } from "@/lib/domain/format";
 import { cn } from "@/lib/utils";
 import { SPEEDS, speedId } from "./clock-bar";
 
-// Floating control present on every page while the site runs in simulation
-// mode: the simulated clock, its speed, jumps, and page-aware shortcuts.
+// The simulated clock, its speed, jumps, and page-aware shortcuts, present while
+// the site runs in simulation mode. Public pages carry it in their header
+// (placement "header"); it floats only over Wilber's panel and the offline page,
+// so it never sits on a headline.
 
-export function SimDock() {
+const OWN_CHROME = /^\/(wilber|simulador|offline)(\/|$)/;
+
+export function SimDock({ placement = "float" }: { placement?: "float" | "header" }) {
   const hydrated = useHydrated();
   const pathname = usePathname();
   const clock = useClock();
@@ -22,6 +27,10 @@ export function SimDock() {
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const header = placement === "header";
+  // Floating, it gets out of the way while reading down a page.
+  const { hidden, show } = useScrollAway();
+  const away = !header && hidden && !open;
 
   useEffect(() => {
     if (!open) return;
@@ -38,6 +47,7 @@ export function SimDock() {
   }, [open]);
 
   if (!hydrated || process.env.NEXT_PUBLIC_DATA_MODE === "supabase" || pathname?.startsWith("/simulador")) return null;
+  if (!header && !OWN_CHROME.test(pathname ?? "/")) return null;
   const departureId = pathname?.match(/^\/salidas\/([^/]+)/)?.[1];
   const active = speedId(clock);
 
@@ -45,19 +55,31 @@ export function SimDock() {
     <div
       ref={ref}
       data-theme="noche"
+      onFocusCapture={header ? undefined : show}
+      style={
+        header
+          ? undefined
+          : {
+              transform: away ? "translateY(calc(100% + 120px + env(safe-area-inset-bottom, 0px)))" : "translateY(0)",
+              transition: away ? "transform 220ms var(--ease-out)" : "transform 320ms var(--ease-drawer)",
+            }
+      }
       className={cn(
-        "fixed bottom-[calc(env(safe-area-inset-bottom)+92px)] left-3 z-[45] font-sans text-sand-50 md:bottom-4 md:left-4",
-        // Wilber's desktop top bar already shows the simulated clock.
-        pathname?.startsWith("/wilber") && "lg:hidden",
+        "font-sans text-sand-50",
+        header && "relative",
+        // Above Wilber's phone tab bar until his desktop top bar, which shows the clock itself,
+        // and under his quick-actions panel, which covers it when it opens.
+        !header && pathname?.startsWith("/wilber") && "fixed bottom-[calc(max(10px,env(safe-area-inset-bottom,0px))+82px)] left-3 z-[39] lg:hidden",
+        !header && !pathname?.startsWith("/wilber") && "fixed bottom-4 left-4 z-[39]",
       )}
     >
       <button
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="pressable flex h-8 items-center gap-1.5 rounded-full bg-cobalt-950 pl-2.5 pr-3 text-[13px] font-semibold shadow-[0_0_0_2px_rgb(238_230_214/0.6)] md:h-9 md:gap-2 md:pr-3.5"
+        className="pressable flex h-8 items-center gap-1.5 rounded-full bg-cobalt-950 pl-2.5 pr-3 text-[13px] font-semibold outline-2 outline-offset-0 outline-sand-100/60 md:h-9 md:gap-2 md:pr-3.5"
       >
-        <span className={cn("size-2 rounded-full", clock?.paused ? "bg-cobalt-300" : "bg-sand-100", !clock?.paused && !reduce && "animate-pulse")} aria-hidden />
+        <span className={cn("size-2 rounded-full", clock?.paused ? "bg-cobalt-300" : "bg-sand-100")} aria-hidden />
         <span className="tabular">
           {now ? (
             <>
@@ -73,12 +95,14 @@ export function SimDock() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.97 }}
-            transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
-            style={{ transformOrigin: "bottom left" }}
-            className="absolute bottom-11 left-0 w-[17rem] space-y-3 rounded-2xl bg-cobalt-900 p-3 shadow-[0_18px_40px_rgb(2_20_71/0.45)]"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: header ? -6 : 6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1, transition: { duration: 0.18, ease: [0.23, 1, 0.32, 1] } }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: header ? -6 : 6, scale: 0.97, transition: { duration: 0.12, ease: [0.23, 1, 0.32, 1] } }}
+            style={{ transformOrigin: header ? "top right" : "bottom left" }}
+            className={cn(
+              "absolute z-50 w-[17rem] space-y-3 rounded-ticket bg-cobalt-900 p-3 shadow-[0_18px_40px_rgb(2_20_71/0.45)]", // taste-skill-ignore: floating menu
+              header ? "right-0 top-11" : "bottom-11 left-0",
+            )}
           >
             <p className="px-1 text-[13px] text-cobalt-300">Reloj de la simulación</p>
             <div className="grid grid-cols-5 gap-1">

@@ -33,6 +33,7 @@ export function Recordatorio({ c }: { c: BookingCtx }) {
           </Text>
         ) : null}
       </Sheet>
+      <Gap h={8} />
       <Band tone="ink">Clima: {weather.summary}</Band>
       <Gap h={14} />
       <Sheet>
@@ -40,7 +41,7 @@ export function Recordatorio({ c }: { c: BookingCtx }) {
         {c.tour.bring.map((item) => (
           <Row key={item} style={{ marginTop: 6 }}>
             <Column style={{ width: 22, verticalAlign: "top", paddingTop: 7 }}>
-              <div style={{ width: 9, height: 9, backgroundColor: INK }} />
+              <div style={{ width: 9, height: 9, borderRadius: 9, backgroundColor: INK }} />
             </Column>
             <Column>
               <Text style={text}>{item}</Text>

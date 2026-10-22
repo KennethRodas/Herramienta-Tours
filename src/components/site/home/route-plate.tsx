@@ -19,7 +19,7 @@ import { useReveal } from "../reveal";
 const FEATURED = ["t-santa-ana", "t-izalco", "t-siete-cascadas"];
 
 const cell =
-  "pressable flex h-[60px] items-center justify-between gap-4 px-5 text-[17px] font-semibold sm:h-[72px] sm:px-6 focus-visible:outline-offset-[-4px]";
+  "pressable flex h-14 items-center justify-between gap-4 rounded-full px-6 text-[17px] font-semibold sm:h-16 sm:px-7";
 
 export function RoutePlate() {
   const tours = useTours();
@@ -29,6 +29,7 @@ export function RoutePlate() {
 
   const featured = FEATURED.map((id) => tours.find((t) => t.id === id)).filter((t): t is Tour => Boolean(t));
   const [activeId, setActiveId] = useState(FEATURED[0]);
+  const [instant, setInstant] = useState(false);
   const active = featured.find((t) => t.id === activeId) ?? featured[0];
 
   const select = (id: string) => {
@@ -39,6 +40,7 @@ export function RoutePlate() {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
     e.preventDefault();
     const next = featured[(i + (e.key === "ArrowRight" ? 1 : -1) + featured.length) % featured.length];
+    setInstant(true);
     setActiveId(next.id);
     document.getElementById(`plate-tab-${next.id}`)?.focus();
   };
@@ -49,9 +51,9 @@ export function RoutePlate() {
         Mapa de rutas
       </h2>
       <div className="mx-auto grid max-w-[1760px] gap-y-10 px-[var(--gutter)] py-[clamp(56px,7vw,112px)] lg:grid-cols-2 lg:gap-x-[clamp(40px,5vw,96px)]">
-        <div data-reveal="plate" className="w-full self-start bg-sand-50 p-2.5 sm:p-3">
+        <div data-reveal="plate" className="w-full self-start rounded-ticket bg-sand-50 p-2.5 sm:p-3">
           {/* The embedded map is an interface fragment with its own label type. */}
-          <div data-ui className="relative aspect-square w-full">
+          <div data-ui className="relative isolate aspect-square w-full overflow-hidden rounded-field">
             <TerrainMap
               variant="card"
               tours={tours}
@@ -76,17 +78,20 @@ export function RoutePlate() {
                     aria-selected={selected}
                     aria-controls="plate-panel"
                     tabIndex={selected ? 0 : -1}
-                    onClick={() => setActiveId(t.id)}
+                    onClick={() => {
+                      setInstant(false);
+                      setActiveId(t.id);
+                    }}
                     onKeyDown={(e) => onKey(e, i)}
-                    className="pressable relative pb-2.5 text-[17px] font-semibold"
+                    className="pressable relative rounded-full px-1 pb-2.5 text-[17px] font-semibold"
                   >
                     {t.shortName}
                     {selected && (
                       <motion.span
                         layoutId="plate-tab-bar"
                         aria-hidden
-                        className="absolute inset-x-0 bottom-0 h-1 bg-cobalt-800"
-                        transition={reduce ? { duration: 0 } : SPRING_LAYOUT}
+                        className="absolute inset-x-0 bottom-0 h-1 rounded-full bg-cobalt-800"
+                        transition={reduce || instant ? { duration: 0 } : SPRING_LAYOUT}
                       />
                     )}
                   </button>
@@ -98,10 +103,14 @@ export function RoutePlate() {
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={active.id}
-                  initial={reduce ? { opacity: 0 } : { opacity: 0, transform: "translateY(10px)" }}
+                  initial={reduce || instant ? { opacity: 0 } : { opacity: 0, transform: "translateY(10px)" }}
                   animate={{ opacity: 1, transform: "translateY(0px)" }}
-                  exit={reduce ? { opacity: 0 } : { opacity: 0, transform: "translateY(-6px)" }}
-                  transition={{ duration: 0.2, ease: EASE_OUT }}
+                  exit={
+                    reduce || instant
+                      ? { opacity: 0, transition: { duration: instant ? 0 : 0.1 } }
+                      : { opacity: 0, transform: "translateY(-6px)", transition: { duration: 0.1, ease: EASE_OUT } }
+                  }
+                  transition={{ duration: instant ? 0 : 0.18, ease: EASE_OUT }}
                 >
                   <h3 className="font-display text-head font-bold uppercase leading-[0.92]">{active.name}</h3>
                   <p className="mt-6 max-w-[40ch] text-body leading-snug">{active.description}</p>
@@ -115,7 +124,7 @@ export function RoutePlate() {
               </AnimatePresence>
             </div>
 
-            <div data-reveal className="grid grid-cols-1 sm:grid-cols-2">
+            <div data-reveal className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               <Link href={`/aventuras/${active.slug}`} className={`${cell} bg-cobalt-800 text-sand-50 hover:bg-cobalt-700`}>
                 Ver ruta en 3D
                 <ArrowRightIcon aria-hidden className="size-5" />
@@ -146,9 +155,9 @@ function Fact({ label, value, hint }: { label: string; value: string; hint?: str
           <Tooltip
             content={hint}
             side="top"
-            className="max-w-[26ch] rounded-none border-0 bg-cobalt-900 px-3 py-2 text-[14px] leading-snug text-sand-50 shadow-none"
+            className="max-w-[26ch] rounded-field border-0 bg-cobalt-900 px-3.5 py-2.5 text-[14px] leading-snug text-sand-50 shadow-none"
           >
-            <button type="button" className="cursor-help underline decoration-dotted decoration-2 underline-offset-4">
+            <button type="button" className="cursor-help rounded-stub underline decoration-dotted decoration-2 underline-offset-4">
               {label}
             </button>
           </Tooltip>

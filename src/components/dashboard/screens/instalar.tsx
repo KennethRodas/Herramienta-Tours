@@ -95,8 +95,8 @@ export function InstalarScreen() {
   return (
     <div className="flex flex-col gap-8">
       {installed ? (
-        <section className="flex items-center gap-4 bg-ink px-5 py-5 text-paper">
-          <span className="grid size-12 shrink-0 place-items-center bg-paper text-ink">
+        <section className="flex items-center gap-4 rounded-ticket bg-ink px-5 py-5 text-paper">
+          <span className="grid size-12 shrink-0 place-items-center rounded-full bg-paper text-ink">
             <Check className="size-7" strokeWidth={3} />
           </span>
           <div className="flex flex-col">
@@ -105,7 +105,7 @@ export function InstalarScreen() {
           </div>
         </section>
       ) : prompt ? (
-        <section className="flex flex-wrap items-center justify-between gap-4 bg-paper px-5 py-5 text-paper-ink">
+        <section className="flex flex-wrap items-center justify-between gap-4 rounded-ticket bg-paper px-5 py-5 text-paper-ink">
           <span className="font-display text-[26px] font-bold uppercase leading-none">Instalar en este dispositivo</span>
           <Btn size="lg" onClick={() => void install()} disabled={busy}>
             <Download className="size-5" /> {busy ? "Abriendo" : "Instalar"}
@@ -137,12 +137,12 @@ export function InstalarScreen() {
                 initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.28, ease: EASE_OUT, delay: reduce ? 0 : i * 0.06 }}
-                className="relative flex flex-col items-center gap-3 bg-paper px-4 pt-5 pb-4 text-paper-ink"
+                className="relative flex flex-col items-center gap-3 rounded-ticket bg-paper px-4 pt-5 pb-4 text-paper-ink"
               >
                 {s.art}
                 <p className="text-center text-[16px] leading-snug">{s.text}</p>
                 {i < plan.steps.length - 1 ? (
-                  <span aria-hidden className="absolute -bottom-3 left-1/2 z-10 grid size-7 -translate-x-1/2 place-items-center bg-ink text-paper md:top-1/2 md:-right-3 md:bottom-auto md:left-auto md:translate-x-0 md:-translate-y-1/2">
+                  <span aria-hidden className="absolute -bottom-3 left-1/2 z-10 grid size-7 -translate-x-1/2 place-items-center rounded-full bg-ink text-paper md:top-1/2 md:-right-3 md:bottom-auto md:left-auto md:translate-x-0 md:-translate-y-1/2">
                     <ArrowDown className="size-4 md:hidden" />
                     <ArrowRight className="hidden size-4 md:block" />
                   </span>
@@ -154,8 +154,8 @@ export function InstalarScreen() {
 
         <section aria-labelledby="qr" className="flex flex-col">
           <SectionTitle id="qr">En el teléfono</SectionTitle>
-          <div className="flex flex-col items-center gap-3 bg-paper px-4 py-5 text-paper-ink">
-            {url ? <QrCode text={url} /> : <span className="size-44 animate-pulse bg-ink/10" />}
+          <div className="flex flex-col items-center gap-3 rounded-ticket bg-paper px-4 py-5 text-paper-ink">
+            {url ? <QrCode text={url} /> : <span className="size-44 rounded-field bg-ink/10" />}
             <p className="text-center text-[15px]">Escanealo con la cámara para abrir el panel.</p>
             {url ? (
               <div className="flex w-full flex-col items-center gap-2">
@@ -164,7 +164,7 @@ export function InstalarScreen() {
               </div>
             ) : null}
             {!secure ? (
-              <p className="bg-destructive/10 px-3 py-2 text-center text-[13px] font-medium text-destructive">
+              <p className="rounded-field bg-destructive/10 px-3 py-2 text-center text-[13px] font-medium text-destructive">
                 Instalar funciona en el sitio publicado con https. Desde esta dirección el teléfono no ofrece instalar.
               </p>
             ) : null}

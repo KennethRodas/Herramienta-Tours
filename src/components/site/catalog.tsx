@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { BoletoStrip } from "@/components/booking/boleto-strip";
@@ -82,19 +82,18 @@ export function Catalog({ initialFilter }: { initialFilter: CatalogFilter }) {
       <section aria-labelledby="catalogo-titulo" className="mx-auto max-w-[1760px] px-[var(--gutter)] pt-8 pb-12 md:pt-12 md:pb-16">
         <h1
           id="catalogo-titulo"
-          data-reveal
-          className="font-display font-bold uppercase leading-[0.8] tracking-[-0.01em] [font-size:clamp(4rem,18vw,13rem)]"
+          className="rise-in font-display font-bold uppercase leading-[0.8] tracking-[-0.01em] [font-size:clamp(4rem,18vw,13rem)]"
         >
           Aventuras
         </h1>
         <div className="mt-8 flex flex-col gap-6 lg:mt-10 lg:flex-row lg:items-center lg:justify-between">
-          <p data-reveal className="max-w-[44ch] text-body leading-snug">
+          <p className="rise-in max-w-[44ch] text-body leading-snug" style={{ ["--i" as string]: 1 } as CSSProperties}>
             {tours.length
               ? `${plural(tours.length, "aventura", "aventuras")} de ${Math.min(...hours)} a ${Math.max(...hours)} horas. Precio por persona de ${formatUsd(Math.min(...prices))} a ${formatUsd(Math.max(...prices))}.`
               : "Sin aventuras activas por ahora."}
           </p>
           {!empty && (
-            <div data-reveal className="catalog-filter -mx-2 w-auto sm:mx-0 sm:w-[560px] sm:max-w-full">
+            <div className="rise-in catalog-filter -mx-2 w-auto sm:mx-0 sm:w-[560px] sm:max-w-full" style={{ ["--i" as string]: 2 } as CSSProperties}>
               <LiquidTabBar
                 variant="segmented"
                 tabs={FILTER_TABS}
@@ -111,9 +110,9 @@ export function Catalog({ initialFilter }: { initialFilter: CatalogFilter }) {
         <div className="cat-wrap mx-auto max-w-[1760px] px-[var(--gutter)] py-[clamp(56px,7vw,120px)]">
           {!empty && ordered.length > 0 && (
             <div className="cat-frame-col">
-              <div className="sticky top-[8svh] -ml-[var(--gutter)]">
+              <div className="sticky top-[8svh]">
                 <div data-reveal="plate">
-                  <PreviewFrame tours={ordered} activeId={activeId} boxClassName="h-[min(80svh,880px)]" captionClassName="pl-[var(--gutter)]" />
+                  <PreviewFrame tours={ordered} activeId={activeId} boxClassName="h-[min(80svh,880px)]" />
                 </div>
               </div>
             </div>
@@ -121,7 +120,7 @@ export function Catalog({ initialFilter }: { initialFilter: CatalogFilter }) {
 
           <div
             data-reveal="card"
-            className="cat-sheet ink-paper edge-scallop-y w-full max-w-[760px] bg-sand-50 px-5 pt-12 pb-14 text-ink sm:px-10 md:px-14 md:pt-14"
+            className="cat-sheet ink-paper edge-scallop-y w-full max-w-[760px] rounded-ticket bg-sand-50 px-5 pt-12 pb-14 text-ink sm:px-10 md:px-14 md:pt-14"
           >
             <p className="text-center text-small">Precio por persona, en dólares. Tocá una aventura para ver sus fechas.</p>
 
@@ -148,7 +147,7 @@ export function Catalog({ initialFilter }: { initialFilter: CatalogFilter }) {
                             layout={reduce ? false : "position"}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            exit={{ opacity: 0, transition: { duration: 0.14, ease: EASE_OUT } }}
                             transition={{ duration: 0.22, ease: EASE_OUT }}
                           >
                             <CatalogRow tour={t} next={next?.[t.id]} live={hydrated && next !== null} onActive={setActiveId} />
@@ -182,7 +181,7 @@ function CatalogRow({
   const held = next ? Math.max(0, next.capacity - next.seatsTaken - next.left) : 0;
   return (
     <Link href={`/aventuras/${t.slug}`} className="cat-row" onPointerEnter={() => onActive(t.id)} onFocus={() => onActive(t.id)}>
-      {photo && <Image src={photo.srcSmall} alt="" width={64} height={64} sizes="64px" className="cat-thumb size-16 object-cover" />}
+      {photo && <Image src={photo.srcSmall} alt="" width={64} height={64} sizes="64px" className="cat-thumb size-16 rounded-field object-cover" />}
       <span className="text-body font-semibold leading-tight">{t.name}</span>
       <span className="text-body font-semibold leading-tight tabular">{formatUsd(t.priceUsd)}</span>
       <span className="cat-span text-[17px] leading-snug">{t.summary}</span>
@@ -194,7 +193,7 @@ function CatalogRow({
       </span>
       <span className="cat-span mt-1 flex min-h-[26px] flex-wrap items-center gap-x-3 gap-y-1.5 text-small">
         {!live ? (
-          <span aria-hidden className="h-3.5 w-48 bg-sand-200" />
+          <span aria-hidden className="h-3.5 w-48 rounded-full bg-sand-200" />
         ) : next ? (
           <>
             <span className="font-semibold">
@@ -226,7 +225,7 @@ const CATALOG_CSS = `
 .cat-frame-col { display: none; }
 .cat-row {
   display: grid; grid-template-columns: 4rem minmax(0, 1fr) auto; column-gap: 14px; row-gap: 4px; align-items: baseline;
-  padding: 14px 8px; margin: 0 -8px;
+  padding: 14px 10px; margin: 0 -10px; border-radius: var(--radius-field);
   transition: opacity var(--dur-fast) ease, background-color var(--dur-fast) ease, transform var(--dur-press) var(--ease-out);
 }
 .cat-row:active { transform: scale(0.985); }

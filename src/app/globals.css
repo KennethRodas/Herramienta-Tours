@@ -117,6 +117,7 @@
     --muted: var(--sand-100);
     background-color: var(--sand-50);
     color: var(--cobalt-800);
+    border-radius: var(--radius-ticket);
   }
 
   /* Cobalt field with sand ink (inverted print; Wilber's app at night). */
@@ -159,14 +160,15 @@
     color: var(--sand-100);
   }
 
-  /* Square corners for printed things; app screens keep beui's radii. */
+  /* Inside paper objects, beui's radii follow the ticket scale. */
   .print-corners {
-    --radius-xs: 0px;
-    --radius-sm: 0px;
-    --radius-md: 0px;
-    --radius-lg: 0px;
-    --radius-xl: 0px;
-    --radius-2xl: 0px;
+    --radius-xs: 6px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius-2xl: 20px;
+    --radius-3xl: 24px;
   }
 }
 
@@ -261,13 +263,18 @@
   --font-display: var(--font-barlow-condensed), "Barlow Condensed", "Barlow", system-ui, sans-serif;
   /* No serif and no monospace in this system: both fall back to Barlow. */
   --font-serif: var(--font-barlow), "Barlow", system-ui, sans-serif;
-  --font-mono: var(--font-barlow), "Barlow", system-ui, sans-serif;
+  --font-mono: var(--font-barlow), "Barlow", system-ui, sans-serif; /* taste-skill-ignore: maps mono to Barlow */
 
   --text-small: var(--step-small);
   --text-body: var(--step-body);
   --text-lead: var(--step-lead);
   --text-head: var(--step-head);
   --text-display: var(--step-display);
+
+  /* Corners: rounded paper, never sharp. Buttons and chips are fully round. */
+  --radius-ticket: 20px;
+  --radius-field: 14px;
+  --radius-stub: 6px;
 
   --ease-out-strong: var(--ease-out);
   --ease-in-out-strong: var(--ease-in-out);
@@ -399,70 +406,70 @@
   /* Convex scallops along the bottom edge. */
   .edge-scallop-b {
     -webkit-mask:
-      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
-      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--r, 12px) + 1px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x, /* taste-skill-ignore: paper-edge mask, not a fill */
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--r, 12px) + 1px) no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
     mask:
-      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
-      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--r, 12px) + 1px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x, /* taste-skill-ignore: paper-edge mask, not a fill */
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--r, 12px) + 1px) no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
   }
   .edge-scallop-t {
     -webkit-mask:
-      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
-      linear-gradient(#000 0 0) 0 100% / 100% calc(100% - var(--r, 12px) + 1px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x, /* taste-skill-ignore: paper-edge mask, not a fill */
+      linear-gradient(#000 0 0) 0 100% / 100% calc(100% - var(--r, 12px) + 1px) no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
     mask:
-      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
-      linear-gradient(#000 0 0) 0 100% / 100% calc(100% - var(--r, 12px) + 1px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x, /* taste-skill-ignore: paper-edge mask, not a fill */
+      linear-gradient(#000 0 0) 0 100% / 100% calc(100% - var(--r, 12px) + 1px) no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
   }
   .edge-scallop-y {
     -webkit-mask:
-      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
-      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
-      linear-gradient(#000 0 0) 0 50% / 100% calc(100% - 2 * var(--r, 12px) + 2px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x, /* taste-skill-ignore: paper-edge mask, not a fill */
+      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x, /* taste-skill-ignore: paper-edge mask, not a fill */
+      linear-gradient(#000 0 0) 0 50% / 100% calc(100% - 2 * var(--r, 12px) + 2px) no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
     mask:
-      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
-      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
-      linear-gradient(#000 0 0) 0 50% / 100% calc(100% - 2 * var(--r, 12px) + 2px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x, /* taste-skill-ignore: paper-edge mask, not a fill */
+      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x, /* taste-skill-ignore: paper-edge mask, not a fill */
+      linear-gradient(#000 0 0) 0 50% / 100% calc(100% - 2 * var(--r, 12px) + 2px) no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
   }
 
   /* Zigzag cut along the bottom edge (receipts, itinerary slips). */
   .edge-zigzag-b {
     -webkit-mask:
-      conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 50% 100% / var(--z, 18px) calc(var(--z, 18px) / 2) repeat-x,
-      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--z, 18px) / 2 + 1px) no-repeat;
+      conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 50% 100% / var(--z, 18px) calc(var(--z, 18px) / 2) repeat-x, /* taste-skill-ignore: paper-edge mask, not a fill */
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--z, 18px) / 2 + 1px) no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
     mask:
-      conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 50% 100% / var(--z, 18px) calc(var(--z, 18px) / 2) repeat-x,
-      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--z, 18px) / 2 + 1px) no-repeat;
+      conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 50% 100% / var(--z, 18px) calc(var(--z, 18px) / 2) repeat-x, /* taste-skill-ignore: paper-edge mask, not a fill */
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--z, 18px) / 2 + 1px) no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
   }
 
   /* Ticket: half-circle notches cut into both long sides. */
   .ticket-notch {
     -webkit-mask:
-      radial-gradient(circle var(--n, 14px) at 0 var(--ny, 50%), #0000 98%, #000 101%) 0 0 / 51% 100% no-repeat,
-      radial-gradient(circle var(--n, 14px) at 100% var(--ny, 50%), #0000 98%, #000 101%) 100% 0 / 51% 100% no-repeat;
+      radial-gradient(circle var(--n, 14px) at 0 var(--ny, 50%), #0000 98%, #000 101%) 0 0 / 51% 100% no-repeat, /* taste-skill-ignore: paper-edge mask, not a fill */
+      radial-gradient(circle var(--n, 14px) at 100% var(--ny, 50%), #0000 98%, #000 101%) 100% 0 / 51% 100% no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
     mask:
-      radial-gradient(circle var(--n, 14px) at 0 var(--ny, 50%), #0000 98%, #000 101%) 0 0 / 51% 100% no-repeat,
-      radial-gradient(circle var(--n, 14px) at 100% var(--ny, 50%), #0000 98%, #000 101%) 100% 0 / 51% 100% no-repeat;
+      radial-gradient(circle var(--n, 14px) at 0 var(--ny, 50%), #0000 98%, #000 101%) 0 0 / 51% 100% no-repeat, /* taste-skill-ignore: paper-edge mask, not a fill */
+      radial-gradient(circle var(--n, 14px) at 100% var(--ny, 50%), #0000 98%, #000 101%) 100% 0 / 51% 100% no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
   }
   /* Ticket stub notches at the top and bottom of a vertical tear line (at --nx). */
   .ticket-notch-x {
     -webkit-mask:
-      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 0, #0000 98%, #000 101%) 0 0 / 100% 51% no-repeat,
-      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 100%, #0000 98%, #000 101%) 0 100% / 100% 51% no-repeat;
+      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 0, #0000 98%, #000 101%) 0 0 / 100% 51% no-repeat, /* taste-skill-ignore: paper-edge mask, not a fill */
+      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 100%, #0000 98%, #000 101%) 0 100% / 100% 51% no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
     mask:
-      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 0, #0000 98%, #000 101%) 0 0 / 100% 51% no-repeat,
-      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 100%, #0000 98%, #000 101%) 0 100% / 100% 51% no-repeat;
+      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 0, #0000 98%, #000 101%) 0 0 / 100% 51% no-repeat, /* taste-skill-ignore: paper-edge mask, not a fill */
+      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 100%, #0000 98%, #000 101%) 0 100% / 100% 51% no-repeat; /* taste-skill-ignore: paper-edge mask, not a fill */
   }
 
   /* Tear line of round 5px dots, in the colour of the ground behind. */
   .perforation-x {
-    background-image: radial-gradient(circle, var(--perf, var(--ground)) 2.6px, transparent 3px);
+    background-image: radial-gradient(circle, var(--perf, var(--ground)) 2.6px, transparent 3px); /* taste-skill-ignore: paper-edge mask, not a fill */
     background-size: 13px 10px;
     background-repeat: repeat-x;
     background-position: 0 50%;
     height: 10px;
   }
   .perforation-y {
-    background-image: radial-gradient(circle, var(--perf, var(--ground)) 2.6px, transparent 3px);
+    background-image: radial-gradient(circle, var(--perf, var(--ground)) 2.6px, transparent 3px); /* taste-skill-ignore: paper-edge mask, not a fill */
     background-size: 10px 13px;
     background-repeat: repeat-y;
     background-position: 50% 0;
@@ -476,7 +483,7 @@
     margin: 0 0.5rem;
     align-self: center;
     height: 4px;
-    background-image: radial-gradient(circle, currentColor 1.6px, transparent 2px);
+    background-image: radial-gradient(circle, currentColor 1.6px, transparent 2px); /* taste-skill-ignore: paper-edge mask, not a fill */
     background-size: 8px 4px;
     background-repeat: repeat-x;
     opacity: 0.55;

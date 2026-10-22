@@ -15,26 +15,24 @@ const PAGES = [
 ];
 
 const linkClass = "site-link pressable inline-block";
-const LIST = new Intl.ListFormat("es", { style: "long", type: "conjunction" });
 
 // The back of the card: the reverse of the site's stationery, with a scalloped
 // top edge. Pages on the left, how to reach Wilber on the right, a stamp, the
 // name at full size, the photo credits and the printer's imprint.
 export function SiteFooter() {
   const stamp = PHOTO_CREDITS["izalco"];
-  const authors = Array.from(new Set(Object.values(PHOTO_CREDITS).map((p) => p.author)));
   const instagram = BUSINESS.instagram.replace(/^@/, "");
 
   return (
     <Reveal
       as="footer"
       start="top 95%"
-      className="field-ink pt-[clamp(64px,9vw,128px)] pb-[calc(env(safe-area-inset-bottom,0px)+104px)] md:pb-10"
+      className="field-ink pt-[clamp(64px,9vw,128px)] pb-[calc(env(safe-area-inset-bottom,0px)+160px)] md:pb-10"
     >
       <div className="mx-auto max-w-[1760px] px-[var(--gutter)]">
         <div
           data-reveal="card"
-          className="ink-paper edge-scallop-t relative bg-sand-50 px-6 pt-14 pb-8 text-ink md:px-10 md:pt-16 lg:px-14"
+          className="ink-paper edge-scallop-t relative rounded-ticket bg-sand-50 px-6 pt-14 pb-8 text-ink md:px-10 md:pt-16 lg:px-14"
           style={{ ["--r" as string]: "18px" }}
         >
           <div className="grid gap-y-10 lg:grid-cols-12 lg:gap-x-8">
@@ -93,14 +91,14 @@ export function SiteFooter() {
               </dl>
 
               <figure className="hidden shrink-0 sm:block">
-                <div className="edge-scallop-y bg-sand-300 p-1.5" style={{ ["--r" as string]: "3px" }}>
+                <div className="edge-scallop-y rounded-stub bg-sand-300 p-1.5" style={{ ["--r" as string]: "3px" }}>
                   <Image
                     src={stamp.srcSmall}
                     alt={stamp.alt}
                     width={88}
                     height={117}
                     sizes="88px"
-                    className="h-[117px] w-[88px] object-cover"
+                    className="h-[117px] w-[88px] rounded-stub object-cover"
                   />
                 </div>
               </figure>
@@ -112,10 +110,11 @@ export function SiteFooter() {
             <span>Wilber</span>
           </p>
 
-          <p className="mt-10 max-w-[72ch] text-small leading-relaxed">
-            Fotos de Wikimedia Commons con licencia CC BY-SA: {LIST.format(authors)}.{" "}
+          {/* CC BY-SA allows attribution through a link to the full credits (licence §3(a)(2)). */}
+          <p className="mt-10 max-w-[72ch] text-[16px] leading-relaxed">
+            Fotos de Wikimedia Commons con licencia CC BY-SA.{" "}
             <Link href="/creditos" className="pressable inline-block font-semibold underline decoration-2 underline-offset-4">
-              Créditos completos
+              Autores y licencias
             </Link>
           </p>
           <p className="mt-6 text-center text-small">© 2026 Tours de Aventura de Wilber · Proyecto académico</p>

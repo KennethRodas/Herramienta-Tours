@@ -20,7 +20,7 @@ export function Crew() {
     <Reveal id="equipo" aria-labelledby="equipo-titulo" className="text-ink">
       <div className="mx-auto max-w-[1760px] px-[var(--gutter)] pb-[var(--section-gap)]">
         <div data-reveal="card" className="mx-auto w-full max-w-[680px]">
-          <div className="ink-night bg-cobalt-800 px-6 pt-12 pb-10 text-ink sm:px-12 sm:pt-14 sm:pb-12">
+          <div className="ink-night rounded-t-ticket bg-cobalt-800 px-6 pt-12 pb-10 text-ink sm:px-12 sm:pt-14 sm:pb-12">
             <h2 id="equipo-titulo" className="font-display text-head font-bold uppercase leading-[0.92]">
               Guías y microbuses
             </h2>
@@ -54,7 +54,7 @@ export function Crew() {
 
           <div aria-hidden className="perforation-x bg-cobalt-800" style={{ ["--perf" as string]: "var(--sand-200)" } as CSSProperties} />
 
-          <div className="ink-night edge-scallop-b flex flex-col gap-2 bg-cobalt-800 px-6 pt-5 pb-10 text-ink sm:flex-row sm:items-baseline sm:justify-between sm:px-12">
+          <div className="ink-night edge-scallop-b flex flex-col gap-2 rounded-b-ticket bg-cobalt-800 px-6 pt-5 pb-10 text-ink sm:flex-row sm:items-baseline sm:justify-between sm:px-12">
             <a href={`mailto:${BUSINESS.email}`} className="site-link pressable inline-block text-body font-semibold">
               {BUSINESS.email}
             </a>

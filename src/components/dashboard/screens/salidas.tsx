@@ -29,7 +29,7 @@ export function SalidasScreen() {
   const [tour, setTour] = useState("todos");
   const [dir, setDir] = useState(1);
 
-  if (!idx || now === null || !deps) return <div className="h-[520px] animate-pulse bg-paper" aria-busy="true" />;
+  if (!idx || now === null || !deps) return <div className="h-[520px] rounded-ticket bg-paper" aria-busy="true" />;
 
   const today = svDateKey(now);
   const base = anchor ?? today;
@@ -68,7 +68,7 @@ export function SalidasScreen() {
     setDir(step);
     if (view === "mes") {
       const target = new Date(Date.UTC(p.year, p.month - 1 + step, 1));
-      const key = `${target.getUTCFullYear()}-${String(target.getUTCMonth() + 1).padStart(2, "0")}-01`;
+      const key = `${target.getUTCFullYear()}-${String(target.getUTCMonth() + 1).padStart(2, "0")}-01`; // taste-skill-ignore: ISO date key
       setAnchor(key);
       if (!desktop) setSelected(key.slice(0, 7) === today.slice(0, 7) ? today : key);
     } else {
@@ -115,18 +115,18 @@ export function SalidasScreen() {
               { id: "mes", label: "Mes" },
               { id: "semana", label: "Semana" },
             ]}
-            className="w-[196px] shrink-0"
+            className="dash-seg w-[196px] shrink-0"
           />
           <Select value={tour} onValueChange={setTour} className="min-w-0 flex-1 sm:w-56 sm:flex-none">
-            <SelectTrigger className="h-[52px] rounded-none! text-[15px]">
+            <SelectTrigger className="h-[52px] rounded-field! text-[15px]">
               <SelectValue placeholder="Tour" />
             </SelectTrigger>
-            <SelectContent className="max-h-80 overflow-y-auto rounded-none!">
-              <SelectItem value="todos" className="rounded-none py-2 text-[15px]">
+            <SelectContent className="max-h-80 overflow-y-auto rounded-field!">
+              <SelectItem value="todos" className="rounded-field py-2 text-[15px]">
                 Todos los tours
               </SelectItem>
               {idx.tours.map((t) => (
-                <SelectItem key={t.id} value={t.id} className="rounded-none py-2 text-[15px]">
+                <SelectItem key={t.id} value={t.id} className="rounded-field py-2 text-[15px]">
                   {t.shortName}
                 </SelectItem>
               ))}

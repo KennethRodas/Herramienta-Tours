@@ -46,7 +46,7 @@ export function BookingView({ id }: { id: string }) {
     return (
       <>
         <SheetHeader title="Reserva" />
-        <div className="h-40 animate-pulse bg-ink/5" />
+        <div className="h-40 rounded-ticket bg-ink/5" />
       </>
     );
   }
@@ -104,7 +104,7 @@ export function BookingView({ id }: { id: string }) {
             <button
               type="button"
               onClick={() => push({ kind: "departure", id: dep.id })}
-              className="pressable -mx-2 inline-flex max-w-full items-center gap-1 px-2 py-1 text-left font-semibold hover:bg-ink/8"
+              className="pressable -mx-2 inline-flex max-w-full items-center gap-1 rounded-full px-2 py-1 text-left font-semibold hover:bg-ink/8"
             >
               <span className="truncate">
                 {ref} · {tour?.shortName} · {formatDayShort(dep.startsAt)} {formatTime(dep.startsAt)}
@@ -148,7 +148,7 @@ export function BookingView({ id }: { id: string }) {
       </dl>
 
       {canCheckIn ? (
-        <section className="flex flex-col gap-3 bg-ink/5 px-4 py-4">
+        <section className="flex flex-col gap-3 rounded-ticket bg-ink/5 px-4 py-4">
           <h4 className="font-display text-[20px] font-bold uppercase leading-none text-ink">Llegada</h4>
           <div className="flex flex-wrap gap-2">
             <Btn
@@ -197,7 +197,7 @@ export function BookingView({ id }: { id: string }) {
       ) : null}
 
       {b.payment.method === "wompi" && b.payment.status === "pendiente" ? (
-        <section className="flex flex-col gap-2 bg-ink/5 px-4 py-4">
+        <section className="flex flex-col gap-2 rounded-ticket bg-ink/5 px-4 py-4">
           <h4 className="font-display text-[20px] font-bold uppercase leading-none text-ink">Anticipo en línea</h4>
           <p className="text-[14px] text-ink-soft">Simulación de Wompi: {formatUsd(b.payment.amountUsd)} pendiente.</p>
           <div className="flex flex-wrap gap-2">
@@ -224,7 +224,7 @@ export function BookingView({ id }: { id: string }) {
           onHoldComplete={() => void cancel()}
           holdingLabel="Seguí presionando"
           completeLabel="Cancelada"
-          className="h-14 w-full min-w-0 rounded-none bg-destructive/12 text-destructive [--hold-radius:0px] [&_svg]:text-destructive/25!"
+          className="h-14 w-full min-w-0 rounded-full bg-destructive/12 text-destructive [--hold-radius:9999px] [&_svg]:text-destructive/25!"
           fillClassName="bg-destructive/25"
           labelClassName="text-[16px] font-semibold"
         >

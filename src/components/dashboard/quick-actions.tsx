@@ -89,13 +89,13 @@ export function QuickActions({ next, nextRef }: { next?: Departure; nextRef?: st
             key="panel"
             layoutId={layoutId}
             transition={morph}
-            style={{ borderRadius: 0 }}
-            className="w-[min(88vw,360px)] overflow-hidden bg-ink text-paper"
+            style={{ borderRadius: 20 }}
+            className="w-[min(88vw,360px)] overflow-hidden bg-ink p-2 text-paper"
             role="menu"
             aria-label="Acciones rápidas"
           >
             <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: reduce ? 0 : 0.08, duration: 0.18 }}>
-              <div className="grid grid-cols-2 gap-px bg-paper/15">
+              <div className="grid grid-cols-2 gap-1.5">
                 {items.map((item, i) => {
                   const Icon = item.icon;
                   return (
@@ -111,7 +111,7 @@ export function QuickActions({ next, nextRef }: { next?: Departure; nextRef?: st
                         item.run();
                         setOpen(false);
                       }}
-                      className="pressable flex min-h-[96px] flex-col items-start justify-between gap-3 bg-ink p-4 text-left select-none hover:bg-ink-soft disabled:opacity-40"
+                      className="pressable flex min-h-[96px] flex-col items-start justify-between gap-3 rounded-field bg-paper/8 p-4 text-left select-none hover:bg-paper/16 disabled:opacity-40"
                     >
                       <Icon className="size-6" aria-hidden />
                       <span className="flex flex-col">
@@ -122,7 +122,7 @@ export function QuickActions({ next, nextRef }: { next?: Departure; nextRef?: st
                   );
                 })}
               </div>
-              <div className="flex justify-end">
+              <div className="flex justify-end pt-1.5">
                 <button
                   type="button"
                   onClick={() => {
@@ -130,7 +130,7 @@ export function QuickActions({ next, nextRef }: { next?: Departure; nextRef?: st
                     window.setTimeout(() => triggerRef.current?.focus(), 0);
                   }}
                   aria-label="Cerrar acciones"
-                  className="pressable grid size-14 place-items-center hover:bg-ink-soft"
+                  className="pressable grid size-12 place-items-center rounded-full hover:bg-paper/12"
                 >
                   <X className="size-6" />
                 </button>
@@ -144,7 +144,7 @@ export function QuickActions({ next, nextRef }: { next?: Departure; nextRef?: st
             type="button"
             layoutId={layoutId}
             transition={morph}
-            style={{ borderRadius: 0 }}
+            style={{ borderRadius: 28 }}
             onClick={() => setOpen(true)}
             aria-haspopup="menu"
             aria-expanded={false}

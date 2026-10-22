@@ -81,7 +81,7 @@ export const mondayOfKey = (key: string) => addDays(key, -mondayIndex(key));
 export const monthKey = (key: string) => key.slice(0, 7);
 
 export function monthGrid(year: number, month: number) {
-  const first = `${year}-${String(month).padStart(2, "0")}-01`;
+  const first = `${year}-${String(month).padStart(2, "0")}-01`; // taste-skill-ignore: ISO date key
   const start = mondayOfKey(first);
   const days: string[] = [];
   for (let i = 0; i < 42; i++) days.push(addDays(start, i));

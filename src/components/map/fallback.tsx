@@ -48,8 +48,8 @@ export function RouteFallback({ tour, showProfile, className }: { tour: Tour; sh
   const points = tour.route.path.map((p) => project(p).join(",")).join(" ");
 
   return (
-    <div className={cn("flex flex-col bg-sand-300", className)}>
-      <div className="relative min-h-0 flex-1 overflow-hidden">
+    <div className={cn("flex flex-col gap-2", className)}>
+      <div className="relative min-h-0 flex-1 overflow-hidden rounded-ticket bg-sand-300">
         {photo ? (
           <Image src={photo.src} alt={photo.alt} fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover" />
         ) : null}
@@ -63,7 +63,7 @@ export function RouteFallback({ tour, showProfile, className }: { tour: Tour; sh
         </svg>
         <Notice className="absolute left-3 top-3 mr-3" />
         {photo ? (
-          <p className="absolute bottom-2 right-2 bg-sand-50/90 px-2 py-0.5 text-[13px] text-ink-soft">
+          <p className="absolute bottom-2 right-2 rounded-full bg-sand-50/90 px-2.5 py-0.5 text-[13px] text-ink-soft">
             Foto: {photo.author} · {photo.licence}
           </p>
         ) : null}
@@ -90,7 +90,7 @@ export function TerrainFallback({
 }) {
   const project = projector([SV_BOUNDS[0], SV_BOUNDS[1]], 1000, 560, 30);
   return (
-    <div className={cn("relative overflow-hidden bg-sand-200", className)}>
+    <div className={cn("relative overflow-hidden rounded-ticket bg-sand-200", className)}>
       <svg viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 size-full">
         {tours.map((t) => {
           const at = t.route.path[0] ?? t.route.camera.center;
@@ -127,7 +127,7 @@ export function TerrainFallback({
 
 export function MeetingFallback({ point, className }: { point: MeetingPoint; className?: string }) {
   return (
-    <div className={cn("flex flex-col justify-between gap-4 bg-sand-300 p-4", className)}>
+    <div className={cn("flex flex-col justify-between gap-4 rounded-ticket bg-sand-300 p-4", className)}>
       <div>
         <p className="font-display text-lead font-semibold">{point.name}</p>
         <p className="text-small text-ink-soft">
@@ -144,7 +144,7 @@ export function MeetingFallback({ point, className }: { point: MeetingPoint; cla
 
 export function EditorFallback({ className }: { className?: string }) {
   return (
-    <div className={cn("grid place-items-center bg-sand-300 p-6", className)}>
+    <div className={cn("grid place-items-center rounded-ticket bg-sand-300 p-6", className)}>
       <p className="max-w-sm text-center text-body">El editor de rutas necesita WebGL2: abrilo en Chrome, Edge, Firefox o Safari actualizado.</p>
     </div>
   );

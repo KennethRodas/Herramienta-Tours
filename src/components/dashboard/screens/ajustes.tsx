@@ -53,7 +53,7 @@ export function AjustesScreen() {
       <div className="flex flex-col gap-8">
         <section aria-labelledby="negocio">
           <SectionTitle id="negocio">Negocio</SectionTitle>
-          <dl className="bg-paper px-4 py-2 text-paper-ink">
+          <dl className="rounded-ticket bg-paper px-4 py-2 text-paper-ink">
             <Line label="Nombre">{BUSINESS.legalName}</Line>
             <Line label="WhatsApp">
               <span className="tabular">{BUSINESS.whatsappDisplay}</span>
@@ -79,7 +79,7 @@ export function AjustesScreen() {
           <SectionTitle id="tema" aside={mode === "auto" && effective ? `Ahora: ${effective === "noche" ? "noche" : "día"}` : undefined}>
             Tema
           </SectionTitle>
-          <div className="flex flex-col gap-2 bg-paper px-4 py-4 text-paper-ink">
+          <div className="flex flex-col gap-2 rounded-ticket bg-paper px-4 py-4 text-paper-ink">
             <ThemeChips />
             <p className="text-[14px] text-ink-soft">{mode === "auto" ? "Noche de 6:00 p. m. a 5:30 a. m., hora de El Salvador." : `Siempre ${THEME_LABEL[mode].toLowerCase()}.`}</p>
           </div>
@@ -87,7 +87,7 @@ export function AjustesScreen() {
 
         <section aria-labelledby="mensajes">
           <SectionTitle id="mensajes">Mensajes automáticos</SectionTitle>
-          <div className="flex items-center justify-between gap-4 bg-paper px-4 py-4 text-paper-ink">
+          <div className="flex items-center justify-between gap-4 rounded-ticket bg-paper px-4 py-4 text-paper-ink">
             <div className="flex flex-col">
               <span className="text-[16px] font-semibold">{settings?.autoMessages ? "Activados" : "Apagados"}</span>
               <span className="text-[14px] text-ink-soft">Recordatorio 24 h, ubicación 2 h antes, reseña, resumen de las 6 p. m. y alertas de cruces.</span>
@@ -109,7 +109,7 @@ export function AjustesScreen() {
 
         <section aria-labelledby="integraciones">
           <SectionTitle id="integraciones">Integraciones</SectionTitle>
-          <ul className="flex flex-col bg-paper px-4 py-2 text-paper-ink">
+          <ul className="flex flex-col rounded-ticket bg-paper px-4 py-2 text-paper-ink">
             {(
               [
                 ["supabase", "Supabase", "Base de datos"],
@@ -128,8 +128,8 @@ export function AjustesScreen() {
                   </span>
                   <span
                     className={cn(
-                      "inline-flex h-7 items-center px-2 text-[13px] font-semibold",
-                      estado.status === "cargando" && "animate-pulse bg-ink/8 text-ink-soft",
+                      "inline-flex h-7 items-center rounded-full px-2.5 text-[13px] font-semibold",
+                      estado.status === "cargando" && "bg-ink/8 text-ink-soft",
                       estado.status === "sin-datos" && "bg-ink/5 text-ink-soft",
                       estado.status === "ok" && (on ? "bg-ink text-paper" : "bg-ink/10 text-ink"),
                     )}
@@ -226,7 +226,7 @@ function PinSection({ current }: { current?: string }) {
   return (
     <section aria-labelledby="pin">
       <SectionTitle id="pin">PIN del panel</SectionTitle>
-      <div className="flex flex-col gap-3 bg-paper px-4 py-4 text-paper-ink">
+      <div className="flex flex-col gap-3 rounded-ticket bg-paper px-4 py-4 text-paper-ink">
         <span className="text-[16px] font-semibold">{step === "nuevo" ? "PIN nuevo" : "Repetí el PIN nuevo"}</span>
         <OTPInput
           key={round}

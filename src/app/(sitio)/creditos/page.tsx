@@ -63,7 +63,7 @@ function CreditList({ items }: { items: Credit[] }) {
   return (
     <ul className="mt-6 flex flex-col gap-5">
       {items.map((c) => (
-        <li key={c.name} className="grid gap-x-8 gap-y-1 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)_auto] md:items-baseline">
+        <li key={c.name} data-reveal="row" className="grid gap-x-8 gap-y-1 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)_auto] md:items-baseline">
           <span className="text-body font-semibold">{c.name}</span>
           <span className="text-[17px] leading-snug">{c.detail}</span>
           <a href={c.href} {...external} className={`${link} text-[17px]`}>
@@ -79,24 +79,34 @@ export default function CreditosPage() {
   const photos = Object.values(PHOTO_CREDITS);
 
   return (
-    <div className="text-ink">
+    <Reveal as="div" className="text-ink" start="top 90%">
       <section aria-labelledby="creditos-titulo" className="mx-auto max-w-[1760px] px-[var(--gutter)] pt-8 pb-12 md:pt-12 md:pb-16">
-        <h1 id="creditos-titulo" className="font-display font-bold uppercase leading-[0.8] tracking-[-0.01em] [font-size:clamp(4rem,18vw,13rem)]">
+        <h1
+          id="creditos-titulo"
+          className="rise-in font-display font-bold uppercase leading-[0.8] tracking-[-0.01em] [font-size:clamp(4rem,18vw,13rem)]"
+        >
           Créditos
         </h1>
       </section>
 
-      <Reveal className="field-ink py-[clamp(48px,7vw,120px)]" aria-label="Lista de créditos">
+      <section aria-label="Lista de créditos" className="field-ink py-[clamp(48px,7vw,120px)]">
         <div className="mx-auto max-w-[1760px] px-[var(--gutter)]">
-          <div data-reveal="card" className="ink-paper edge-scallop-y mx-auto max-w-[1120px] bg-sand-50 px-5 pt-12 pb-14 text-ink sm:px-10 md:px-14 md:pt-16">
+          <div data-reveal="card" className="ink-paper edge-scallop-y mx-auto max-w-[1120px] rounded-ticket bg-sand-50 px-5 pt-12 pb-14 text-ink sm:px-10 md:px-14 md:pt-16">
             <h2 className="font-display text-head font-bold uppercase leading-none">Fotos</h2>
             <p className="mt-3 max-w-[60ch] text-[17px] leading-snug">
               Fotografías de Wikimedia Commons. Muestran los lugares de cada aventura; no son fotos de Wilber ni de sus grupos.
             </p>
-            <ul className="mt-8 grid gap-x-10 gap-y-7 md:grid-cols-2">
+            <ul className="mt-8 grid gap-x-10 gap-y-8 md:grid-cols-2">
               {photos.map((p) => (
-                <li key={p.slug} className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-4">
-                  <Image src={p.srcSmall} alt={p.alt} width={96} height={72} sizes="96px" className="h-[72px] w-24 object-cover" />
+                <li key={p.slug} data-reveal="row" className="grid grid-cols-[7.5rem_minmax(0,1fr)] gap-x-4 lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-x-5">
+                  <Image
+                    src={p.srcSmall}
+                    alt={p.alt}
+                    width={176}
+                    height={132}
+                    sizes="(min-width: 1024px) 176px, 120px"
+                    className="aspect-[4/3] w-full rounded-field object-cover"
+                  />
                   <div className="flex flex-col gap-1 text-[17px] leading-snug">
                     <span className="font-semibold">{p.title}</span>
                     <span>
@@ -113,17 +123,17 @@ export default function CreditosPage() {
               ))}
             </ul>
 
-            <h2 className="mt-16 font-display text-head font-bold uppercase leading-none">Componentes</h2>
+            <h2 className="mt-24 font-display text-head font-bold uppercase leading-none">Componentes</h2>
             <CreditList items={CODE} />
 
-            <h2 className="mt-16 font-display text-head font-bold uppercase leading-none">Tipografía</h2>
+            <h2 className="mt-24 font-display text-head font-bold uppercase leading-none">Tipografía</h2>
             <CreditList items={TYPE} />
 
-            <h2 className="mt-16 font-display text-head font-bold uppercase leading-none">Mapas</h2>
+            <h2 className="mt-24 font-display text-head font-bold uppercase leading-none">Mapas</h2>
             <CreditList items={MAPS} />
           </div>
         </div>
-      </Reveal>
-    </div>
+      </section>
+    </Reveal>
   );
 }

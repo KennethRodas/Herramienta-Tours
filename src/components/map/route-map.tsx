@@ -14,7 +14,7 @@ import { RouteFallback } from "./fallback";
 import { Flyover, type FlyoverState } from "./flyover";
 import { along, clamp, easeInOut, haversine, toLine } from "./geo";
 import { readInks } from "./inks";
-import { placeLabels } from "./labels";
+import { watchLabels } from "./labels";
 import { LoadingVeil } from "./lazy";
 import { createMap, MAP_BOX, supportsWebGL2 } from "./maplibre";
 import { KIND_PRIORITY, MeetingPin, WaypointPin, useMarkerSlots, type MarkerSpec } from "./markers";
@@ -23,7 +23,7 @@ import { addRouteLayers, progressGradient, removeRouteLayers, routeFeatures } fr
 import { routeCamera, routeView, settleOnIdle, useStableRoute, type Pad, type RouteGeo } from "./routes";
 import { buildStyle } from "./style";
 import type { RouteMapProps } from "./types";
-import { frameThrottle, useMap } from "./use-map";
+import { useMap } from "./use-map";
 
 const SOURCE = "route";
 /** Keys at the top and bottom, tickets above the trail. */
@@ -110,15 +110,7 @@ export default function RouteMapImpl({ tour, flyover = false, className }: Route
       }),
       ...meetingSlots.map((s) => ({ el: s.el, lngLat: s.lngLat, priority: 80 })),
     ];
-    const run = frameThrottle(() => placeLabels(map, items));
-    run();
-    map.on("move", run);
-    map.on("resize", run);
-    return () => {
-      map.off("move", run);
-      map.off("resize", run);
-      run.cancel();
-    };
+    return watchLabels(map, items);
   }, [map, wpSlots, meetingSlots, route]);
 
   // ---- Profile from the DEM once its tiles under the route are in -----------
@@ -225,14 +217,15 @@ export default function RouteMapImpl({ tour, flyover = false, className }: Route
     flyRef.current?.release();
     setFollowing(false);
     setStep(-1);
-    if (map) map.easeTo({ ...routeView(map, route, FRAME_PAD, dimension === "3d"), duration: 900, easing: easeInOut });
+    if (map) map.easeTo({ ...routeView(map, route, FRAME_PAD, dimension === "3d"), duration: 800, easing: easeInOut });
   };
 
   const seek = (d: number, phase: ScrubPhase) => {
     const fly = flyRef.current;
     if (!fly) return;
     if (phase === "start") setStep(-1);
-    fly.seek(d, reduce);
+    // Keyboard steps jump (never animate a key press); pointer scrubs glide.
+    fly.seek(d, reduce || phase === "key");
     setFollowing(true);
   };
 
@@ -271,11 +264,13 @@ export default function RouteMapImpl({ tour, flyover = false, className }: Route
     flyState === "playing" ? "Pausa" : flyState === "paused" ? "Seguir" : flyState === "ended" ? "Repetir" : "Recorrer la ruta";
   const PlayIcon = flyState === "playing" ? Pause : flyState === "ended" ? RotateCcw : Play;
   const keyClass =
-    "pressable inline-flex h-10 items-center gap-2 bg-sand-50 px-3 text-[15px] font-semibold text-cobalt-800 hover:bg-sand-100 disabled:opacity-45";
+    "pressable inline-flex h-10 items-center gap-2 rounded-full bg-sand-50 px-3.5 text-[15px] font-semibold text-cobalt-800 hover:bg-sand-100 disabled:opacity-45";
+  // Keys that join the bar once the flyover starts rise in from 4px (@starting-style).
+  const appear = "transition-[opacity,translate] duration-200 ease-out-strong starting:translate-y-1 starting:opacity-0";
 
   return (
-    <div className={cn("wm-map flex flex-col bg-sand-300", className)}>
-      <div className="relative min-h-0 flex-1">
+    <div className={cn("flex flex-col gap-2", className)}>
+      <div className="wm-map relative min-h-0 flex-1 rounded-ticket bg-sand-300">
         <div ref={containerRef} style={MAP_BOX} />
         <LoadingVeil ready={status === "ready"} />
         {status === "loading" ? (
@@ -319,7 +314,7 @@ export default function RouteMapImpl({ tour, flyover = false, className }: Route
           <div className="absolute bottom-3 left-3 right-14 flex flex-wrap items-center gap-2">
             {reduce ? (
               <>
-                <div className="inline-grid grid-flow-col gap-[2px] bg-sand-300 p-[2px]">
+                <div className="inline-grid grid-flow-col gap-[3px] rounded-full bg-sand-300 p-[3px]">
                   <button type="button" className={keyClass} onClick={() => stepTo(step - 1)} disabled={step < 0} aria-label="Punto anterior">
                     <ChevronLeft size={18} strokeWidth={2.25} aria-hidden />
                   </button>
@@ -329,7 +324,7 @@ export default function RouteMapImpl({ tour, flyover = false, className }: Route
                   </button>
                 </div>
                 {step >= 0 && wps[step] ? (
-                  <p className="bg-sand-50 px-3 py-2 text-[15px] font-semibold leading-tight tabular" aria-live="polite">
+                  <p className={cn("rounded-full bg-sand-50 px-3.5 py-2 text-[15px] font-semibold leading-tight tabular", appear)} aria-live="polite">
                     {wps[step].name} · {step + 1}/{wps.length}
                   </p>
                 ) : null}
@@ -347,6 +342,7 @@ export default function RouteMapImpl({ tour, flyover = false, className }: Route
                 {flyState !== "idle" ? (
                   <>
                     <Segmented
+                      className={appear}
                       label="Velocidad"
                       options={[
                         { id: "1", label: "x1" },
@@ -358,13 +354,17 @@ export default function RouteMapImpl({ tour, flyover = false, className }: Route
                         if (flyRef.current) flyRef.current.rate = r === "2" ? 2 : 1;
                       }}
                     />
-                    <span ref={readoutRef} className="bg-sand-50 px-3 py-2 text-[15px] font-semibold leading-tight tabular" aria-hidden />
+                    <span
+                      ref={readoutRef}
+                      className={cn("rounded-full bg-sand-50 px-3.5 py-2 text-[15px] font-semibold leading-tight tabular", appear)}
+                      aria-hidden
+                    />
                   </>
                 ) : null}
               </>
             )}
             {following ? (
-              <button type="button" onClick={overview} className={keyClass}>
+              <button type="button" onClick={overview} className={cn(keyClass, appear)}>
                 <Scan size={18} strokeWidth={2.25} aria-hidden />
                 Vista general
               </button>

@@ -94,8 +94,8 @@ export default function WilberWhatsAppPage() {
             </thead>
             <tbody>
               {AUTOMATIONS.map(([what, when, who]) => (
-                <tr key={what} className="even:bg-surface/60">
-                  <td className="py-1.5 pr-3">{what}</td>
+                <tr key={what} className="[&>td:first-child]:rounded-l-field [&>td:last-child]:rounded-r-field even:bg-surface/60">
+                  <td className="py-1.5 pl-3 pr-3">{what}</td>
                   <td className="py-1.5 pr-3 tabular">{when}</td>
                   <td className="py-1.5">{who}</td>
                 </tr>

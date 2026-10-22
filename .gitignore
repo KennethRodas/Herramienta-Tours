@@ -42,5 +42,6 @@ yarn-error.log*
 next-env.d.ts
 
 # taste-skill screenshots
-.taste-skill/inspect*/
+.taste-skill/*/
+.taste-skill/*.txt
 .taste-skill/*.png

@@ -1,8 +1,8 @@
 /* Map module styles: the paper markers that ride on the map and the few
-   maplibre pieces that show (credits, two-finger notice). Colours are the
-   design tokens from globals.css. */
+   maplibre pieces that show (credits, two-finger notice). Colours and corner
+   radii are the design tokens from globals.css; nothing here is square. */
 
-/* Position, size and background come from utility classes on the element. */
+/* Position, size, radius and background come from utility classes on the element. */
 .wm-map {
   isolation: isolate;
   overflow: hidden;
@@ -17,7 +17,7 @@
   outline-offset: -2px;
 }
 
-/* Credits: a small paper tab, square like the rest of the print, 13px type. */
+/* Credits: a round paper tab, 13px type. */
 .wm-map .maplibregl-ctrl-attrib {
   font-family: var(--font-sans);
   font-size: 13px;
@@ -26,22 +26,22 @@
 .wm-map .maplibregl-ctrl-attrib.maplibregl-compact {
   background: var(--sand-50);
   color: var(--cobalt-800);
-  border-radius: 0;
+  border-radius: 999px;
   margin: 8px;
 }
 .wm-map .maplibregl-ctrl-attrib.maplibregl-compact-show {
-  border-radius: 0;
+  border-radius: var(--radius-field);
   max-width: min(420px, calc(100vw - 32px));
 }
 .wm-map .maplibregl-ctrl-attrib-button {
   background-color: transparent;
-  border-radius: 0;
+  border-radius: 999px;
 }
 .wm-map .maplibregl-ctrl-attrib a {
   color: var(--cobalt-800);
 }
 .wm-map .maplibregl-ctrl-attrib-button:focus-visible {
-  box-shadow: none;
+  box-shadow: none; /* taste-skill-ignore: removes maplibre's own focus glow, adds nothing */
   outline: 2px solid var(--cobalt-800);
   outline-offset: 1px;
 }
@@ -64,8 +64,9 @@
 
 /* ---- Pins: dot on the exact spot, stem, paper ticket above ---------------- */
 
+/* The marker element itself is positioned by maplibre with an inline
+   transform: never transition or transform it here, only its children. */
 .wm-marker {
-  /* maplibre positions this element with a transform; keep our own off it. */
   pointer-events: none;
 }
 .wm-marker[data-active="true"] {
@@ -108,6 +109,7 @@
   display: grid;
   gap: 1px;
   padding: 5px 11px 6px;
+  border-radius: var(--radius-stub);
   background: var(--sand-50);
   color: var(--cobalt-800);
   white-space: nowrap;
@@ -140,15 +142,17 @@
 .wm-stem {
   width: 2px;
   height: 7px;
+  border-radius: 999px;
   background: var(--cobalt-800);
   transition: opacity 180ms var(--ease-out);
 }
+/* The 2px sand ring is an outline: it follows the radius and is not a shadow. */
 .wm-dot {
   width: 10px;
   height: 10px;
   border-radius: 999px;
   background: var(--cobalt-800);
-  box-shadow: 0 0 0 2px var(--sand-50);
+  outline: 2px solid var(--sand-50);
   transition: transform 150ms var(--ease-out);
 }
 
@@ -198,29 +202,29 @@
   transform: scale(1.1);
 }
 
-/* Meeting point: a square stamp instead of a dot. */
+/* Meeting point: a rounded stamp instead of a dot. */
 .wm-pin[data-shape="square"] .wm-dot {
-  border-radius: 0;
+  border-radius: 3px;
   width: 12px;
   height: 12px;
 }
 
 /* The walker during "Recorrer la ruta". */
 .wm-walker {
-  width: 18px;
-  height: 18px;
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
   border-radius: 999px;
   background: var(--cobalt-800);
-  box-shadow:
-    0 0 0 3px var(--sand-50),
-    0 0 0 5px rgb(6 43 138 / 0.25);
+  border: 3px solid var(--sand-50);
+  outline: 2px solid rgb(6 43 138 / 0.25);
   pointer-events: none;
 }
 
 /* ---- Route editor handles ------------------------------------------------ */
 
-/* No position here: maplibre places the marker element absolutely, which is
-   also what anchors the enlarged hit area below. */
+/* The handle element is the marker (maplibre owns its transform); the knob
+   inside carries the look and the press/hover scale. */
 .wm-vertex,
 .wm-mid {
   touch-action: none;
@@ -235,47 +239,57 @@
 .wm-vertex {
   width: 14px;
   height: 14px;
-  background: var(--cobalt-800);
-  box-shadow: 0 0 0 2px var(--sand-50);
   cursor: grab;
-  transition: transform 140ms var(--ease-out);
 }
-.wm-vertex[data-end="start"] {
+.wm-vertex[data-end] {
   width: 18px;
   height: 18px;
-  border-radius: 999px;
-}
-.wm-vertex[data-end="end"] {
-  width: 18px;
-  height: 18px;
-  background: var(--sand-50);
-  box-shadow: inset 0 0 0 4px var(--cobalt-800), 0 0 0 2px var(--sand-50);
 }
 .wm-vertex:active {
   cursor: grabbing;
-  transform: scale(0.92);
-}
-@media (hover: hover) and (pointer: fine) {
-  .wm-vertex:hover {
-    transform: scale(1.15);
-  }
 }
 .wm-mid {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: var(--sand-50);
-  box-shadow: inset 0 0 0 2px var(--cobalt-600);
-  opacity: 0.9;
+  width: 12px;
+  height: 12px;
   cursor: copy;
+}
+.wm-knob {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--cobalt-800);
+  outline: 2px solid var(--sand-50);
   transition:
     transform 140ms var(--ease-out),
     opacity 140ms ease;
 }
+.wm-vertex[data-end="start"] .wm-knob {
+  border-radius: 999px;
+}
+.wm-vertex[data-end="end"] .wm-knob {
+  border-radius: 6px;
+  background: var(--sand-50);
+  border: 4px solid var(--cobalt-800);
+}
+.wm-mid .wm-knob {
+  border-radius: 999px;
+  background: var(--sand-50);
+  border: 2px solid var(--cobalt-600);
+  outline: none;
+  opacity: 0.9;
+}
+.wm-vertex:active .wm-knob {
+  transform: scale(0.92);
+}
 @media (hover: hover) and (pointer: fine) {
-  .wm-mid:hover {
+  .wm-vertex:hover .wm-knob {
+    transform: scale(1.15);
+  }
+  .wm-mid:hover .wm-knob {
     opacity: 1;
-    transform: scale(1.3);
+    transform: scale(1.25);
   }
 }
 .wm-hide-handles .wm-vertex,

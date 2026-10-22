@@ -119,7 +119,7 @@ export function NumerosScreen() {
   const days = Number(range);
   const data = useMemo(() => (idx && now !== null ? compute(idx, now, days) : null), [idx, now, days]);
 
-  if (!idx || now === null || !data) return <div className="h-[520px] animate-pulse bg-paper" aria-busy="true" />;
+  if (!idx || now === null || !data) return <div className="h-[520px] rounded-ticket bg-paper" aria-busy="true" />;
 
   const n = days === 7 ? "7 días" : "30 días";
   const channelTotal = [...data.channels.values()].reduce((s, c) => s + c.groups, 0);
@@ -138,7 +138,7 @@ export function NumerosScreen() {
             { id: "7", label: "7 días" },
             { id: "30", label: "30 días" },
           ]}
-          className="w-[200px]"
+          className="dash-seg w-[200px]"
         />
       </div>
 
@@ -169,7 +169,7 @@ export function NumerosScreen() {
         <SectionTitle id="canales" aside={`Creadas en los últimos ${n} · ${plural(channelTotal, "reserva", "reservas")}`}>
           Reservas por canal
         </SectionTitle>
-        <div className="flex flex-col gap-1.5 bg-paper px-4 py-4 text-paper-ink">
+        <div className="flex flex-col gap-1.5 rounded-ticket bg-paper px-4 py-4 text-paper-ink">
           {SOURCE_ORDER.map((k) => {
             const c = data.channels.get(k)!;
             const share = channelTotal ? c.groups / channelTotal : 0;
@@ -185,8 +185,8 @@ export function NumerosScreen() {
               >
                 <button type="button" className="grid grid-cols-[92px_minmax(0,1fr)_96px] items-center gap-3 py-1 text-left">
                   <span className="text-[15px] font-semibold">{SOURCE_LABEL[k]}</span>
-                  <span className="relative h-3.5 bg-ink/8">
-                    <span className="absolute inset-y-0 left-0 rounded-r-[3px] bg-ink transition-[width] duration-500" style={{ width: `${share * 100}%`, transitionTimingFunction: "var(--ease-out)" }} />
+                  <span className="relative h-3.5 overflow-hidden rounded-full bg-ink/8">
+                    <span className="absolute inset-y-0 left-0 rounded-full bg-ink transition-[width] duration-500" style={{ width: `${share * 100}%`, transitionTimingFunction: "var(--ease-out)" }} />
                   </span>
                   <span className="text-right text-[14px] tabular">
                     <b className="font-semibold">{c.groups}</b> <span className="text-ink-soft">· {pct(share)}</span>
@@ -259,7 +259,7 @@ function OccupancyCalendar({ idx, now }: { idx: DashIndex; now: number }) {
       <SectionTitle id="ocupacion" aside="4 semanas atrás · 6 adelante">
         Ocupación por día
       </SectionTitle>
-      <div id="ocupacion-cal" className="flex flex-col gap-3 bg-paper px-4 py-4 text-paper-ink">
+      <div id="ocupacion-cal" className="flex flex-col gap-3 rounded-ticket bg-paper px-4 py-4 text-paper-ink">
         <style>{`#ocupacion-cal [data-heat-cell="${tw}-${td}"]{outline:2px solid var(--destructive);outline-offset:2px}`}</style>
         <HeatCalendar values={values} weeks={WEEKS} endDate={new Date(`${endKey}T00:00:00Z`)} maxCount={100} unit="% de ocupación" color="var(--ink)" className="w-full">
           <div className="flex gap-2">
@@ -360,7 +360,7 @@ function RevenueByTour({ tours, label }: { tours: { id: string; name: string; co
         Ingresos por tour
       </SectionTitle>
       {total ? (
-        <div className="flex flex-col gap-4 bg-paper px-4 py-4 text-paper-ink">
+        <div className="flex flex-col gap-4 rounded-ticket bg-paper px-4 py-4 text-paper-ink">
           <DonutChart segments={segments} formatValue={(v) => formatUsd(Math.round(v))} label="Ingresos por tour" activeId={active} onActiveChange={setActive}>
             <div className="grid items-center gap-5 sm:grid-cols-[minmax(0,13rem)_1fr]">
               <DonutChartPlot className="max-w-52">
@@ -384,28 +384,31 @@ function RevenueByTour({ tours, label }: { tours: { id: string; name: string; co
               />
             </div>
           </DonutChart>
-          <table className="w-full border-collapse text-[14px]">
+          <table className="w-full border-separate border-spacing-0 text-[14px]">
             <caption className="sr-only">Ingresos por tour</caption>
             <thead>
-              <tr className="border-b border-border text-left text-[12px] text-ink-soft">
-                <th className="py-1.5 font-semibold">Tour</th>
-                <th className="py-1.5 text-right font-semibold">Cobrado</th>
-                <th className="py-1.5 text-right font-semibold">Esperado</th>
-                <th className="py-1.5 text-right font-semibold">Total</th>
+              <tr className="text-left text-[13px] text-ink-soft">
+                <th className="px-2 pb-1.5 font-semibold">Tour</th>
+                <th className="px-2 pb-1.5 text-right font-semibold">Cobrado</th>
+                <th className="px-2 pb-1.5 text-right font-semibold">Esperado</th>
+                <th className="px-2 pb-1.5 text-right font-semibold">Total</th>
               </tr>
             </thead>
             <tbody>
-              {tours.map((t) => (
+              {tours.map((t, i) => (
                 <tr
                   key={t.id}
-                  className={cn("border-b border-border/60 transition-colors duration-150", (active === t.id || (active === "otros" && !top.some((x) => x.id === t.id))) && "bg-ink/8")}
+                  className={cn(
+                    "[&>td]:px-2 [&>td]:transition-colors [&>td]:duration-150 [&>td:first-child]:rounded-l-field [&>td:last-child]:rounded-r-field",
+                    active === t.id || (active === "otros" && !top.some((x) => x.id === t.id)) ? "[&>td]:bg-ink/12" : i % 2 === 0 && "[&>td]:bg-ink/5",
+                  )}
                   onPointerEnter={() => setActive(top.some((x) => x.id === t.id) ? t.id : "otros")}
                   onPointerLeave={() => setActive(null)}
                 >
-                  <td className="py-1.5 font-semibold">{t.name}</td>
-                  <td className="py-1.5 text-right tabular">{formatUsd(Math.round(t.cobrado))}</td>
-                  <td className="py-1.5 text-right tabular">{formatUsd(Math.round(t.esperado))}</td>
-                  <td className="py-1.5 text-right font-semibold tabular">{formatUsd(Math.round(t.total))}</td>
+                  <td className="py-2 font-semibold">{t.name}</td>
+                  <td className="py-2 text-right tabular">{formatUsd(Math.round(t.cobrado))}</td>
+                  <td className="py-2 text-right tabular">{formatUsd(Math.round(t.esperado))}</td>
+                  <td className="py-2 text-right font-semibold tabular">{formatUsd(Math.round(t.total))}</td>
                 </tr>
               ))}
             </tbody>

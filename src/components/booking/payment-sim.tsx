@@ -60,7 +60,7 @@ export function PaymentSim({ bookingId }: { bookingId: string | undefined }) {
   if (booking === undefined) {
     return (
       <Shell>
-        <div className="bk-skeleton h-[480px] bg-sand-50" aria-busy="true" aria-label="Cargando pago" />
+        <div className="bk-skeleton h-[480px] rounded-ticket bg-sand-50" aria-busy="true" aria-label="Cargando pago" />
       </Shell>
     );
   }
@@ -148,7 +148,7 @@ export function PaymentSim({ bookingId }: { bookingId: string | undefined }) {
               onClick={() => void settle(o)}
               disabled={busy !== null && busy !== o}
               className={cx(
-                "h-14 w-full rounded-none text-(length:--step-body) font-semibold",
+                "h-14 w-full rounded-full text-(length:--step-body) font-semibold",
                 o === preferred ? "bg-cobalt-800 text-sand-50 hover:bg-cobalt-700" : "bg-sand-300 text-cobalt-800 hover:bg-sand-400",
               )}
             >

@@ -73,9 +73,6 @@ export function BookingLookup() {
           }}
           className="paper edge-zigzag-b flex flex-col gap-6 px-5 pb-12 pt-7 sm:px-9"
         >
-          <label htmlFor="codigo" className="text-small font-semibold">
-            Código del boleto
-          </label>
           <CodeInput
             id="codigo"
             value={code}
@@ -98,7 +95,7 @@ export function BookingLookup() {
             state={status === "success" ? "loading" : "idle"}
             loadingText="Abriendo"
             disabled={code.length < 4}
-            className="h-14 w-full rounded-none bg-cobalt-800 text-(length:--step-body) font-semibold text-sand-50 hover:bg-cobalt-700"
+            className="h-14 w-full rounded-full bg-cobalt-800 text-(length:--step-body) font-semibold text-sand-50 hover:bg-cobalt-700"
             icon={<ArrowRight className="size-5" strokeWidth={2.5} />}
           >
             Abrir boleto
@@ -127,14 +124,14 @@ export function BookingLookup() {
           <div className="flex-1">
             <PhoneField id="buscar-telefono" label="WhatsApp" value={phone} onChange={setPhone} error={phoneError} placeholder="7012 3456" />
           </div>
-          <button type="submit" className="pressable h-[52px] shrink-0 bg-cobalt-800 px-6 text-body font-semibold text-sand-50 transition-colors hover:bg-cobalt-700 sm:mt-[calc(var(--step-small)*1.45+0.5rem)]">
+          <button type="submit" className="pressable h-[52px] shrink-0 rounded-full bg-cobalt-800 px-7 text-body font-semibold text-sand-50 transition-colors hover:bg-cobalt-700 sm:mt-[calc(var(--step-small)*1.45+0.5rem)]">
             Buscar
           </button>
         </form>
 
         {sorted ? (
           sorted.length === 0 ? (
-            <p className="bk-rise bg-sand-300 px-5 py-4 text-body" role="status">
+            <p className="bk-rise rounded-field bg-sand-300 px-5 py-4 text-body" role="status">
               No hay reservas con ese número. Revisá los 8 dígitos o buscá por código.
             </p>
           ) : (
@@ -146,7 +143,7 @@ export function BookingLookup() {
                   <li key={b.id} className="bk-rise" style={{ animationDelay: `${i * 50}ms` }}>
                     <Link
                       href={`/reserva/${b.code}`}
-                      className="ticket-notch group flex items-center justify-between gap-4 bg-sand-50 py-4 pl-6 pr-5 transition-[background-color,transform] duration-200 hover:bg-sand-100 active:scale-[0.99]"
+                      className="ticket-notch group flex items-center justify-between gap-4 rounded-ticket bg-sand-50 py-4 pl-6 pr-5 transition-[background-color,transform] duration-200 hover:bg-sand-100 active:scale-[0.99]"
                       style={{ "--n": "9px" } as CSSProperties}
                     >
                       <span className="flex min-w-0 flex-col">
@@ -169,7 +166,7 @@ export function BookingLookup() {
 
         <Link
           href="/entrar?next=/cuenta"
-          className="group -mx-1 inline-flex items-center gap-2 self-start px-1 py-1 text-body font-semibold underline decoration-2 underline-offset-4 transition-colors hover:bg-sand-300"
+          className="group -mx-3 inline-flex items-center gap-2 self-start rounded-full px-3 py-1.5 text-body font-semibold underline decoration-2 underline-offset-4 transition-colors hover:bg-sand-300"
         >
           Entrá con tu WhatsApp para ver todas tus reservas
           <ArrowRight aria-hidden className="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-1" strokeWidth={2.5} />

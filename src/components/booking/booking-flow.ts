@@ -29,6 +29,7 @@ export interface FormState {
 }
 
 const MAX_GROUP = 25;
+const STEP_ORDER: Step[] = ["grupo", "datos", "resumen"];
 const pendingRelease = new Map<string, number>();
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
@@ -59,7 +60,15 @@ export function useBookingFlow(dep: DepartureView, tour: Tour, prefill?: FormSta
     }
   });
 
-  const [step, setStep] = useState<Step>("grupo");
+  const [step, setStepRaw] = useState<Step>("grupo");
+  // +1 forward, -1 back: the panel slides the next step in from the side it
+  // sits on in the tabs, so "Editar" visibly goes back.
+  const [dir, setDir] = useState<1 | -1>(1);
+  const setStep = (next: Step) => {
+    setDir(STEP_ORDER.indexOf(next) >= STEP_ORDER.indexOf(step) ? 1 : -1);
+    setStepRaw(next);
+  };
+  const [reviewTries, setReviewTries] = useState(0);
   // A prefill (break-ui worst case, development only) also asks for every seat.
   const [party, setParty] = useState<number | null>(prefill ? MAX_GROUP : (restored?.partySize ?? null));
   const [holdId, setHoldId] = useState<string | null>(restored?.id ?? null);
@@ -210,6 +219,7 @@ export function useBookingFlow(dep: DepartureView, tour: Tour, prefill?: FormSta
   const toResumen = () => {
     if (!validation.ok && missing.length) {
       setSubmitted(true);
+      setReviewTries((n) => n + 1);
       const first = (["name", "phone", "email", "notes", "paymentMethod"] as FieldKey[]).find((k) => errors[k]);
       if (first) document.getElementById(fieldId(first))?.focus();
       return;
@@ -265,6 +275,8 @@ export function useBookingFlow(dep: DepartureView, tour: Tour, prefill?: FormSta
     tour,
     now,
     step,
+    dir,
+    reviewTries,
     go: (target: Step) => {
       if (!canEnter(target)) return;
       setFailure(null);

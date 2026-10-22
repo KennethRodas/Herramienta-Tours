@@ -235,3 +235,11 @@ Fuentes: las páginas citadas en las secciones anteriores.
 - Pendientes (**SIN CONFIRMAR**): separador y codificación del hash del redirect; ortografía de `permitePagoQuickPay`; host sandbox y tarjetas de prueba; reintentos y códigos HTTP del webhook; valores de `ResultadoTransaccion`; tipo de `resultadoTransaccion` y `formaPago`; casing de `EnlacePago` en el webhook; formato de errores; renovación del token; moneda del enlace.
 - Errores de la doc: JSON de enlace y 3DS con coma final; `cantidadPorDefecto` (bool vs cantidad); `estaProductivo` ("Url" vs booleano); `tarjetaCreditoDebito` vs `tarjetaCreditoDebido`; `true` vs `True` en `esReal`; ejemplos con placeholders; notas de Bitcoin y QuickPay copiadas del texto de cuotas.
 - Otros endpoints del sitemap, no revisados: `GET /EnlacePago`, `GET /EnlacePago/{id}`, activar, desactivar y actualizar enlace, `POST /Tokenizacion`, `POST /EnlacePagoRecurrente`, `GET /Cuenta`, `GET /api/Regiones`.
+
+## 11. Estado en este proyecto (22 de octubre de 2026)
+
+- Aplicativo "Wilber Tours" en **modo prueba** (`estaProductivo: false`). Las llaves están en `.env.local` (no se sube) y en Vercel, producción y preview: `WOMPI_CLIENT_ID` y `WOMPI_CLIENT_SECRET` (esta marcada como sensible).
+- Probado: el token OAuth de `id.wompi.sv` responde 200 y `GET /Aplicativo` devuelve el aplicativo. `POST /api/pagos/wompi/enlace` crea enlaces de prueba en local y en `wilbertours.vercel.app` (`https://s.wompi.sv/…`).
+- Con las llaves puestas, el paso de pago de la reserva usa el enlace real de Wompi en vez del pago simulado.
+- Falta confirmar con un pago de prueba completo: el hash del redirect (`verifyRedirectHash`) y el cuerpo del webhook.
+- Antes de pasar a producción: generar un API Secret nuevo en el Panel (el actual se compartió en el chat), actualizarlo en Vercel y desactivar el modo prueba.

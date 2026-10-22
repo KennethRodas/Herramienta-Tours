@@ -20,11 +20,11 @@ function Phone({ children, label }: { children: ReactNode; label: string }) {
 function Lines({ y = 62 }: { y?: number }) {
   return (
     <g className="fill-ink" opacity="0.14">
-      <rect x="24" y={y} width="120" height="12" />
-      <rect x="24" y={y + 22} width="152" height="7" />
-      <rect x="24" y={y + 36} width="140" height="7" />
-      <rect x="24" y={y + 50} width="150" height="7" />
-      <rect x="24" y={y + 72} width="152" height="54" />
+      <rect x="24" y={y} width="120" height="12" rx="6" />
+      <rect x="24" y={y + 22} width="152" height="7" rx="3.5" />
+      <rect x="24" y={y + 36} width="140" height="7" rx="3.5" />
+      <rect x="24" y={y + 50} width="150" height="7" rx="3.5" />
+      <rect x="24" y={y + 72} width="152" height="54" rx="6" />
     </g>
   );
 }
@@ -46,7 +46,7 @@ export function IosShare() {
     <Phone label="Safari con el botón Compartir marcado en la barra de abajo">
       <rect x="22" y="36" width="156" height="16" rx="8" className="fill-ink" opacity="0.1" />
       <Lines />
-      <rect x="10" y="244" width="180" height="1.5" className="fill-ink" opacity="0.2" />
+      <rect x="10" y="244" width="180" height="1.5" rx="0.75" className="fill-ink" opacity="0.2" />
       <g className="stroke-ink" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round">
         <path d="M30 262l-6 6 6 6" />
         <path d="M58 262l6 6-6 6" />
@@ -111,10 +111,10 @@ export function IosConfirm() {
       <text x="84" y="104" style={T} fontSize="14" className="fill-ink">
         Wilber
       </text>
-      <rect x="84" y="112" width="84" height="6" className="fill-ink" opacity="0.15" />
+      <rect x="84" y="112" width="84" height="6" rx="3" className="fill-ink" opacity="0.15" />
       <g className="fill-ink" opacity="0.1">
-        <rect x="18" y="156" width="164" height="7" />
-        <rect x="18" y="170" width="130" height="7" />
+        <rect x="18" y="156" width="164" height="7" rx="3.5" />
+        <rect x="18" y="170" width="130" height="7" rx="3.5" />
       </g>
     </Phone>
   );
@@ -173,11 +173,11 @@ export function AndroidConfirm() {
       <text x="74" y="154" style={T} fontSize="12" className="fill-ink">
         Wilber
       </text>
-      <text x="92" y="202" style={T} fontSize="11.5" className="fill-ink" opacity="0.7">
+      <text x="108" y="202" style={T} fontSize="11.5" textAnchor="end" className="fill-ink" opacity="0.7">
         Cancelar
       </text>
-      <rect x="132" y="186" width="42" height="24" rx="12" className="fill-ink" />
-      <text x="153" y="202" style={T} fontSize="11" textAnchor="middle" className="fill-paper">
+      <rect x="116" y="186" width="56" height="24" rx="12" className="fill-ink" />
+      <text x="144" y="202" style={T} fontSize="11" textAnchor="middle" className="fill-paper">
         Instalar
       </text>
     </Phone>
@@ -208,10 +208,10 @@ export function DesktopBar() {
         <path d="M282 61h8M286 48v6M283 51l3 3 3-3" />
       </g>
       <g className="fill-ink" opacity="0.12">
-        <rect x="16" y="82" width="140" height="12" />
-        <rect x="16" y="104" width="288" height="7" />
-        <rect x="16" y="118" width="250" height="7" />
-        <rect x="16" y="132" width="270" height="7" />
+        <rect x="16" y="82" width="140" height="12" rx="6" />
+        <rect x="16" y="104" width="288" height="7" rx="3.5" />
+        <rect x="16" y="118" width="250" height="7" rx="3.5" />
+        <rect x="16" y="132" width="270" height="7" rx="3.5" />
       </g>
     </Browser>
   );

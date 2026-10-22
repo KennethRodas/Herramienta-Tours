@@ -38,7 +38,7 @@ export function EmailShell({ preview, siteUrl, children }: { preview: string; si
           <Section style={{ padding: "0 20px 18px" }}>
             <Row>
               <Column style={{ width: 44, verticalAlign: "middle" }}>
-                <Img src={`${siteUrl}/apple-icon.png`} width={36} height={36} alt="" style={{ display: "block" }} />
+                <Img src={`${siteUrl}/apple-icon.png`} width={36} height={36} alt="" style={{ display: "block", borderRadius: 9 }} />
               </Column>
               <Column style={{ verticalAlign: "middle" }}>
                 <Text style={{ margin: 0, fontFamily: CONDENSED, fontSize: 24, lineHeight: "24px", fontWeight: 700, textTransform: "uppercase", color: INK }}>Wilber</Text>
@@ -68,7 +68,7 @@ export function EmailShell({ preview, siteUrl, children }: { preview: string; si
 /** A sheet of paper with the content set inside. */
 export function Sheet({ children, padding = "28px 28px 30px" }: { children: ReactNode; padding?: string }) {
   return (
-    <Section style={{ backgroundColor: PAPER, padding }}>
+    <Section style={{ backgroundColor: PAPER, padding, borderRadius: 20 }}>
       {children}
     </Section>
   );
@@ -106,14 +106,15 @@ export function Fields({ items }: { items: [string, ReactNode][] }) {
  */
 export function Boleto({ code, title, items, stubLabel, stubValue }: { code: string; title: string; items: [string, ReactNode][]; stubLabel: string; stubValue: string }) {
   return (
-    <Section style={{ backgroundColor: PAPER }}>
+    <Section>
       <Row>
-        <Column style={{ padding: "26px 22px 26px 26px", verticalAlign: "top" }}>
+        {/* Rounded on the outside, square along the tear line (the two cells meet there). */}
+        <Column style={{ backgroundColor: PAPER, borderRadius: "20px 0 0 20px", padding: "26px 22px 26px 26px", verticalAlign: "top" }}>
           <Text style={{ margin: 0, fontFamily: CONDENSED, fontSize: 52, lineHeight: "50px", fontWeight: 700, letterSpacing: "-0.01em", color: INK }}>{code}</Text>
           <Text style={{ margin: "10px 0 0", fontFamily: SANS, fontSize: 19, lineHeight: "24px", fontWeight: 600, color: INK }}>{title}</Text>
           <Fields items={items} />
         </Column>
-        <Column style={{ width: 132, padding: "26px 18px", verticalAlign: "top", borderLeft: `3px dotted ${SAND}` }}>
+        <Column style={{ width: 132, backgroundColor: PAPER, borderRadius: "0 20px 20px 0", padding: "26px 18px", verticalAlign: "top", borderLeft: `3px dotted ${SAND}` }}>
           <Text style={label}>{stubLabel}</Text>
           <Text style={{ margin: 0, fontFamily: CONDENSED, fontSize: 34, lineHeight: "34px", fontWeight: 700, color: INK }}>{stubValue}</Text>
         </Column>
@@ -136,7 +137,7 @@ export function Action({ href, children, quiet }: { href: string; children: Reac
         fontWeight: 600,
         lineHeight: "20px",
         padding: "15px 24px",
-        borderRadius: 0,
+        borderRadius: 999,
         textDecoration: "none",
       }}
     >
@@ -166,7 +167,7 @@ export function Band({ children, tone = "sand" }: { children: ReactNode; tone?: 
   const bg = tone === "ink" ? INK : tone === "stamp" ? STAMP : SAND_300;
   const fg = tone === "sand" ? INK : PAPER;
   return (
-    <Section style={{ backgroundColor: bg, padding: "14px 26px" }}>
+    <Section style={{ backgroundColor: bg, padding: "14px 26px", borderRadius: 14 }}>
       <Text style={{ ...text, color: fg }}>{children}</Text>
     </Section>
   );

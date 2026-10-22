@@ -47,17 +47,16 @@ export function EventLog({ className, limit = 120 }: { className?: string; limit
           </button>
         ))}
       </div>
-      <ol data-lenis-prevent className="min-h-0 flex-1 space-y-px overflow-y-auto">
+      <ol data-lenis-prevent className="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1">
         <AnimatePresence initial={false}>
           {list.map((e) => (
             <motion.li
               key={e.id}
-              layout={reduce ? false : "position"}
-              initial={reduce ? false : { opacity: 0, x: -12 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
-              className="grid grid-cols-[10px_1fr] gap-3 bg-cobalt-900 px-3 py-2.5"
+              initial={reduce ? false : { opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, transition: { duration: 0.1 } }}
+              transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
+              className="grid grid-cols-[10px_1fr] gap-3 rounded-field bg-cobalt-900 px-3 py-2.5"
             >
               <span className={cn("mt-1.5 size-2.5 rounded-full", tone(e))} aria-hidden />
               <span className="min-w-0">

@@ -27,7 +27,7 @@ export function HoldBand({ flow, className }: { flow: BookingFlow; className?: s
           animate={{ opacity: 1, y: 0 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
           transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
-          className={cx("relative overflow-hidden", holdLive ? (low ? "bg-stamp text-sand-50" : "field-ink") : "bg-sand-300 text-ink", className)}
+          className={cx("relative overflow-hidden transition-colors duration-300", holdLive ? (low ? "bg-stamp text-sand-50" : "field-ink") : "bg-sand-300 text-ink", className)}
         >
           {holdLive && hold ? (
             <div className="flex items-center justify-between gap-4 px-5 py-3">
@@ -51,7 +51,7 @@ export function HoldBand({ flow, className }: { flow: BookingFlow; className?: s
                 type="button"
                 onClick={() => void flow.rehold()}
                 disabled={busy !== null}
-                className="pressable h-9 bg-cobalt-800 px-4 text-small font-semibold text-sand-50 hover:bg-cobalt-700 disabled:opacity-50"
+                className="pressable h-9 rounded-full bg-cobalt-800 px-4 text-small font-semibold text-sand-50 hover:bg-cobalt-700 disabled:opacity-50"
               >
                 {busy === "hold" ? "Apartando…" : "Apartar de nuevo"}
               </button>

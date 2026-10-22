@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { Map as MLMap } from "maplibre-gl";
 import type { Route, Tour, Waypoint } from "@/lib/domain/types";
-import { along, boundsOf, clamp, toLine, type LL } from "./geo";
+import { along, boundsOf, clamp, easeInOut, toLine, type LL } from "./geo";
 import type { MapPadding } from "./types";
 
 // What the maps need from a tour, with an identity that only changes when the
@@ -189,7 +189,7 @@ export function settleOnIdle(map: MLMap, compute: () => View | null, reduce: boo
     const a = map.project(v.center);
     const b = map.project(map.getCenter());
     if (Math.abs(v.zoom - map.getZoom()) < 0.04 && Math.hypot(a.x - b.x, a.y - b.y) < 6) return;
-    map.easeTo({ ...v, duration: reduce ? 0 : 450 });
+    map.easeTo({ ...v, duration: reduce ? 0 : 400, easing: easeInOut });
   };
   map.on("movestart", onMoveStart);
   map.once("idle", onIdle);

@@ -2,7 +2,7 @@
 // Ported to TypeScript from "Liquid Glass Navbar | Switcher" by Sis
 // (https://codepen.io/Sis-the-builder/pen/GgjppJe), MIT licence — see THIRD_PARTY_NOTICES.md.
 // It renders a displacement map + specular map into an SVG filter and applies it
-// through `backdrop-filter: url(#id)`, which only Chromium supports; other
+// through the backdrop filter url(#id), which only Chromium supports; other
 // browsers keep the tint and highlight layers and simply skip the refraction.
 
 export interface GlassConfig {

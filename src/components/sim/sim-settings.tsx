@@ -20,7 +20,7 @@ export function SimSettingsPanel({ className }: { className?: string }) {
   const settings = useSettings();
   const state = useSimState();
   const [seed, setSeed] = useState("");
-  if (!settings) return <div className={cn("h-64 animate-pulse bg-cobalt-900", className)} />;
+  if (!settings) return <div className={cn("h-64 rounded-ticket bg-cobalt-900", className)} />;
 
   const exportJson = () => {
     if (!state) return;
@@ -70,7 +70,7 @@ export function SimSettingsPanel({ className }: { className?: string }) {
         <Switch checked={settings.catalogEmpty} onCheckedChange={(v) => void sim.updateSettings({ catalogEmpty: v })} ariaLabel="Catálogo vacío" />
       </Row>
 
-      <div className="mt-4 space-y-2 bg-cobalt-900 p-4">
+      <div className="mt-4 space-y-2 rounded-ticket bg-cobalt-900 p-4">
         <p className="text-[15px]">
           Semilla actual <span className="font-semibold tabular">{state?.seed}</span>. La misma semilla genera el mismo mundo.
         </p>

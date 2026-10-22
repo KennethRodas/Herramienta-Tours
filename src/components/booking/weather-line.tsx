@@ -30,7 +30,7 @@ export function WeatherLine({ tour, startsAt }: { tour: Tour; startsAt: string }
   }, [lat, lng, startsAt]);
 
   if (!result || result.for !== startsAt) {
-    return <p className="bk-skeleton h-6 w-3/4 bg-sand-300" aria-label="Cargando pronóstico" />;
+    return <p className="bk-skeleton h-6 w-3/4 rounded-full bg-sand-300" aria-label="Cargando pronóstico" />;
   }
   const real = result.data;
   if (real) {

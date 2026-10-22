@@ -76,7 +76,7 @@ export default function SimuladorPage() {
             <H2>Ajustes</H2>
             <SimSettingsPanel />
           </section>
-          <RealWhatsAppPanel className="bg-cobalt-900 p-4" />
+          <RealWhatsAppPanel className="rounded-ticket bg-cobalt-900 p-4" />
         </div>
 
         <div className="min-w-0 space-y-12">

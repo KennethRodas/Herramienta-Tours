@@ -7,7 +7,7 @@ import type { CSSProperties } from "react";
 import { SPRING_PANEL } from "@/lib/ease";
 import { useHoverCapable } from "@/lib/hooks/use-hover-capable";
 
-const TICKET = "ticket-notch absolute inset-0";
+const TICKET = "ticket-notch absolute inset-0 rounded-ticket";
 const notch = { ["--n" as string]: "18px" } as CSSProperties;
 
 export function NotFoundTickets() {

@@ -35,8 +35,8 @@ export default async function DeparturePage({ params, searchParams }: Props) {
   const worst = dev && query.data === "peor";
   return (
     <div className="pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-32">
-      <DepartureBooking id={id} worst={worst} />
       {dev ? <DevDataToggle worst={worst} /> : null}
+      <DepartureBooking id={id} worst={worst} />
     </div>
   );
 }

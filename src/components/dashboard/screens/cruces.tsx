@@ -26,7 +26,7 @@ export function CrucesScreen() {
   const { open } = useDash();
   const [allState, runAll] = useAsyncAction();
 
-  if (!idx || now === null || !conflicts || !stats) return <div className="h-[520px] animate-pulse bg-paper" aria-busy="true" />;
+  if (!idx || now === null || !conflicts || !stats) return <div className="h-[520px] rounded-ticket bg-paper" aria-busy="true" />;
 
   const risk = conflicts.reduce((n, c) => n + c.costRiskUsd, 0);
   const fixable = conflicts.filter((c) => c.fix);
@@ -136,7 +136,7 @@ function ConflictCard({ c, refs, onOpen }: { c: Conflict; refs: Map<string, stri
       toast.success(`${c.fix?.label} · ${formatUsd(c.costRiskUsd)} protegidos`);
     });
   return (
-    <div className="relative flex flex-col gap-3 bg-paper py-4 pr-4 pl-5 text-paper-ink sm:pr-5 sm:pl-6">
+    <div className="relative flex flex-col gap-3 overflow-hidden rounded-ticket bg-paper py-4 pr-4 pl-5 text-paper-ink sm:pr-5 sm:pl-6">
       <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1.5", c.severity === "alta" ? "bg-destructive" : "bg-destructive/40")} />
       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
         <Stamp tilt={false} className="text-[13px]">
@@ -152,7 +152,7 @@ function ConflictCard({ c, refs, onOpen }: { c: Conflict; refs: Map<string, stri
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {c.departureIds.map((id) => (
-          <button key={id} type="button" onClick={() => onOpen(id)} className="pressable inline-flex h-9 items-center gap-1 bg-ink/8 px-3 font-display text-[16px] font-bold uppercase hover:bg-ink/14">
+          <button key={id} type="button" onClick={() => onOpen(id)} className="pressable inline-flex h-9 items-center gap-1 rounded-full bg-ink/8 px-3.5 font-display text-[16px] font-bold uppercase hover:bg-ink/14">
             {refs.get(id) ?? "Salida"} <ChevronRight className="size-4" aria-hidden />
           </button>
         ))}

@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react";
 import { useEffect, useRef, type ReactNode } from "react";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { BUSINESS, meetingPointById } from "@/content/catalog";
 import { formatDayLong, formatPhone, formatTime, formatUsd, plural, waLink } from "@/lib/domain/format";
 import { contactWilberText } from "@/lib/whatsapp/templates";
@@ -32,6 +32,14 @@ const STEPS: { id: Step; label: string }[] = [
 ];
 
 const EASE = [0.23, 1, 0.32, 1] as const;
+
+// d = +1 forward, -1 back, 0 reduced motion (a plain crossfade).
+const STEP_VARIANTS: Variants = {
+  enter: (d: number) => (d ? { opacity: 0, x: 18 * d, filter: "blur(3px)" } : { opacity: 0 }),
+  center: { opacity: 1, x: 0, filter: "blur(0px)", transition: { duration: 0.24, ease: EASE } },
+  exit: (d: number) =>
+    d ? { opacity: 0, x: -14 * d, filter: "blur(3px)", transition: { duration: 0.15, ease: EASE } } : { opacity: 0, transition: { duration: 0.12 } },
+};
 
 export function BookingPanel({ flow, variant }: { flow: BookingFlow; variant: "inline" | "sheet" }) {
   const reduce = useReducedMotion();
@@ -66,12 +74,16 @@ export function BookingPanel({ flow, variant }: { flow: BookingFlow; variant: "i
             inline && "overflow-y-auto overscroll-contain [scrollbar-color:var(--cobalt-300)_transparent] [scrollbar-width:thin]",
           )}
         >
-          <AnimatePresence mode="popLayout" initial={false}>
+          {/* Steps slide along the tabs' axis: forward comes in from the right,
+              back ("Editar") from the left. Exit is quicker than entry. */}
+          <AnimatePresence mode="popLayout" initial={false} custom={reduce ? 0 : flow.dir}>
             <motion.div
               key={view}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10, filter: "blur(4px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.24, ease: EASE } }}
-              exit={reduce ? { opacity: 0, transition: { duration: 0.12 } } : { opacity: 0, y: -8, filter: "blur(4px)", transition: { duration: 0.16, ease: EASE } }}
+              custom={reduce ? 0 : flow.dir}
+              variants={STEP_VARIANTS}
+              initial="enter"
+              animate="center"
+              exit="exit"
               className="flex min-h-full flex-1 flex-col"
             >
               {view === "falla" ? (
@@ -109,9 +121,9 @@ function StepTabs({ flow }: { flow: BookingFlow }) {
             disabled={!enabled}
             onClick={() => flow.go(s.id)}
             className={cx(
-              "relative -mb-px inline-flex h-11 items-center gap-1 px-3.5 text-small font-semibold transition-[background-color,color,transform] duration-200 [clip-path:polygon(8px_0,calc(100%-8px)_0,100%_100%,0_100%)] sm:gap-1.5 sm:px-5",
+              "relative -mb-px inline-flex h-11 items-center gap-1 rounded-t-field px-3.5 text-small font-semibold transition-[background-color,color,transform] duration-200 sm:gap-1.5 sm:px-5",
               current ? "h-12 bg-sand-50 text-ink" : "bg-sand-300 text-ink hover:bg-sand-100 active:scale-[0.97]",
-              !enabled && "cursor-not-allowed text-ink-soft hover:bg-sand-300 active:scale-100",
+              !enabled && "cursor-not-allowed bg-sand-200 text-cobalt-600 hover:bg-sand-200 active:scale-100",
             )}
           >
             {done && !current ? <Check aria-hidden className="size-3.5" strokeWidth={3} /> : null}
@@ -149,7 +161,7 @@ function GroupView({ flow }: { flow: BookingFlow }) {
               onValueChange={(v) => flow.pick(Number(v))}
               visibleCount={3}
               itemHeight={44}
-              className="w-28 rounded-none border-0 bg-sand-100 font-display text-(length:--step-lead) font-bold"
+              className="w-28 rounded-field border-0 bg-sand-100 font-display text-(length:--step-lead) font-bold"
             />
           ) : (
             <div id={fieldId("partySize")} tabIndex={-1} className="field-ink w-max outline-none" style={{ backgroundColor: "transparent" }}>
@@ -195,7 +207,7 @@ function GroupView({ flow }: { flow: BookingFlow }) {
           loadingText="Apartando"
           onClick={() => void flow.apartar()}
           disabled={maxParty < 1}
-          className="h-14 w-full rounded-none bg-cobalt-800 text-(length:--step-body) font-semibold text-sand-50 hover:bg-cobalt-700"
+          className="h-14 w-full rounded-full bg-cobalt-800 text-(length:--step-body) font-semibold text-sand-50 hover:bg-cobalt-700"
           icon={<ArrowRight className="size-5" strokeWidth={2.5} />}
         >
           {flow.holdLive && flow.hold?.partySize === size ? "Seguir" : `Apartar ${plural(size, "cupo", "cupos")}`}
@@ -239,7 +251,7 @@ function DatosView({ flow }: { flow: BookingFlow }) {
           <button
             type="button"
             onClick={flow.clearAccount}
-            className="pressable -my-1 px-1 py-1 font-semibold underline decoration-2 underline-offset-4 hover:bg-sand-300"
+            className="pressable -my-1 rounded-full px-2 py-1 font-semibold underline decoration-2 underline-offset-4 hover:bg-sand-300"
           >
             Cambiar
           </button>
@@ -289,9 +301,10 @@ function DatosView({ flow }: { flow: BookingFlow }) {
           Revisar
           <ArrowRight aria-hidden className="size-5" strokeWidth={2.5} />
         </button>
-        {flow.submitted && flow.missing.length ? (
-          <Note tone="stamp">{flow.missing.length === 1 ? "Falta un dato." : `Faltan ${flow.missing.length} datos.`}</Note>
-        ) : null}
+        {/* Every blocked "Revisar" answers: the line shakes, and focus is already on the first field to fix. */}
+        <Shake signal={flow.reviewTries}>
+          <Note tone="stamp">{flow.submitted && flow.missing.length ? (flow.missing.length === 1 ? "Falta un dato." : `Faltan ${flow.missing.length} datos.`) : null}</Note>
+        </Shake>
       </ActionStrip>
     </form>
   );
@@ -321,7 +334,7 @@ function SummaryRow({
     // whole width; from `sm` the three columns run side by side.
     <div
       className={cx(
-        "relative grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 py-2.5 pl-3 transition-colors duration-200 sm:grid-cols-[6.5rem_minmax(0,1fr)_auto]",
+        "relative grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 overflow-hidden rounded-field py-2.5 pl-3 transition-colors duration-200 sm:grid-cols-[6.5rem_minmax(0,1fr)_auto]",
         flag && "bg-stamp/8",
       )}
     >
@@ -335,7 +348,7 @@ function SummaryRow({
         <button
           type="button"
           onClick={onEdit}
-          className="pressable -my-1 px-2 py-1 text-small font-semibold underline decoration-2 underline-offset-4 hover:bg-sand-300"
+          className="pressable -my-1 rounded-full px-2.5 py-1 text-small font-semibold underline decoration-2 underline-offset-4 hover:bg-sand-300"
           aria-label={`Editar ${label.toLowerCase()}`}
         >
           Editar
@@ -394,7 +407,7 @@ function ResumenView({ flow }: { flow: BookingFlow }) {
         </dl>
       </Shake>
 
-      <div className="flex items-end justify-between gap-4 bg-sand-100 px-4 py-3.5">
+      <div className="flex items-end justify-between gap-4 rounded-field bg-sand-100 px-4 py-3.5">
         <span className="text-body font-semibold">Total</span>
         <span className="flex flex-col items-end">
           <span className="tabular font-display text-head font-bold leading-none">{formatUsd(flow.total)}</span>
@@ -407,36 +420,55 @@ function ResumenView({ flow }: { flow: BookingFlow }) {
       </div>
 
       <ActionStrip>
-        <div className={cx(busy && "pointer-events-none")}>
-          {touch ? (
-            <SlideActionButton
-              onComplete={() => void flow.confirm()}
-              completeLabel={blocked ? "Revisá los datos" : "Reservando"}
-              resetDelay={blocked ? 900 : 60_000}
-              className="h-16 w-full rounded-none bg-sand-300 ring-0"
-              thumbClassName="rounded-none bg-cobalt-800 text-sand-50 size-14"
-              fillClassName="bg-cobalt-800"
+        {/* Once the hold or slide completes, the control gives way to a filled
+            "Reservando" pill until the ticket opens: releasing the finger must
+            not make the button look idle again while the booking is on its way. */}
+        <AnimatePresence mode="popLayout" initial={false}>
+          {busy ? (
+            <motion.div
+              key="reservando"
+              role="status"
+              initial={{ opacity: 0, filter: "blur(3px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              transition={{ duration: 0.18, ease: EASE }}
+              className="flex h-16 items-center justify-center gap-2.5 rounded-full bg-cobalt-950 text-body font-semibold text-sand-50"
             >
-              Deslizá para confirmar
-            </SlideActionButton>
+              <Loader2 aria-hidden className="size-5 animate-spin" strokeWidth={2.5} />
+              Reservando
+            </motion.div>
           ) : (
-            <HoldActionButton
-              type="horizontal"
-              holdDuration={1100}
-              onHoldComplete={() => void flow.confirm()}
-              holdingLabel="Seguí presionando"
-              completeLabel={blocked ? "Revisá los datos" : "Reservando"}
-              disabled={busy}
-              className="h-16 w-full min-w-0 bg-cobalt-800 text-sand-50 [--hold-radius:0px] hover:bg-cobalt-700"
-              // Clipping the fill drops beui's liquid edge, which peeks in at rest
-              // on a horizontal fill; what is left is a straight ink bar filling up.
-              fillClassName="overflow-hidden bg-cobalt-950"
-              labelClassName="text-(length:--step-body) font-semibold"
-            >
-              Mantené para confirmar
-            </HoldActionButton>
+            <motion.div key="confirmar" exit={{ opacity: 0, transition: { duration: 0.12 } }}>
+              {touch ? (
+                <SlideActionButton
+                  onComplete={() => void flow.confirm()}
+                  completeLabel={blocked ? "Revisá los datos" : "Reservando"}
+                  resetDelay={blocked ? 900 : 60_000}
+                  className="h-16 w-full rounded-full bg-sand-300 ring-0"
+                  // A light thumb reads on the sand track and on the ink fill behind it.
+                  thumbClassName="rounded-full bg-sand-50 text-cobalt-800 size-14"
+                  fillClassName="bg-cobalt-800"
+                >
+                  Deslizá para confirmar
+                </SlideActionButton>
+              ) : (
+                <HoldActionButton
+                  type="horizontal"
+                  holdDuration={1100}
+                  onHoldComplete={() => void flow.confirm()}
+                  holdingLabel="Seguí presionando"
+                  completeLabel="Revisá los datos"
+                  className="h-16 w-full min-w-0 bg-cobalt-800 text-sand-50 [--hold-radius:9999px] hover:bg-cobalt-700"
+                  // Clipping the fill drops beui's liquid edge, which peeks in at rest
+                  // on a horizontal fill; what is left is a straight ink bar filling up.
+                  fillClassName="overflow-hidden bg-cobalt-950"
+                  labelClassName="text-(length:--step-body) font-semibold"
+                >
+                  Mantené para confirmar
+                </HoldActionButton>
+              )}
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
         <Note tone="stamp">{blocked && flow.attempts > 0 ? "Completá los datos marcados. No se envió la reserva." : null}</Note>
       </ActionStrip>
     </div>
@@ -470,7 +502,7 @@ function FailureView({ flow }: { flow: BookingFlow }) {
             state={flow.busy === "hold" ? "loading" : "idle"}
             loadingText="Apartando"
             onClick={() => void flow.reduceTo(f.seatsLeft)}
-            className="h-14 w-full rounded-none bg-cobalt-800 text-(length:--step-body) font-semibold text-sand-50 hover:bg-cobalt-700"
+            className="h-14 w-full rounded-full bg-cobalt-800 text-(length:--step-body) font-semibold text-sand-50 hover:bg-cobalt-700"
           >
             {`Reservar para ${plural(f.seatsLeft, "persona", "personas")}`}
           </StatefulButton>

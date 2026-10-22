@@ -45,7 +45,7 @@ export function ResumenWilber({ digest, siteUrl }: { digest: Digest; siteUrl: st
         return (
           <Section key={departure.id}>
             <Gap h={12} />
-            <Section style={{ backgroundColor: INK, padding: "16px 24px" }}>
+            <Section style={{ backgroundColor: INK, padding: "16px 24px", borderRadius: "20px 20px 0 0" }}>
               <Row>
                 <Column style={{ verticalAlign: "bottom" }}>
                   <Text style={{ margin: 0, fontFamily: CONDENSED, fontSize: 26, lineHeight: "26px", fontWeight: 700, textTransform: "uppercase", color: PAPER }}>
@@ -62,7 +62,7 @@ export function ResumenWilber({ digest, siteUrl }: { digest: Digest; siteUrl: st
                 </Column>
               </Row>
             </Section>
-            <Section style={{ backgroundColor: PAPER, padding: "6px 24px 14px" }}>
+            <Section style={{ backgroundColor: PAPER, padding: "6px 24px 14px", borderRadius: "0 0 20px 20px" }}>
               {list.length === 0 ? (
                 <Text style={{ ...text, paddingTop: 10 }}>Sin reservas.</Text>
               ) : (

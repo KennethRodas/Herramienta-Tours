@@ -30,7 +30,7 @@ function Row({ b, startsAt, price }: { b: Booking; startsAt?: string; price?: nu
     <li>
       <Link
         href={`/reserva/${b.code}`}
-        className="pressable grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 bg-sand-50 px-5 py-4 hover:bg-sand-100 sm:grid-cols-[9rem_1fr_auto]"
+        className="pressable grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 rounded-field bg-sand-50 px-5 py-4 hover:bg-sand-100 sm:grid-cols-[9rem_1fr_auto]"
       >
         <span className="font-display text-2xl font-bold uppercase leading-none tabular">{b.code}</span>
         <span className="col-span-2 row-start-2 min-w-0 sm:col-span-1 sm:row-start-1">
@@ -76,7 +76,7 @@ export function AccountView() {
   if (!ready || !customer) {
     return (
       <main className="mx-auto max-w-4xl px-[var(--gutter)] pb-32 pt-12">
-        <div className="h-48 animate-pulse bg-sand-300" />
+        <div className="h-48 rounded-ticket bg-sand-300" />
       </main>
     );
   }
@@ -102,7 +102,7 @@ export function AccountView() {
 
   return (
     <main className="mx-auto max-w-4xl px-[var(--gutter)] pb-32 pt-12">
-      <section className="field-ink edge-zigzag-b px-6 pb-12 pt-8 sm:px-10">
+      <section className="field-ink edge-zigzag-b rounded-t-ticket px-6 pb-12 pt-8 sm:px-10">
         <AnimatePresence mode="wait" initial={false}>
           {editing ? (
             <motion.form
@@ -110,7 +110,7 @@ export function AccountView() {
               onSubmit={save}
               initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
+              exit={{ opacity: 0, transition: { duration: 0.1 } }}
               transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
               className="paper grid gap-5 p-6 sm:grid-cols-2"
             >
@@ -160,7 +160,7 @@ export function AccountView() {
             ))}
           </ul>
         ) : (
-          <div className="flex flex-wrap items-center justify-between gap-4 bg-sand-300 px-5 py-5">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-ticket bg-sand-300 px-5 py-5">
             <p className="text-body">No tenés reservas próximas con este número.</p>
             <ButtonLink href="/aventuras">Ver aventuras</ButtonLink>
           </div>

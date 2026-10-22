@@ -149,7 +149,7 @@ export function LiveIsland({ className }: { className?: string }) {
             >
               <DynamicIslandView id="aviso" className="px-5 py-3.5">
                 <span className="flex w-[min(78vw,340px)] flex-col gap-1">
-                  <span className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.04em] opacity-75">
+                  <span className="flex items-center gap-2 text-[14px] font-semibold opacity-80">
                     <span className={cn("size-2 rounded-full", current.stamp ? "bg-destructive" : "bg-background")} />
                     {current.title}
                   </span>

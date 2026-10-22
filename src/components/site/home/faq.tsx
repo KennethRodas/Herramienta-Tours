@@ -7,18 +7,19 @@ import { BUSINESS } from "@/content/catalog";
 import { formatUsd, waLink } from "@/lib/domain/format";
 import type { Tour } from "@/lib/domain/types";
 import { useTours } from "@/lib/sim/hooks";
-import { cn } from "@/lib/utils";
+import { FolderTab } from "../folder-tab";
 import { useReveal } from "../reveal";
 
-// Preguntas as index cards filed in a drawer: each card's tab steps right, each
-// card overlaps the one behind it, one card is open at a time.
+// Preguntas as index cards filed in a drawer: each card has a manila tab that
+// steps right, each card lies over the one behind it (its rounded corners show
+// that card), one card is open at a time.
 
 const LIST = new Intl.ListFormat("es", { style: "long", type: "conjunction" });
 
 const TONES = [
-  { card: "bg-sand-50 text-cobalt-800", button: "primary" as const },
-  { card: "bg-sand-400 text-cobalt-800", button: "primary" as const },
-  { card: "bg-cobalt-800 text-sand-50", button: "inverse" as const },
+  { c: "var(--sand-50)", t: "var(--cobalt-800)", button: "primary" as const },
+  { c: "var(--sand-400)", t: "var(--cobalt-800)", button: "primary" as const },
+  { c: "var(--cobalt-800)", t: "var(--sand-50)", button: "inverse" as const },
 ];
 
 type Item = { id: string; tab: string; q: string; a: (button: "primary" | "inverse") => ReactNode };
@@ -142,15 +143,16 @@ export function Faq() {
               const tone = TONES[i % TONES.length];
               const open = openId === item.id;
               return (
-                <div key={item.id} data-reveal="card" className="relative" style={{ zIndex: i + 1 }}>
+                <div key={item.id} data-reveal="card" className="faq-item relative" style={{ zIndex: i + 1 }}>
                   <Collapsible
                     open={open}
                     onOpenChange={(next) => setOpenId(next ? item.id : null)}
-                    className={cn("faq-card", tone.card)}
-                    style={{ ["--i" as string]: i } as CSSProperties}
+                    className="faq-card"
+                    data-pos={i % 3}
+                    style={{ ["--i" as string]: i, ["--c" as string]: tone.c, ["--t" as string]: tone.t } as CSSProperties}
                   >
                     <CollapsibleTrigger render={<button type="button" className="faq-trigger" />}>
-                      <span className={cn("faq-tab", tone.card)}>{item.tab}</span>
+                      <FolderTab>{item.tab}</FolderTab>
                       <span className="faq-q">{item.q}</span>
                       <span aria-hidden className="faq-sign" />
                     </CollapsibleTrigger>
@@ -169,28 +171,30 @@ export function Faq() {
 }
 
 const FAQ_CSS = `
-.faq-stack { --tab-h: 34px; --tab-w: 144px; --under: var(--tab-h); margin-top: calc(var(--tab-h) + 32px); }
-@media (min-width: 768px) { .faq-stack { --tab-h: 40px; --tab-w: 184px; margin-top: calc(var(--tab-h) + 48px); } }
-.faq-card { padding-bottom: var(--under); }
+.faq-stack { --cr: var(--radius-ticket); margin-top: 72px; }
+@media (min-width: 768px) { .faq-stack { margin-top: 88px; } }
+.faq-card { background: var(--c); color: var(--t); border-radius: var(--cr); padding-bottom: calc(40px + var(--cr)); }
+.faq-item + .faq-item { margin-top: calc(-1 * var(--cr)); }
 .faq-trigger {
   position: relative; display: flex; width: 100%; min-height: 60px; align-items: center; gap: 16px;
-  padding: 12px 20px; text-align: left; cursor: pointer; color: inherit;
+  padding: 12px 20px; text-align: left; cursor: pointer; color: inherit; border-radius: var(--cr) var(--cr) 0 0;
   transition: transform var(--dur-press) var(--ease-out);
 }
 @media (min-width: 768px) { .faq-trigger { min-height: 64px; padding: 12px 28px; } }
+.faq-item:first-child .faq-trigger { padding-top: 16px; }
 .faq-trigger:active { transform: scale(0.992); }
 .faq-trigger:focus-visible { outline: 2px solid currentColor; outline-offset: -6px; }
-.faq-tab {
-  position: absolute; bottom: calc(100% - 1px); height: calc(var(--tab-h) + 1px); width: var(--tab-w);
-  left: calc(var(--i) * min(150px, (100% - var(--tab-w)) / (var(--n) - 1)));
-  display: flex; align-items: center; justify-content: center; padding: 0 8px;
-  font-size: 17px; font-weight: 600; line-height: 1; white-space: nowrap;
-  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 100%, 0 100%);
+/* Tabs: left, centre, right on a phone; stepping right on wider screens. */
+.faq-trigger > .ft { left: 20px; }
+.faq-card[data-pos="1"] .faq-trigger > .ft { left: 50%; transform: translateX(-50%); }
+.faq-card[data-pos="2"] .faq-trigger > .ft { left: auto; right: 20px; }
+@media (min-width: 768px) {
+  .faq-card[data-pos] .faq-trigger > .ft { left: calc(20px + var(--i) * min(150px, (100% - 240px) / (var(--n) - 1))); right: auto; transform: none; }
 }
 .faq-q { flex: 1; font-size: var(--step-lead); font-weight: 600; line-height: 1.15; text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: 0.2em; text-decoration-color: transparent; transition: text-decoration-color var(--dur-fast) ease; }
 @media (hover: hover) and (pointer: fine) { .faq-trigger:hover .faq-q { text-decoration-color: currentColor; } }
 .faq-sign { position: relative; width: 18px; height: 18px; flex: none; }
-.faq-sign::before, .faq-sign::after { content: ""; position: absolute; left: 0; top: 8px; width: 18px; height: 2.5px; background: currentColor; transition: transform var(--dur-base) var(--ease-out); }
+.faq-sign::before, .faq-sign::after { content: ""; position: absolute; left: 0; top: 7.75px; width: 18px; height: 2.5px; border-radius: 2px; background: currentColor; transition: transform var(--dur-base) var(--ease-out); }
 .faq-sign::after { transform: rotate(90deg); }
 .faq-trigger[data-state="open"] .faq-sign::after { transform: rotate(0deg); }
 .faq-answer { padding: 4px 20px 16px; max-width: 62ch; font-size: var(--step-body); line-height: 1.45; }

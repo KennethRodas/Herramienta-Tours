@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { WaText } from "@/components/whatsapp/wa-text";
 import { DAY, formatDayShort, formatTime, plural } from "@/lib/domain/format";
 import { useDepartures, useNow } from "@/lib/sim/hooks";
-import { effectiveTours, sim } from "@/lib/sim/store";
+import { sim } from "@/lib/sim/store";
 import * as wa from "@/lib/whatsapp/templates";
 import { cn } from "@/lib/utils";
 import { useDash } from "./context";
@@ -37,7 +37,7 @@ export function WeatherAlertForm({ departureId }: { departureId?: string }) {
     return (
       <>
         <SheetHeader title="Aviso de clima" />
-        <div className="h-40 animate-pulse bg-ink/5" />
+        <div className="h-40 rounded-ticket bg-ink/5" />
       </>
     );
   }
@@ -61,19 +61,9 @@ export function WeatherAlertForm({ departureId }: { departureId?: string }) {
     run(async () => {
       const text = detail.trim();
       if (!text) throw new Error("vacío");
-      await sim.commit((d, at) => {
-        const dep = d.departures.find((x) => x.id === chosen.id);
-        if (!dep) return;
-        const t = effectiveTours(d).find((x) => x.id === dep.tourId);
-        if (!t) return;
-        let count = 0;
-        for (const b of d.bookings.filter((x) => x.departureId === dep.id && x.status !== "cancelada" && x.status !== "no_show")) {
-          sim.queueWa(d, at, b.phone, "alerta_clima", wa.weatherAlert(b, dep, t, text), { bookingId: b.id, departureId: dep.id });
-          count += b.partySize;
-        }
-        sim.logEvent(d, at, "mensaje.enviado", "wilber", `Aviso de clima a ${count} personas de ${t.shortName} ${formatDayShort(dep.startsAt)}.`);
-      });
-      toast.success(`Aviso enviado a ${plural(groups.length, "grupo", "grupos")} · ${plural(people, "persona", "personas")}`);
+      const sent = await sim.weatherAlert(chosen.id, text);
+      if (!sent) throw new Error("sin grupos");
+      toast.success(`Aviso enviado a ${plural(sent, "grupo", "grupos")} · ${plural(people, "persona", "personas")}`);
       window.setTimeout(close, 600);
     });
 
@@ -99,7 +89,7 @@ export function WeatherAlertForm({ departureId }: { departureId?: string }) {
                 aria-checked={on}
                 onClick={() => setSelected(d.id)}
                 className={cn(
-                  "pressable flex shrink-0 flex-col items-start px-3 py-2 text-left whitespace-nowrap transition-colors duration-150",
+                  "pressable flex shrink-0 flex-col items-start rounded-field px-3.5 py-2 text-left whitespace-nowrap transition-colors duration-150",
                   on ? "bg-ink text-paper" : "bg-ink/8 text-ink hover:bg-ink/14",
                 )}
               >
@@ -132,12 +122,12 @@ export function WeatherAlertForm({ departureId }: { departureId?: string }) {
       {preview ? (
         <section className="flex flex-col gap-2">
           <FieldLabel>Así lo recibe cada grupo</FieldLabel>
-          <div className="max-w-[340px] self-start bg-ink/8 px-3.5 py-2.5 text-[15px] leading-snug text-ink">
+          <div className="max-w-[340px] self-start rounded-field rounded-tl-stub bg-ink/8 px-3.5 py-2.5 text-[15px] leading-snug text-ink">
             <WaText text={preview.body} />
             {preview.buttons?.length ? (
-              <div className="mt-2 flex flex-col gap-px">
+              <div className="mt-2 flex flex-col gap-1">
                 {preview.buttons.map((label) => (
-                  <span key={label} className="bg-paper/70 py-1.5 text-center text-[14px] font-semibold text-ink">
+                  <span key={label} className="rounded-full bg-paper/70 py-1.5 text-center text-[14px] font-semibold text-ink">
                     {label}
                   </span>
                 ))}

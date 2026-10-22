@@ -24,7 +24,7 @@ import { SheetHeader } from "./overlay-host";
 import { ActionButton, FieldError, FieldLabel, STEPPER_CLASS, SeatMeter, inputClass, useAsyncAction } from "./ui";
 
 const fieldClasses = {
-  field: "h-12 rounded-none bg-background",
+  field: "h-12 rounded-field bg-background",
   label: "px-0 text-[14px] font-semibold text-ink",
   input: "text-[16px]",
   errorMessage: "px-0 text-[13px] font-medium",
@@ -51,7 +51,7 @@ export function ManualBookingForm({ departureId: initialDeparture }: { departure
     return (
       <>
         <SheetHeader title="Reserva manual" />
-        <div className="h-40 animate-pulse bg-ink/5" />
+        <div className="h-40 rounded-ticket bg-ink/5" />
       </>
     );
   }
@@ -120,7 +120,7 @@ export function ManualBookingForm({ departureId: initialDeparture }: { departure
       <section className="flex flex-col gap-2">
         <FieldLabel>Salida</FieldLabel>
         {chosen ? (
-          <div className="flex items-center justify-between gap-3 bg-ink/6 px-4 py-3">
+          <div className="flex items-center justify-between gap-3 rounded-field bg-ink/6 px-4 py-3">
             <div className="flex min-w-0 flex-col gap-1">
               <span className="truncate text-[16px] font-semibold text-ink">
                 {idx.refs.get(chosen.id)} · {tourOfChosen?.shortName} · {formatDayShort(chosen.startsAt)} {formatTime(chosen.startsAt)}
@@ -130,21 +130,21 @@ export function ManualBookingForm({ departureId: initialDeparture }: { departure
               </span>
               <SeatMeter taken={chosen.seatsTaken} capacity={chosen.capacity} className="mt-1 max-w-48" />
             </div>
-            <button type="button" className="pressable shrink-0 px-2 py-2 text-[14px] font-semibold text-ink underline underline-offset-4" onClick={() => setDepartureId(undefined)}>
+            <button type="button" className="pressable shrink-0 rounded-full px-3 py-2 text-[14px] font-semibold text-ink underline underline-offset-4 hover:bg-ink/8" onClick={() => setDepartureId(undefined)}>
               Cambiar
             </button>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
             <Select value={activeTour} onValueChange={setTourFilter}>
-              <SelectTrigger className="h-12 rounded-none! text-[16px]">
+              <SelectTrigger className="h-12 rounded-field! text-[16px]">
                 <SelectValue placeholder="Tour" />
               </SelectTrigger>
-              <SelectContent className="max-h-72 overflow-y-auto rounded-none!">
+              <SelectContent className="max-h-72 overflow-y-auto rounded-field!">
                 {idx.tours
                   .filter((t) => open.some((d) => d.tourId === t.id))
                   .map((t) => (
-                    <SelectItem key={t.id} value={t.id} className="rounded-none py-2 text-[15px]">
+                    <SelectItem key={t.id} value={t.id} className="rounded-field py-2 text-[15px]">
                       {t.name}
                     </SelectItem>
                   ))}
@@ -160,7 +160,7 @@ export function ManualBookingForm({ departureId: initialDeparture }: { departure
                         setDepartureId(d.id);
                         setFailure(null);
                       }}
-                      className="pressable flex w-full items-center justify-between gap-3 bg-ink/6 px-4 py-3 text-left hover:bg-ink/12"
+                      className="pressable flex w-full items-center justify-between gap-3 rounded-field bg-ink/6 px-4 py-3 text-left hover:bg-ink/12"
                     >
                       <span className="flex min-w-0 flex-col">
                         <span className="text-[15px] font-semibold text-ink">
@@ -257,7 +257,7 @@ export function ManualBookingForm({ departureId: initialDeparture }: { departure
             animate={{ opacity: 1, x: [6, -4, 2, 0] }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: EASE_OUT }}
-            className="bg-destructive/10 px-4 py-3 text-[15px] font-semibold text-destructive"
+            className="rounded-field bg-destructive/10 px-4 py-3 text-[15px] font-semibold text-destructive"
           >
             {failure}
           </motion.p>

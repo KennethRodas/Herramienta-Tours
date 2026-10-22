@@ -121,7 +121,7 @@ export function HoyScreen() {
             <Perforation />
 
             {/* Guide and vehicle, editable in place */}
-            <div className="grid grid-cols-2 gap-px bg-ink/10">
+            <div className="grid grid-cols-2 gap-1.5 px-3 pt-3">
               {(["guide", "vehicle"] as const).map((k) => {
                 const isGuide = k === "guide";
                 const onSite = !isGuide && !vehicle && !needsTransport(tour);
@@ -134,7 +134,7 @@ export function HoyScreen() {
                     type="button"
                     aria-expanded={on}
                     onClick={() => setEditing(on ? null : k)}
-                    className={cn("pressable flex items-center justify-between gap-2 bg-paper px-5 py-3 text-left hover:bg-surface-2", on && "bg-surface-2")}
+                    className={cn("pressable flex items-center justify-between gap-2 rounded-field bg-ink/5 px-4 py-3 text-left hover:bg-ink/10", on && "bg-ink/10")}
                   >
                     <span className="flex min-w-0 flex-col">
                       <span className="text-[13px] font-medium text-ink-soft">{isGuide ? "Guía" : "Vehículo"}</span>
@@ -171,7 +171,7 @@ export function HoyScreen() {
               ) : null}
             </AnimatePresence>
 
-            <Perforation className="mt-3" />
+            <Perforation className="mt-4" />
 
             {/* Check-in */}
             <div className="flex flex-col gap-4 px-5 pt-4">
@@ -202,7 +202,7 @@ export function HoyScreen() {
           <ul className="flex flex-col gap-1.5">
             {conflicts && conflicts.length ? (
               <li>
-                <Link href="/wilber/cruces" className="pressable flex items-center gap-3 bg-destructive px-4 py-3.5 text-paper hover:brightness-110">
+                <Link href="/wilber/cruces" className="pressable flex items-center gap-3 rounded-field bg-destructive px-4 py-3.5 text-paper hover:brightness-110">
                   <Shuffle className="size-5 shrink-0" aria-hidden />
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="text-[17px] font-bold leading-tight">{plural(conflicts.length, "cruce", "cruces")}</span>
@@ -214,7 +214,7 @@ export function HoyScreen() {
             ) : null}
             {pendingDeposits.length ? (
               <li>
-                <Link href="/wilber/reservas?estado=pendiente_pago" className="pressable flex items-center gap-3 bg-paper px-4 py-3.5 text-paper-ink hover:bg-surface-2">
+                <Link href="/wilber/reservas?estado=pendiente_pago" className="pressable flex items-center gap-3 rounded-field bg-paper px-4 py-3.5 text-paper-ink hover:bg-surface-2">
                   <Banknote className="size-5 shrink-0" aria-hidden />
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="text-[17px] font-bold leading-tight">{plural(pendingDeposits.length, "anticipo pendiente", "anticipos pendientes")}</span>
@@ -234,7 +234,7 @@ export function HoyScreen() {
                   <button
                     type="button"
                     onClick={() => open({ kind: "departure", id: d.id })}
-                    className="pressable flex w-full items-center gap-3 bg-paper px-4 py-3.5 text-left text-paper-ink hover:bg-surface-2"
+                    className="pressable flex w-full items-center gap-3 rounded-field bg-paper px-4 py-3.5 text-left text-paper-ink hover:bg-surface-2"
                   >
                     <UserX className="size-5 shrink-0 text-destructive" aria-hidden />
                     <span className="flex min-w-0 flex-1 flex-col">
@@ -252,7 +252,7 @@ export function HoyScreen() {
             })}
             {unassigned.length > 3 ? (
               <li>
-                <Link href="/wilber/cruces" className="pressable flex items-center justify-between gap-3 bg-paper px-4 py-3 text-[15px] font-semibold text-paper-ink hover:bg-surface-2">
+                <Link href="/wilber/cruces" className="pressable flex items-center justify-between gap-3 rounded-field bg-paper px-4 py-3 text-[15px] font-semibold text-paper-ink hover:bg-surface-2">
                   {plural(unassigned.length - 3, "salida más", "salidas más")} sin guía o vehículo
                   <ArrowRight className="size-5 shrink-0 text-ink-soft" aria-hidden />
                 </Link>
@@ -312,9 +312,9 @@ function DayList({
 function HoySkeleton() {
   return (
     <div className="flex flex-col gap-6" aria-busy="true">
-      <div className="h-5 w-48 animate-pulse bg-ink/10" />
-      <div className="h-[420px] animate-pulse bg-paper" />
-      <div className="h-24 animate-pulse bg-paper" />
+      <div className="h-5 w-48 rounded-full bg-ink/10" />
+      <div className="h-[420px] rounded-ticket bg-paper" />
+      <div className="h-24 rounded-ticket bg-paper" />
     </div>
   );
 }

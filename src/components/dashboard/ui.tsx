@@ -30,7 +30,7 @@ export type BtnVariant = "primary" | "quiet" | "ghost" | "stamp" | "outline";
 export type BtnSize = "sm" | "md" | "lg";
 
 const BTN_BASE =
-  "pressable inline-flex items-center justify-center gap-2 font-sans font-semibold leading-none select-none whitespace-nowrap [-webkit-touch-callout:none] disabled:cursor-not-allowed disabled:opacity-45";
+  "pressable inline-flex items-center justify-center gap-2 rounded-full font-sans font-semibold leading-none select-none whitespace-nowrap [-webkit-touch-callout:none] disabled:cursor-not-allowed disabled:opacity-45";
 
 const BTN_VARIANT: Record<BtnVariant, string> = {
   primary: "bg-ink text-paper hover:bg-ink-soft",
@@ -70,7 +70,7 @@ export function IconBtn({
       aria-label={label}
       title={label}
       className={cn(
-        "pressable grid shrink-0 place-items-center text-ink select-none hover:bg-ink/10 disabled:opacity-40",
+        "pressable grid shrink-0 place-items-center rounded-full text-ink select-none hover:bg-ink/10 disabled:opacity-40",
         size === "md" ? "size-11" : "size-9",
         className,
       )}
@@ -91,7 +91,7 @@ export function useAsyncAction() {
     setState("loading");
     try {
       // A short floor keeps the spinner from flashing for a 3 ms local write.
-      await Promise.all([fn(), new Promise((r) => setTimeout(r, 260))]);
+      await Promise.all([fn(), new Promise((r) => setTimeout(r, 200))]);
       setState("success");
       timer.current = window.setTimeout(() => setState("idle"), 1300);
       return true;
@@ -143,7 +143,7 @@ export function ActionButton({
       successText={successText}
       errorText={errorText}
       className={cn(
-        "rounded-none font-semibold [-webkit-touch-callout:none]",
+        "rounded-full font-semibold [-webkit-touch-callout:none]",
         BTN_VARIANT[variant],
         BTN_SIZE[size],
         state === "error" && "bg-destructive text-paper",
@@ -180,7 +180,7 @@ export function SectionTitle({
 
 export function Empty({ children, action, className }: { children: ReactNode; action?: ReactNode; className?: string }) {
   return (
-    <div className={cn("flex flex-wrap items-center justify-between gap-3 bg-ink/5 px-4 py-4 text-[15px] text-ink-soft", className)}>
+    <div className={cn("flex flex-wrap items-center justify-between gap-3 rounded-field bg-ink/5 px-4 py-4 text-[15px] text-ink-soft", className)}>
       <p>{children}</p>
       {action}
     </div>
@@ -190,7 +190,7 @@ export function Empty({ children, action, className }: { children: ReactNode; ac
 // --- Surfaces ------------------------------------------------------------------------
 
 export const Paper = forwardRef<HTMLDivElement, ComponentPropsWithoutRef<"div">>(function Paper({ className, ...props }, ref) {
-  return <div ref={ref} className={cn("bg-paper text-paper-ink", className)} {...props} />;
+  return <div ref={ref} className={cn("rounded-ticket bg-paper text-paper-ink", className)} {...props} />;
 });
 
 /** Tear line of round dots in the ground colour, between two parts of a paper object. */
@@ -214,7 +214,7 @@ export function StatusTag({ status, className }: { status: BookingStatus; classN
   return (
     <span
       className={cn(
-        "relative inline-flex h-7 items-center overflow-hidden px-2 text-[13px] font-semibold leading-none transition-colors duration-200",
+        "relative inline-flex h-7 items-center overflow-hidden rounded-full px-2.5 text-[13px] font-semibold leading-none transition-colors duration-200",
         BOOKING_TONE[status],
         className,
       )}
@@ -247,7 +247,7 @@ const DEPARTURE_TONE: Record<DepartureState, string> = {
 export function DepartureTag({ state, className }: { state: DepartureState; className?: string }) {
   if (state === "llena" || state === "cancelada") return <Stamp className={className}>{DEPARTURE_STATE_LABEL[state]}</Stamp>;
   return (
-    <span className={cn("inline-flex h-7 items-center px-2 text-[13px] font-semibold leading-none", DEPARTURE_TONE[state], className)}>
+    <span className={cn("inline-flex h-7 items-center rounded-full px-2.5 text-[13px] font-semibold leading-none", DEPARTURE_TONE[state], className)}>
       {DEPARTURE_STATE_LABEL[state]}
     </span>
   );
@@ -258,7 +258,7 @@ export function Stamp({ children, className, tilt = true }: { children: ReactNod
   return (
     <span
       className={cn(
-        "inline-flex items-center border-[3px] border-current px-1.5 py-0.5 font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em] text-destructive",
+        "inline-flex items-center rounded-stub border-[3px] border-current px-1.5 py-0.5 font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em] text-destructive",
         tilt && "-rotate-3",
         className,
       )}
@@ -274,9 +274,9 @@ export function Stamp({ children, className, tilt = true }: { children: ReactNod
 export function SeatMeter({ taken, capacity, className, tone = "ink" }: { taken: number; capacity: number; className?: string; tone?: "ink" | "stamp" }) {
   const ratio = capacity ? Math.min(1, taken / capacity) : 0;
   return (
-    <span aria-hidden className={cn("relative block h-1 w-full overflow-hidden bg-ink/12", className)}>
+    <span aria-hidden className={cn("relative block h-1 w-full overflow-hidden rounded-full bg-ink/12", className)}>
       <span
-        className={cn("absolute inset-y-0 left-0 block origin-left transition-transform duration-300", tone === "stamp" ? "bg-destructive" : "bg-ink")}
+        className={cn("absolute inset-y-0 left-0 block origin-left rounded-full transition-transform duration-300", tone === "stamp" ? "bg-destructive" : "bg-ink")}
         style={{ width: "100%", transform: `scaleX(${ratio})`, transitionTimingFunction: "var(--ease-out)" }}
       />
     </span>
@@ -299,7 +299,7 @@ export function Stat({
   className?: string;
 }) {
   return (
-    <div className={cn("flex min-w-0 flex-col gap-1.5 bg-paper px-4 py-3.5 text-paper-ink", className)}>
+    <div className={cn("flex min-w-0 flex-col gap-1.5 rounded-ticket bg-paper px-4 py-3.5 text-paper-ink", className)}>
       <span className="text-[13px] font-medium leading-tight text-ink-soft">{label}</span>
       <span className={cn("font-display text-[34px] font-bold leading-none tracking-[-0.01em]", tone === "stamp" && "text-destructive")}>{value}</span>
       {detail ? <span className="text-[13px] leading-snug text-ink-soft">{detail}</span> : null}
@@ -380,10 +380,10 @@ export function FieldError({ children, id }: { children?: ReactNode; id?: string
 }
 
 /** beui's liquid stepper fills with --background; give it a visible tint on paper. */
-export const STEPPER_CLASS = "bg-ink/6 [--background:color-mix(in_srgb,var(--ink)_16%,var(--paper))]";
+export const STEPPER_CLASS = "rounded-full bg-ink/6 [--background:color-mix(in_srgb,var(--ink)_16%,var(--paper))]";
 
 export const inputClass =
-  "h-12 w-full rounded-none bg-background px-3.5 text-[16px] text-foreground ring-1 ring-inset ring-input outline-none transition-shadow duration-150 placeholder:text-muted-foreground/70 focus:ring-2 focus:ring-ring aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-destructive";
+  "h-12 w-full rounded-field bg-background px-3.5 text-[16px] text-foreground ring-1 ring-inset ring-input outline-none transition-shadow duration-150 placeholder:text-muted-foreground/70 focus:ring-2 focus:ring-ring aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-destructive";
 
 /** Horizontal choice chips: every option visible, one tap. */
 export function Chips<T extends string>({
@@ -414,7 +414,7 @@ export function Chips<T extends string>({
             disabled={o.disabled}
             onClick={() => onChange(o.value)}
             className={cn(
-              "pressable inline-flex shrink-0 items-center gap-1.5 px-3 font-semibold whitespace-nowrap transition-colors duration-150 select-none disabled:opacity-40",
+              "pressable inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 font-semibold whitespace-nowrap transition-colors duration-150 select-none disabled:opacity-40",
               size === "md" ? "h-10 text-[15px]" : "h-8 text-[13px]",
               on ? "bg-ink text-paper" : "bg-ink/8 text-ink hover:bg-ink/14",
             )}
@@ -429,5 +429,5 @@ export function Chips<T extends string>({
 }
 
 export function Kbd({ children }: { children: ReactNode }) {
-  return <kbd className="inline-flex h-6 items-center bg-ink/10 px-1.5 font-sans text-[12px] font-semibold text-ink-soft">{children}</kbd>;
+  return <kbd className="inline-flex h-6 items-center rounded-stub bg-ink/10 px-1.5 font-sans text-[12px] font-semibold text-ink-soft">{children}</kbd>;
 }

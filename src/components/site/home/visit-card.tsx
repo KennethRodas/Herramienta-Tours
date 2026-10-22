@@ -41,19 +41,19 @@ export function VisitCard() {
   const [main, ...others] = MEETING_POINTS;
 
   return (
-    <section id="contacto" ref={ref} aria-labelledby="contacto-titulo" className="relative isolate overflow-x-clip bg-cobalt-800">
-      <div className="relative h-[72svh] overflow-hidden md:h-[100svh] md:min-h-[760px]">
-        <div ref={photoRef} className="absolute inset-0 will-change-transform">
+    <section id="contacto" ref={ref} aria-labelledby="contacto-titulo" className="relative isolate overflow-x-clip bg-cobalt-800 pt-[var(--gutter)]">
+      <div className="relative isolate mx-[var(--gutter)] h-[72svh] overflow-hidden rounded-ticket md:h-[calc(100svh-2*var(--gutter))] md:min-h-[720px]">
+        <div ref={photoRef} className="absolute inset-0">
           <Image src={photo.src} alt={photo.alt} fill sizes="100vw" quality={75} className="object-cover object-[30%_60%]" />
         </div>
-        <p className="absolute top-3 left-[var(--gutter)] z-10 bg-sand-50 px-3 py-1.5 text-small text-cobalt-800 md:top-auto md:bottom-6">
+        <p className="absolute top-3 left-3 z-10 rounded-full bg-sand-50 px-3.5 py-1.5 text-small text-cobalt-800 md:top-auto md:bottom-5 md:left-5">
           Lago de Coatepeque. Foto: {photo.author}, {photo.licence}
         </p>
       </div>
 
       <div
         data-reveal="card"
-        className="ink-paper relative z-20 mx-[var(--gutter)] -mt-20 bg-sand-50 text-ink md:absolute md:top-[60px] md:right-[60px] md:mx-0 md:mt-0 md:w-[400px]"
+        className="ink-paper relative z-20 mx-[calc(var(--gutter)+12px)] -mt-20 rounded-ticket bg-sand-50 text-ink md:absolute md:top-[calc(var(--gutter)+48px)] md:right-[calc(var(--gutter)+48px)] md:mx-0 md:mt-0 md:w-[400px]"
       >
         <div className="px-6 pt-7 pb-6 sm:px-8 sm:pt-8">
           <h2 id="contacto-titulo" className="font-display text-lead font-bold uppercase leading-none">
@@ -90,7 +90,7 @@ export function VisitCard() {
             WhatsApp <span className="font-semibold tabular">{BUSINESS.whatsappDisplay}</span>
           </p>
         </div>
-        <div className="px-4 pb-4 md:p-0">
+        <div className="px-4 pb-4 sm:px-6 sm:pb-6">
           <ButtonLink
             href={waLink(BUSINESS.whatsapp, "Hola Wilber, quiero información sobre una salida.")}
             target="_blank"

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { MeetingPoint, Tour } from "@/lib/domain/types";
 import { DIFFICULTY_LABEL, DIFFICULTY_NOTE, DIFFICULTY_ORDER } from "@/content/catalog";
-import type { PhotoCredit } from "@/content/photo-credits";
+import { PHOTO_CREDITS, type PhotoCredit } from "@/content/photo-credits";
 import { formatDuration, formatKm, formatMeters, formatTime, formatUsd, svISO } from "@/lib/domain/format";
 import { MeetingPointMap, RouteMap } from "@/components/map";
 import { buttonClass } from "@/components/ui/button";
@@ -39,7 +39,7 @@ function DifficultyMeter({ level }: { level: Tour["difficulty"] }) {
   return (
     <span aria-hidden className="inline-flex gap-1 align-middle">
       {DIFFICULTY_ORDER.map((d, i) => (
-        <span key={d} className={cn("inline-block h-3.5 w-2.5", i <= at ? "bg-cobalt-800" : "bg-sand-300")} />
+        <span key={d} className={cn("inline-block h-3.5 w-2.5 rounded-stub", i <= at ? "bg-cobalt-800" : "bg-sand-300")} />
       ))}
     </span>
   );
@@ -49,7 +49,7 @@ export function TourHeader({ tour, photo }: { tour: Tour; photo: PhotoCredit }) 
   return (
     <header className="relative">
       <PaperStyles />
-      <div className="relative h-[42svh] min-h-64 w-full overflow-hidden bg-sand-300 lg:h-[64svh] lg:max-h-[720px]">
+      <div className="relative mx-(--gutter) h-[28svh] min-h-48 overflow-hidden rounded-ticket bg-sand-300 sm:h-[42svh] lg:h-[64svh] lg:max-h-[720px]">
         <Image
           src={photo.src}
           alt={photo.alt}
@@ -59,7 +59,7 @@ export function TourHeader({ tour, photo }: { tour: Tour; photo: PhotoCredit }) 
           className="bk-photo object-cover"
           style={{ objectPosition: photo.height > photo.width ? "50% 62%" : "50% 50%" }}
         />
-        <div className="absolute right-(--gutter) top-3 bg-sand-50 px-2.5 py-1 text-cobalt-800">
+        <div className="absolute right-3 top-3 rounded-full bg-sand-50 px-3 py-1 text-cobalt-800">
           <PhotoCreditLine photo={photo} />
         </div>
       </div>
@@ -69,15 +69,15 @@ export function TourHeader({ tour, photo }: { tour: Tour; photo: PhotoCredit }) 
           as="article"
           className="bk-rise"
           stubWidth="20rem"
-          bodyClassName="px-5 pb-8 pt-7 sm:px-8 lg:px-12 lg:pb-12 lg:pt-11"
-          stubClassName="px-5 pb-6 pt-7 sm:px-8 lg:flex lg:flex-col lg:justify-between lg:px-9 lg:py-11"
+          bodyClassName="px-5 pb-10 pt-7 sm:px-8 lg:px-12 lg:pb-12 lg:pt-11"
+          stubClassName="px-5 pb-6 pt-12 sm:px-8 lg:flex lg:flex-col lg:justify-between lg:px-9 lg:py-11"
           body={
             <>
               <h1 className="font-display text-[min(var(--step-head),8.2vw)] font-bold uppercase leading-[0.9] tracking-[-0.015em] sm:text-head">
                 {tour.name}
               </h1>
-              <dl className="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:mt-10 lg:gap-x-10">
-                <Field label="Dificultad" className="col-span-2 sm:col-span-3">
+              <dl className="mt-7 grid grid-cols-3 gap-x-4 gap-y-5 sm:gap-x-6 lg:mt-10 lg:gap-x-10">
+                <Field label="Dificultad" className="col-span-3">
                   <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <DifficultyMeter level={tour.difficulty} />
                     <span>{DIFFICULTY_LABEL[tour.difficulty]}</span>
@@ -129,16 +129,82 @@ export function RouteSection({ tour }: { tour: Tour }) {
         <h2 id="ruta" className="font-display text-head font-bold uppercase">
           Ruta
         </h2>
-        <p className="mt-5 max-w-[46ch] text-lead leading-snug">{tour.description}</p>
+        <p className="mt-5 max-w-[52ch] text-body leading-relaxed">{tour.description}</p>
         <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4">
           <Field label="Inicio">{tour.route.waypoints[0]?.name}</Field>
           {tour.route.waypoints.length > 1 ? <Field label="Punto más alto">{highest(tour)}</Field> : null}
         </dl>
+        <RoutePlates tour={tour} />
       </div>
       <div className="lg:col-span-7">
-        <RouteMap tour={tour} flyover className="h-[62svh] w-full lg:aspect-[7/5] lg:h-auto" />
+        <RouteMap tour={tour} flyover className="h-[62svh] w-full overflow-hidden rounded-ticket lg:aspect-[7/5] lg:h-auto" />
       </div>
     </Reveal>
+  );
+}
+
+// Places on the itinerary that have their own photograph in the catalog.
+// A plate appears only where the stop really is that place, never as decoration.
+const PLACE_PHOTOS: [RegExp, string][] = [
+  [/cerro verde/i, "cerro-verde"],
+  [/coatepeque/i, "coatepeque"],
+  [/izalco/i, "izalco"],
+  [/suchitoto|suchitl[aá]n/i, "suchitoto"],
+  [/juay[uú]a|calera/i, "juayua"],
+  [/ataco/i, "ataco"],
+  [/tercios/i, "los-tercios"],
+  [/boquer[oó]n/i, "boqueron"],
+  [/pital/i, "el-pital"],
+  [/tunco/i, "el-tunco"],
+  [/jiquilisco/i, "jiquilisco"],
+  [/montecristo/i, "montecristo"],
+];
+
+function stopsWithPhotos(tour: Tour) {
+  const stops = [
+    ...tour.itinerary.map((s) => ({ caption: `${s.time} · ${s.label}`, text: s.label })),
+    ...tour.route.waypoints.map((w) => ({ caption: w.altitude ? `${w.name} · ${formatMeters(w.altitude)}` : w.name, text: w.name })),
+  ];
+  const seen = new Set([tour.photo]);
+  const out: { caption: string; photo: PhotoCredit }[] = [];
+  for (const stop of stops) {
+    const hit = PLACE_PHOTOS.find(([re, slug]) => re.test(stop.text) && !seen.has(slug));
+    const photo = hit ? PHOTO_CREDITS[hit[1]] : undefined;
+    if (!hit || !photo) continue;
+    seen.add(hit[1]);
+    out.push({ caption: stop.caption, photo });
+  }
+  return out.slice(0, 3);
+}
+
+function RoutePlates({ tour }: { tour: Tour }) {
+  const plates = stopsWithPhotos(tour);
+  if (!plates.length) return null;
+  return (
+    <div className="mt-10">
+      <ul className="grid grid-cols-3 gap-3">
+        {plates.map(({ caption, photo }) => (
+          <li key={photo.slug} className="min-w-0">
+            <figure className="flex flex-col gap-2">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-field bg-sand-300">
+                <Image src={photo.srcSmall} alt={photo.alt} fill sizes="(min-width: 1024px) 150px, 30vw" className="object-cover" />
+              </div>
+              <figcaption className="flex flex-col gap-0.5">
+                <span className="text-small font-semibold leading-snug">{caption}</span>
+                <a
+                  href={photo.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-fit text-small text-ink-soft underline decoration-1 underline-offset-2 hover:decoration-2"
+                >
+                  Foto: {photo.author}, {photo.licence}
+                </a>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -164,14 +230,14 @@ export function ItinerarySection({ tour }: { tour: Tour }) {
               </li>
             ))}
           </ol>
-          <p className="field-ink -mx-6 mt-7 flex h-11 items-center justify-between px-6 text-body font-semibold sm:-mx-9 sm:px-9">
+          <p className="field-ink mt-7 flex h-12 items-center justify-between rounded-field px-4 text-body font-semibold sm:px-5">
             <span>Duración total</span>
             <span className="tabular">{formatDuration(tour.durationHours)}</span>
           </p>
         </div>
       </Reveal>
 
-      <div className="grid gap-10 sm:grid-cols-2 lg:col-span-6 lg:col-start-7 lg:grid-cols-1 xl:col-span-6 xl:col-start-7 xl:grid-cols-2 xl:gap-6">
+      <div className="grid gap-16 sm:grid-cols-2 sm:gap-10 lg:col-span-6 lg:col-start-7 lg:grid-cols-1 xl:col-span-6 xl:col-start-7 xl:grid-cols-2 xl:gap-6">
         <Reveal>
           <h2 id="que-llevar" className="font-display text-head font-bold uppercase">
             Qué llevar
@@ -180,7 +246,7 @@ export function ItinerarySection({ tour }: { tour: Tour }) {
             <ul className="flex flex-col gap-3">
               {tour.bring.map((item) => (
                 <li key={item} className="flex gap-3 text-body leading-snug">
-                  <span aria-hidden className="mt-[0.45em] inline-block size-2.5 shrink-0 bg-cobalt-800" />
+                  <span aria-hidden className="mt-[0.45em] inline-block size-2.5 shrink-0 rounded-full bg-cobalt-800" />
                   {item}
                 </li>
               ))}
@@ -191,7 +257,7 @@ export function ItinerarySection({ tour }: { tour: Tour }) {
           <h2 id="incluye" className="font-display text-head font-bold uppercase">
             Incluye
           </h2>
-          <div className="field-ink mt-6 px-6 py-7 sm:px-8">
+          <div className="field-ink mt-6 rounded-ticket px-6 py-7 sm:px-8">
             <ul className="flex flex-col gap-3">
               {tour.includes.map((item) => (
                 <li key={item} className="flex gap-3 text-body leading-snug">
@@ -216,7 +282,7 @@ export function MeetingSection({ tour, point }: { tour: Tour; point: MeetingPoin
         Punto de encuentro
       </h2>
       <div className="relative mt-6">
-        <MeetingPointMap point={point} className="h-[48svh] min-h-72 w-full lg:h-[560px]" />
+        <MeetingPointMap point={point} className="h-[48svh] min-h-72 w-full overflow-hidden rounded-ticket lg:h-[560px]" />
         <div className="paper relative z-10 mx-3 -mt-12 px-6 py-7 sm:mx-6 sm:px-8 lg:absolute lg:right-8 lg:top-8 lg:m-0 lg:w-[380px]">
           <p className="text-lead font-semibold leading-tight">{point.name}</p>
           <p className="mt-2 text-body leading-snug">

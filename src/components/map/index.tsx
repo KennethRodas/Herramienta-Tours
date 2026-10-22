@@ -20,7 +20,7 @@ const RouteEditorImpl = dynamic(() => import("./route-editor"), { ssr: false, lo
 export function TerrainMap(props: TerrainMapProps) {
   const full = (props.variant ?? "full") === "full";
   return (
-    <LazyMount className={shellClass("min-h-64 bg-sand-300", props.className)} placeholder={<MapSkeleton />} lenisPrevent={full}>
+    <LazyMount className={shellClass("min-h-64 overflow-hidden rounded-ticket bg-sand-300", props.className)} placeholder={<MapSkeleton />} lenisPrevent={full}>
       <TerrainMapImpl {...props} className={FILL} />
     </LazyMount>
   );
@@ -31,7 +31,7 @@ export function RouteMap(props: RouteMapProps) {
   const Impl = props.flyover ? RouteMapFlyoverImpl : RouteMapImpl;
   return (
     <LazyMount
-      className={shellClass(props.flyover ? "min-h-[480px] bg-sand-300" : "min-h-64 bg-sand-300", props.className)}
+      className={shellClass(props.flyover ? "min-h-[480px] lg:min-h-[580px]" : "min-h-64 overflow-hidden rounded-ticket bg-sand-300", props.className)}
       placeholder={<MapSkeleton profile={props.flyover} />}
     >
       <Impl {...props} className={FILL} />
@@ -42,7 +42,7 @@ export function RouteMap(props: RouteMapProps) {
 /** Flat street map of a meeting point with a link to Google Maps. */
 export function MeetingPointMap(props: MeetingPointMapProps) {
   return (
-    <LazyMount className={shellClass("min-h-64 bg-sand-300", props.className)} placeholder={<MapSkeleton />}>
+    <LazyMount className={shellClass("min-h-64 overflow-hidden rounded-ticket bg-sand-300", props.className)} placeholder={<MapSkeleton />}>
       <MeetingPointMapImpl {...props} className={FILL} />
     </LazyMount>
   );

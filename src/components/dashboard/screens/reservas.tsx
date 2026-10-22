@@ -112,7 +112,7 @@ export function ReservasScreen({ estado: estadoProp, tour: tourProp, q: qProp }:
 
   const people = filtered.reduce((n, r) => n + (r.b.status === "cancelada" ? 0 : r.b.partySize), 0);
 
-  if (!idx || now === null) return <div className="h-[520px] animate-pulse bg-paper" aria-busy="true" />;
+  if (!idx || now === null) return <div className="h-[520px] rounded-ticket bg-paper" aria-busy="true" />;
 
   const clear = () => {
     setQ("");
@@ -144,37 +144,37 @@ export function ReservasScreen({ estado: estadoProp, tour: tourProp, q: qProp }:
             ) : undefined
           }
           className="lg:w-80"
-          classNames={{ field: "h-12 rounded-none bg-paper", input: "text-[16px]" }}
+          classNames={{ field: "h-12 rounded-field bg-paper", input: "text-[16px]" }}
         />
         <div className="grid grid-cols-2 gap-2 lg:flex">
           <Select value={estado} onValueChange={(v) => setEstado(v as Estado)} className="lg:w-52">
-            <SelectTrigger className="h-12 rounded-none! bg-paper text-[15px]">
+            <SelectTrigger className="h-12 rounded-field! bg-paper text-[15px]">
               <SelectValue placeholder="Estado" />
             </SelectTrigger>
-            <SelectContent className="rounded-none!">
-              <SelectItem value="activas" className="rounded-none py-2 text-[15px]">
+            <SelectContent className="rounded-field!">
+              <SelectItem value="activas" className="rounded-field py-2 text-[15px]">
                 Activas
               </SelectItem>
-              <SelectItem value="todas" className="rounded-none py-2 text-[15px]">
+              <SelectItem value="todas" className="rounded-field py-2 text-[15px]">
                 Todos los estados
               </SelectItem>
               {BOOKING_STATUS_ORDER.map((s) => (
-                <SelectItem key={s} value={s} className="rounded-none py-2 text-[15px]">
+                <SelectItem key={s} value={s} className="rounded-field py-2 text-[15px]">
                   {BOOKING_STATUS_LABEL[s]}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select value={tour} onValueChange={setTour} className="lg:w-52">
-            <SelectTrigger className="h-12 rounded-none! bg-paper text-[15px]">
+            <SelectTrigger className="h-12 rounded-field! bg-paper text-[15px]">
               <SelectValue placeholder="Tour" />
             </SelectTrigger>
-            <SelectContent className="max-h-80 overflow-y-auto rounded-none!">
-              <SelectItem value="todos" className="rounded-none py-2 text-[15px]">
+            <SelectContent className="max-h-80 overflow-y-auto rounded-field!">
+              <SelectItem value="todos" className="rounded-field py-2 text-[15px]">
                 Todos los tours
               </SelectItem>
               {idx.tours.map((t) => (
-                <SelectItem key={t.id} value={t.id} className="rounded-none py-2 text-[15px]">
+                <SelectItem key={t.id} value={t.id} className="rounded-field py-2 text-[15px]">
                   {t.shortName}
                 </SelectItem>
               ))}
@@ -211,14 +211,14 @@ export function ReservasScreen({ estado: estadoProp, tour: tourProp, q: qProp }:
           >
             <DateRangePickerTrigger
               aria-label="Rango de fechas"
-              className={cn("h-10 shrink-0 rounded-none border-0 px-3 text-[15px] font-semibold", fechas === "rango" ? "bg-ink text-paper hover:bg-ink" : "bg-ink/8 text-ink hover:bg-ink/14")}
-              style={{ borderRadius: 0 }}
+              className={cn("h-10 shrink-0 rounded-full border-0 px-3.5 text-[15px] font-semibold", fechas === "rango" ? "bg-ink text-paper hover:bg-ink" : "bg-ink/8 text-ink hover:bg-ink/14")}
+              style={{ borderRadius: 999 }}
             >
               <CalendarDays className="size-4" aria-hidden />
               {range ? (range.to && range.to !== range.from ? `${shortDate(range.from)} – ${shortDate(range.to)}` : `Desde ${shortDate(range.from)}`) : "Rango"}
             </DateRangePickerTrigger>
-            <DateRangePickerContent className="rounded-none">
-              <DateRangePickerCalendar showSummary={false} className="rounded-none border-0">
+            <DateRangePickerContent className="rounded-field">
+              <DateRangePickerCalendar showSummary={false} className="rounded-field border-0">
                 <DateRangePickerHeader />
                 <DateRangePickerGrid />
               </DateRangePickerCalendar>
@@ -343,7 +343,7 @@ function DesktopTable({
       cell: (r) => (r.dep ? <span className="tabular">{`${formatDayShort(r.dep.startsAt)} ${formatTime24(r.dep.startsAt)}`}</span> : "—"),
     },
     { key: "personas", header: "Pers.", width: "76px", align: "right", sortable: true, sortValue: (r) => r.b.partySize, cell: (r) => <span className="tabular font-semibold">{r.b.partySize}</span> },
-    { key: "estado", header: "Estado", width: "168px", sortable: true, sortValue: (r) => BOOKING_STATUS_ORDER.indexOf(r.b.status), cell: (r) => (r.dep?.status === "cancelada" && r.b.status !== "cancelada" ? <Stamp tilt={false} className="text-[12px]">Salida cancelada</Stamp> : <StatusTag status={r.b.status} />) },
+    { key: "estado", header: "Estado", width: "168px", sortable: true, sortValue: (r) => BOOKING_STATUS_ORDER.indexOf(r.b.status), cell: (r) => (r.dep?.status === "cancelada" && r.b.status !== "cancelada" ? <Stamp tilt={false} className="text-[14px]">Salida cancelada</Stamp> : <StatusTag status={r.b.status} />) },
     { key: "pago", header: "Pago", width: "140px", sortable: true, sortValue: (r) => paymentShort(r.b), cell: (r) => paymentShort(r.b) },
     { key: "canal", header: "Canal", width: "112px", sortable: true, sortValue: (r) => SOURCE_LABEL[r.b.source], cell: (r) => SOURCE_LABEL[r.b.source] },
   ];
@@ -357,7 +357,12 @@ function DesktopTable({
         const id = target.closest("tr")?.querySelector<HTMLElement>("[data-row]")?.dataset.row;
         if (id) onOpen(id);
       }}
-      className="[&_tbody_tr]:cursor-pointer [&_tbody_tr:hover]:bg-ink/6 [&_td]:text-[14px] [&_th]:text-[13px]"
+      // Rows are rounded fields: separate borders so cells can take a radius, tone instead of rules.
+      className={cn(
+        "[&_table]:border-separate [&_table]:border-spacing-0 [&_thead_th]:border-b-0 [&_thead_th]:bg-paper [&_td]:text-[14px] [&_th]:text-[13px]",
+        "[&_tbody_tr]:cursor-pointer [&_tbody_tr:hover]:bg-transparent [&_tbody_td]:transition-colors [&_tbody_td]:duration-150 [&_tbody_tr:hover>td:not(:last-child)]:bg-ink/6",
+        "[&_tbody_tr>td:first-child]:rounded-l-field [&_tbody_tr>td:nth-last-child(2)]:rounded-r-field",
+      )}
     >
       <Table
         data={rows}
@@ -375,7 +380,7 @@ function DesktopTable({
             </Btn>
           </span>
         }
-        className="border-0 bg-paper text-paper-ink"
+        className="rounded-ticket border-0 bg-paper text-paper-ink [&>div]:px-2"
       />
     </div>
   );
@@ -450,13 +455,13 @@ function MobileList({ rows, onOpen, onNew, onClear }: { rows: Row[]; onOpen: (id
 function MobileCard({ r, onOpen }: { r: Row; onOpen: (id: string) => void }) {
   const { b, dep, tour } = r;
   return (
-    <button type="button" onClick={() => onOpen(b.id)} className="pressable flex w-full flex-col gap-1.5 bg-paper px-4 py-3 text-left text-paper-ink active:bg-surface-2">
+    <button type="button" onClick={() => onOpen(b.id)} className="pressable flex w-full flex-col gap-1.5 rounded-field bg-paper px-4 py-3 text-left text-paper-ink active:bg-surface-2">
       <span className="flex items-start justify-between gap-3">
         <span className="flex min-w-0 flex-col">
           <span className="font-display text-[19px] font-bold uppercase leading-none tracking-[0.01em]">{b.code}</span>
           <span className={cn("mt-1 truncate text-[17px] font-semibold leading-tight", b.status === "cancelada" && "line-through opacity-60")}>{b.name}</span>
         </span>
-        {dep?.status === "cancelada" && b.status !== "cancelada" ? <Stamp tilt={false} className="shrink-0 text-[12px]">Salida cancelada</Stamp> : <StatusTag status={b.status} className="shrink-0" />}
+        {dep?.status === "cancelada" && b.status !== "cancelada" ? <Stamp tilt={false} className="shrink-0 text-[14px]">Salida cancelada</Stamp> : <StatusTag status={b.status} className="shrink-0" />}
       </span>
       <span className="truncate text-[14px] leading-snug text-ink">
         {r.ref} · {tour?.shortName} · {dep ? `${formatDayShort(dep.startsAt)} ${formatTime24(dep.startsAt)}` : "sin salida"} · {plural(b.partySize, "pers.", "pers.")}

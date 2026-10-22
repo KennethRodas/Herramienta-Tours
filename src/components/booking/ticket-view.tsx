@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { CalendarPlus, Check, CreditCard, MapPin, MessageCircle, Share2 } from "lucide-react";
 import type { Booking, Departure, MeetingPoint, Tour } from "@/lib/domain/types";
 import { BUSINESS, meetingPointById, tourById } from "@/content/catalog";
@@ -14,7 +15,9 @@ import { TextScramble } from "@/components/motion/text-scramble";
 import { buttonClass } from "@/components/ui/button";
 import { buildIcs, downloadIcs } from "./ics";
 import { Field, PaperStyles, SplitTicket, Stamp } from "./paper";
+import { PhotoPlate } from "./photo-plate";
 import { PrepChecklist } from "./prep-checklist";
+import { Reveal } from "./reveal";
 import { TearOff } from "./tear-off";
 import { TicketQr } from "./ticket-qr";
 import { WeatherLine } from "./weather-line";
@@ -85,24 +88,26 @@ function Ticket({ booking, departure, tour, fresh, payment }: { booking: Booking
   const depCancelled = departure.status === "cancelada";
   const past = start <= now;
   const live = !cancelled && !depCancelled;
+  const failedConfirmation = booking.confirmation === "fallida" && live;
+  const rejected = (payment === "rechazado" || booking.payment.status === "rechazado") && live;
 
   return (
     <div className="mx-auto w-full max-w-[1120px] px-(--gutter) pt-10 lg:pt-14">
       <PaperStyles />
       <div className="flex flex-col gap-3">
-        {booking.confirmation === "fallida" && live ? (
+        {failedConfirmation ? (
           <Notice
             title="La reserva quedó registrada."
             text={`No pudimos enviarte la confirmación por WhatsApp. Escribile a Wilber con el código ${booking.code} para confirmarla.`}
             action={<WilberLink code={booking.code} label="Escribir a Wilber" primary />}
           />
         ) : null}
-        {(payment === "rechazado" || booking.payment.status === "rechazado") && live ? (
+        {rejected ? (
           <Notice title="El pago fue rechazado." text={`La reserva sigue en pie: pagás ${formatUsd(total)} el día de la salida.`} />
         ) : null}
       </div>
 
-      <div className="mt-6">
+      <div className={failedConfirmation || rejected ? "mt-16" : "mt-6"}>
         <TearOff
           play={phase === "playing"}
           capacity={departure.capacity}
@@ -123,7 +128,7 @@ function Ticket({ booking, departure, tour, fresh, payment }: { booking: Booking
                       phone's width: WIL-WMWM, the widest code, fits at 320px. */}
                   <h1 className="font-display text-[min(var(--step-display),8rem,calc((100vw-5.5rem)/4.1))] font-bold uppercase leading-[0.8] tracking-[-0.02em]">
                     <span className="sr-only">Boleto </span>
-                    <TextScramble text={revealed ? booking.code : "WIL-····"} duration={720} className="tabular" />
+                    <TextScramble text={revealed ? booking.code : "WIL-····"} duration={720} glyphs="ACDEFGHJKMNPQRTUVWXY34679" className="tabular" />
                   </h1>
                   <p className="mt-5 text-lead font-semibold leading-tight">{tour.name}</p>
                   <dl className="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3">
@@ -212,8 +217,19 @@ function TicketActions({ booking, departure, tour, point, url, now }: { booking:
         className={buttonClass(owes ? "quiet" : "primary", "md", "justify-start sm:justify-center")}
         aria-live="polite"
       >
-        {saved ? <Check aria-hidden className={icon} strokeWidth={2.5} /> : <CalendarPlus aria-hidden className={icon} strokeWidth={2.25} />}
-        {saved ? "Archivo descargado" : "Agregar al calendario"}
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span
+            key={saved ? "ok" : "idle"}
+            initial={{ opacity: 0, filter: "blur(3px)" }}
+            animate={{ opacity: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, filter: "blur(3px)" }}
+            transition={{ duration: 0.16, ease: [0.23, 1, 0.32, 1] }}
+            className="inline-flex items-center gap-2"
+          >
+            {saved ? <Check aria-hidden className={icon} strokeWidth={2.5} /> : <CalendarPlus aria-hidden className={icon} strokeWidth={2.25} />}
+            {saved ? "Archivo descargado" : "Agregar al calendario"}
+          </motion.span>
+        </AnimatePresence>
       </button>
       <a href={waLink("", share)} target="_blank" rel="noreferrer" className={buttonClass("quiet", "md", "justify-start sm:justify-center")}>
         <Share2 aria-hidden className={icon} strokeWidth={2.25} />
@@ -255,8 +271,9 @@ function Indicaciones({ booking, departure, tour, point, arrive }: { booking: Bo
           <div className="paper bk-tag px-6 pb-7 pt-14 sm:px-8 lg:col-span-5">
             <PrepChecklist code={booking.code} items={tour.bring} />
           </div>
-          <div className="flex flex-col gap-6 lg:col-span-7">
-            <div className="field-ink flex flex-col gap-4 px-6 py-6 sm:px-8">
+          <Reveal className="flex flex-col gap-6 lg:col-span-7">
+            <PhotoPlate photo={tour.photo} className="aspect-[16/9] w-full" />
+            <div className="field-ink flex flex-col gap-4 rounded-ticket px-6 py-6 sm:px-8">
               <p className="flex items-baseline justify-between gap-4">
                 <span className="text-body font-semibold">Llegar a las</span>
                 <span className="tabular font-display text-head font-bold leading-none">{formatTime(arrive)}</span>
@@ -269,15 +286,15 @@ function Indicaciones({ booking, departure, tour, point, arrive }: { booking: Bo
               <WeatherLine tour={tour} startsAt={departure.startsAt} />
             </div>
             {departure.notes ? (
-              <p className="bg-sand-300 px-6 py-4 text-body leading-snug sm:px-8">
+              <p className="rounded-field bg-sand-300 px-6 py-4 text-body leading-snug sm:px-8">
                 <span className="font-semibold">Nota de Wilber:</span> {departure.notes}
               </p>
             ) : null}
-          </div>
+          </Reveal>
         </div>
       )}
       {point ? (
-        <div className="paper print-corners flex flex-col">
+        <div className="paper print-corners flex flex-col overflow-hidden">
           <MeetingPointMap point={point} className="h-72 w-full sm:h-96" />
           <div className="flex flex-col gap-4 px-5 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <p className="text-body leading-snug">
@@ -305,7 +322,7 @@ function CancelledNote({ code }: { code: string }) {
 
 function Notice({ title, text, action }: { title: string; text: string; action?: ReactNode }) {
   return (
-    <div role="status" className="bk-rise flex flex-col gap-4 bg-sand-300 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+    <div role="status" className="bk-rise flex flex-col gap-4 rounded-ticket bg-sand-300 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
       <p className="text-body leading-snug">
         <span className="block font-semibold">{title}</span>
         {text}
@@ -319,10 +336,10 @@ function TicketSkeleton() {
   return (
     <div aria-busy="true" aria-label="Cargando boleto" className="mx-auto w-full max-w-[1120px] px-(--gutter) pt-10 lg:pt-14">
       <PaperStyles />
-      <div className="bk-skeleton mt-6 h-[420px] bg-sand-50" />
+      <div className="bk-skeleton mt-6 h-[420px] rounded-ticket bg-sand-50" />
       <div className="mt-6 flex gap-2">
-        <div className="bk-skeleton h-12 w-56 bg-sand-300" />
-        <div className="bk-skeleton h-12 w-56 bg-sand-300" style={{ animationDelay: "120ms" }} />
+        <div className="bk-skeleton h-12 w-56 rounded-full bg-sand-300" />
+        <div className="bk-skeleton h-12 w-56 rounded-full bg-sand-300" style={{ animationDelay: "120ms" }} />
       </div>
     </div>
   );

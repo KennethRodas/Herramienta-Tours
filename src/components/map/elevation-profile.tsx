@@ -28,7 +28,7 @@ export interface ProfileHandle {
   setCursor: (d: number | null) => void;
 }
 
-export type ScrubPhase = "start" | "move" | "end";
+export type ScrubPhase = "start" | "move" | "end" | "key";
 
 interface Props {
   data: ProfileData;
@@ -223,7 +223,7 @@ export function ElevationProfile({ data, ref, onScrub, onHover, height = 120, st
     e.preventDefault();
     activeRef.current = clamp(next, 0, L);
     draw();
-    onScrub?.(activeRef.current, "end");
+    onScrub?.(activeRef.current, "key");
   };
 
   const approximate = data.source === "waypoints";
@@ -328,7 +328,7 @@ export function ElevationProfile({ data, ref, onScrub, onHover, height = 120, st
         <div
           ref={readoutRef}
           aria-hidden
-          className="pointer-events-none absolute left-0 top-0 bg-cobalt-800 px-1.5 py-0.5 text-[13px] font-semibold leading-tight text-sand-50 tabular opacity-0"
+          className="pointer-events-none absolute left-0 top-0 rounded-stub bg-cobalt-800 px-1.5 py-0.5 text-[13px] font-semibold leading-tight text-sand-50 tabular opacity-0"
         />
       </div>
       <table className="sr-only">

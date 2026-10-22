@@ -20,9 +20,9 @@ export function SimMetrics({ className }: { className?: string }) {
       ]
     : [];
   return (
-    <dl className={cn("grid grid-cols-2 gap-px bg-cobalt-700 font-sans", className)}>
+    <dl className={cn("grid grid-cols-2 gap-2 font-sans", className)}>
       {items.map((it, i) => (
-        <div key={it.label} className={cn("bg-cobalt-900 p-4", i === items.length - 1 && items.length % 2 === 1 && "col-span-2")}>
+        <div key={it.label} className={cn("rounded-ticket bg-cobalt-900 p-4", i === items.length - 1 && items.length % 2 === 1 && "col-span-2")}>
           <dt className="text-[14px] leading-tight text-cobalt-200">{it.label}</dt>
           <dd className={cn("mt-1 font-display text-4xl font-semibold leading-none", it.alert && "text-[#ff8b7e]")}>
             <NumberTicker value={it.value} prefix={it.prefix} />

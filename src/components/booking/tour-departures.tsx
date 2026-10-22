@@ -75,16 +75,16 @@ function DepartureRow({ d, now }: { d: DepartureView; now: number }) {
   const body = (
     <>
       <div className="flex min-w-0 flex-1 flex-col gap-3 py-4 pl-6 pr-5 sm:flex-row sm:items-center sm:gap-6 sm:pl-8 sm:pr-6">
-        <p className="flex min-w-0 items-baseline gap-3 sm:w-48 sm:flex-col sm:items-start sm:gap-0">
+        <p className="flex min-w-0 flex-wrap items-baseline gap-x-3 sm:w-56 sm:flex-col sm:items-start sm:gap-0">
           <span className="font-display text-lead font-bold uppercase leading-none tracking-[-0.005em]">{formatDayShort(d.startsAt)}</span>
-          <span className="text-small text-ink-soft sm:mt-1">
-            {formatTime(d.startsAt)}
-            {soon ? ` · ${formatRelativeDay(d.startsAt, now)}` : ""}
+          <span className="whitespace-nowrap sm:mt-1">
+            <span className="text-body">{formatTime(d.startsAt)}</span>
+            {soon ? <span className="text-small text-ink-soft"> · {formatRelativeDay(d.startsAt, now)}</span> : null}
           </span>
         </p>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <BoletoStrip capacity={d.capacity} taken={d.seatsTaken} held={held} size="sm" />
-          <p className="text-small text-ink-soft">
+          <p className="text-body">
             <span className="tabular font-semibold text-ink">{d.left}</span> de <span className="tabular">{d.capacity}</span> libres
           </p>
         </div>
@@ -112,7 +112,7 @@ function DepartureRow({ d, now }: { d: DepartureView; now: number }) {
     </>
   );
 
-  const shell = "ticket-notch group relative flex flex-col text-ink sm:flex-row sm:items-stretch";
+  const shell = "ticket-notch group relative flex flex-col overflow-hidden rounded-ticket text-ink sm:flex-row sm:items-stretch";
   if (bookable) {
     return (
       <Link
@@ -126,7 +126,7 @@ function DepartureRow({ d, now }: { d: DepartureView; now: number }) {
     );
   }
   return (
-    <div className={cn(shell, "bg-sand-100")} style={NOTCH_10} aria-disabled="true">
+    <div className={cn(shell, "bg-sand-50")} style={NOTCH_10} aria-disabled="true">
       {body}
     </div>
   );
@@ -147,10 +147,10 @@ function SkeletonRows() {
   return (
     <div aria-busy="true" aria-label="Cargando salidas" className="flex flex-col gap-2">
       {[0, 1, 2, 3].map((i) => (
-        <div key={i} className="bk-skeleton ticket-notch flex h-[88px] items-center gap-6 bg-sand-50 px-8" style={{ ...NOTCH_10, animationDelay: `${i * 120}ms` }}>
-          <span className="h-5 w-28 bg-sand-300" />
-          <span className="hidden h-5 w-60 bg-sand-300 sm:block" />
-          <span className="ml-auto h-5 w-14 bg-sand-300" />
+        <div key={i} className="bk-skeleton ticket-notch flex h-[88px] items-center gap-6 rounded-ticket bg-sand-50 px-8" style={{ ...NOTCH_10, animationDelay: `${i * 120}ms` }}>
+          <span className="h-5 w-28 rounded-full bg-sand-300" />
+          <span className="hidden h-5 w-60 rounded-full bg-sand-300 sm:block" />
+          <span className="ml-auto h-5 w-14 rounded-full bg-sand-300" />
         </div>
       ))}
     </div>

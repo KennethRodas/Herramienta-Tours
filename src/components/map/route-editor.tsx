@@ -11,7 +11,7 @@ import { ControlButton, ControlStack, Segmented, type Dimension } from "./contro
 import { ElevationProfile, type ProfileHandle } from "./elevation-profile";
 import { EditorFallback } from "./fallback";
 import { Flyover } from "./flyover";
-import { along, bearing, boundsOf, clamp, haversine, snap, toLine, type LL } from "./geo";
+import { along, bearing, boundsOf, clamp, easeInOut, haversine, snap, toLine, type LL } from "./geo";
 import { readInks } from "./inks";
 import { LoadingVeil } from "./lazy";
 import { createMap, MAP_BOX, supportsWebGL2 } from "./maplibre";
@@ -240,6 +240,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
     path.forEach((p, i) => {
       const el = document.createElement("div");
       el.className = "wm-vertex";
+      el.appendChild(document.createElement("span")).className = "wm-knob";
       if (i === 0) el.dataset.end = "start";
       else if (i === path.length - 1) el.dataset.end = "end";
       el.title = i === 0 ? "Inicio: arrastrá para mover, clic para borrar" : "Arrastrá para mover, clic para borrar";
@@ -259,6 +260,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
       const mid: LL = [r6((a[0] + b[0]) / 2), r6((a[1] + b[1]) / 2)];
       const el = document.createElement("div");
       el.className = "wm-mid";
+      el.appendChild(document.createElement("span")).className = "wm-knob";
       el.title = "Clic o arrastre: insertar un punto aquí";
       const m = new ml.Marker({ element: el, draggable: true }).setLngLat(mid).addTo(map);
       m.on("drag", () => previewTrace([...path.slice(0, i), ll(m), ...path.slice(i)]));
@@ -391,7 +393,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
       walker.remove();
       chart?.setCursor(null);
       if (map.getLayer(progress)) map.setLayoutProperty(progress, "visibility", "none");
-      map.easeTo({ ...before, duration: 700 });
+      map.easeTo({ ...before, duration: 700, easing: easeInOut });
     };
   }, [map, ml, previewing, ink, reduce]);
 
@@ -421,7 +423,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
   // ---- Actions ----------------------------------------------------------------------
   const switchView = (v: Dimension) => {
     setView(v);
-    map?.easeTo({ pitch: v === "3d" ? 60 : 0, duration: 500 });
+    map?.easeTo({ pitch: v === "3d" ? 60 : 0, duration: 500, easing: easeInOut });
   };
 
   const updateWaypoint = (id: string, patch: Partial<Waypoint>, tag: string) => {
@@ -496,7 +498,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
             type="button"
             onClick={() => setPreviewing((p) => !p)}
             disabled={!valid}
-            className="pressable inline-flex h-10 items-center gap-2 bg-sand-300 px-3 text-[15px] font-semibold text-cobalt-800 hover:bg-sand-400 disabled:opacity-45"
+            className="pressable inline-flex h-10 items-center gap-2 rounded-full bg-sand-300 pl-3.5 pr-4 text-[15px] font-semibold text-cobalt-800 hover:bg-sand-400 disabled:opacity-45"
           >
             {previewing ? <Square size={16} strokeWidth={2.25} aria-hidden className="fill-current" /> : <Play size={16} strokeWidth={2.25} aria-hidden className="fill-current" />}
             {previewing ? "Detener" : "Recorrer"}
@@ -505,7 +507,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
             type="button"
             onClick={save}
             disabled={!dirty || !valid || previewing}
-            className="pressable ml-auto inline-flex h-10 items-center bg-primary px-4 text-[15px] font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            className="pressable ml-auto inline-flex h-10 items-center rounded-full bg-primary px-5 text-[15px] font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Guardar
           </button>
@@ -514,7 +516,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
 
         <div
           className={cn(
-            "wm-map relative h-[52vh] min-h-[340px] bg-sand-300 lg:h-[58vh]",
+            "wm-map relative h-[52vh] min-h-[340px] rounded-ticket bg-sand-300 lg:h-[58vh]",
             previewing && "wm-hide-handles",
             mode === "trazo" && !previewing && "wm-edit-trace",
           )}
@@ -542,7 +544,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
             {sortedWaypoints.map((w) => (
               <li
                 key={w.id}
-                className={cn("paper grid gap-2 p-3", selected === w.id && "outline-2 outline-cobalt-800")}
+                className={cn("paper grid gap-2 rounded-field p-3", selected === w.id && "outline-2 outline-offset-2 outline-cobalt-800")}
                 onFocusCapture={() => setSelected(w.id)}
               >
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
@@ -553,7 +555,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
                     id={`${w.id}-name`}
                     value={w.name}
                     onChange={(e) => updateWaypoint(w.id, { name: e.target.value }, `name:${w.id}`)}
-                    className="h-10 min-w-0 border border-cobalt-800/25 bg-sand-50 px-2 text-[16px] font-semibold text-cobalt-800 outline-none focus-visible:border-cobalt-800"
+                    className="h-10 min-w-0 rounded-field border border-cobalt-800/25 bg-sand-50 px-3 text-[16px] font-semibold text-cobalt-800 outline-none focus-visible:border-cobalt-800"
                   />
                   <label className="sr-only" htmlFor={`${w.id}-kind`}>
                     Tipo
@@ -562,7 +564,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
                     id={`${w.id}-kind`}
                     value={w.kind}
                     onChange={(e) => updateWaypoint(w.id, { kind: e.target.value as Waypoint["kind"] }, `kind:${w.id}`)}
-                    className="h-10 border border-cobalt-800/25 bg-sand-50 px-2 text-[16px] text-cobalt-800 outline-none focus-visible:border-cobalt-800"
+                    className="h-10 rounded-field border border-cobalt-800/25 bg-sand-50 px-3 text-[16px] text-cobalt-800 outline-none focus-visible:border-cobalt-800"
                   >
                     {KIND_ORDER.map((k) => (
                       <option key={k} value={k}>
@@ -572,7 +574,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
                   </select>
                 </div>
                 <div className="grid grid-cols-[7rem_minmax(0,1fr)_auto] items-center gap-2">
-                  <label className="flex h-10 items-center gap-1 border border-cobalt-800/25 bg-sand-50 px-2 focus-within:border-cobalt-800">
+                  <label className="flex h-10 items-center gap-1 rounded-field border border-cobalt-800/25 bg-sand-50 px-3 focus-within:border-cobalt-800">
                     <span className="sr-only">Altura en metros</span>
                     <input
                       type="number"
@@ -594,7 +596,7 @@ export default function RouteEditorImpl({ tour, onSave, className }: RouteEditor
                     value={w.note ?? ""}
                     placeholder="Nota"
                     onChange={(e) => updateWaypoint(w.id, { note: e.target.value }, `note:${w.id}`)}
-                    className="h-10 min-w-0 border border-cobalt-800/25 bg-sand-50 px-2 text-[16px] text-cobalt-800 outline-none placeholder:text-cobalt-300 focus-visible:border-cobalt-800"
+                    className="h-10 min-w-0 rounded-field border border-cobalt-800/25 bg-sand-50 px-3 text-[16px] text-cobalt-800 outline-none placeholder:text-cobalt-300 focus-visible:border-cobalt-800"
                   />
                   <ControlButton label={`Quitar ${w.name}`} onClick={() => removeWaypoint(w.id)}>
                     <Trash size={18} strokeWidth={2.25} aria-hidden />

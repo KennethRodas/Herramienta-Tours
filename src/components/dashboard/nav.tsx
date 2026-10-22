@@ -142,17 +142,17 @@ function SideLink({ item, active, badge }: { item: NavItem; active: boolean; bad
       href={item.href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "pressable relative isolate flex h-11 items-center gap-3 px-3 text-[16px] font-semibold select-none [-webkit-touch-callout:none]",
+        "pressable relative isolate flex h-11 items-center gap-3 rounded-full px-3.5 text-[16px] font-semibold select-none [-webkit-touch-callout:none]",
         active ? "text-paper" : "text-ink hover:bg-ink/8",
       )}
     >
       {active ? (
-        <motion.span layoutId="wilber-side-active" transition={reduce ? { duration: 0 } : SPRING_LAYOUT} className="absolute inset-0 -z-10 bg-ink" />
+        <motion.span layoutId="wilber-side-active" transition={reduce ? { duration: 0 } : SPRING_LAYOUT} className="absolute inset-0 -z-10 rounded-full bg-ink" />
       ) : null}
       <Icon className="size-5 shrink-0" aria-hidden />
       <span className="flex-1 truncate">{item.label}</span>
       {badge ? (
-        <span className="grid h-6 min-w-6 place-items-center bg-destructive px-1.5 text-[12px] font-bold tabular text-paper">{badge}</span>
+        <span className="grid h-6 min-w-6 place-items-center rounded-full bg-destructive px-1.5 text-[12px] font-bold tabular text-paper">{badge}</span>
       ) : null}
     </Link>
   );
@@ -162,8 +162,8 @@ export function Sidebar({ conflicts }: { conflicts: number }) {
   const pathname = usePathname();
   const active = navIdFor(pathname);
   return (
-    <aside className="sticky top-0 hidden h-dvh w-[248px] shrink-0 flex-col bg-paper text-paper-ink lg:flex">
-      <Link href="/wilber" className="pressable flex h-20 shrink-0 items-center gap-3 px-5 select-none">
+    <aside className="sticky top-3 m-3 mr-0 hidden h-[calc(100dvh-24px)] w-[248px] shrink-0 flex-col overflow-y-auto rounded-ticket bg-paper text-paper-ink lg:flex">
+      <Link href="/wilber" className="pressable m-2 flex h-16 shrink-0 items-center gap-3 rounded-field px-3 select-none hover:bg-ink/6">
         <LogoMark className="size-10" paper="var(--ink)" ink="var(--paper)" />
         <span className="flex flex-col leading-none">
           <span className="font-display text-[24px] font-bold uppercase tracking-[-0.01em]">Wilber</span>
@@ -196,7 +196,7 @@ export function TopBar({ title, onSearch, island }: { title: string; onSearch: (
       <button
         type="button"
         onClick={onSearch}
-        className="pressable flex h-11 w-[300px] items-center gap-2.5 bg-ink/8 px-3.5 text-left text-[15px] text-ink-soft select-none hover:bg-ink/12"
+        className="pressable flex h-11 w-[300px] items-center gap-2.5 rounded-full bg-ink/8 px-4 text-left text-[15px] text-ink-soft select-none hover:bg-ink/12"
       >
         <Search className="size-4.5 shrink-0" aria-hidden />
         <span className="flex-1 truncate">Código, nombre o salida</span>
@@ -259,9 +259,9 @@ export function MoreSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
       onOpenChange={onOpenChange}
       snapPoints={["auto"]}
       title="Más"
-      className="rounded-t-[22px] border-0 bg-paper text-paper-ink [&_h2[id$='-title']]:sr-only"
+      className="rounded-t-ticket border-0 bg-paper text-paper-ink [&_h2[id$='-title']]:sr-only"
     >
-      <nav aria-label="Más" className="flex flex-col pb-[calc(env(safe-area-inset-bottom,0px)+8px)]">
+      <nav aria-label="Más" className="flex flex-col pt-1 pb-[calc(env(safe-area-inset-bottom,0px)+8px)]">
         <ul className="flex flex-col gap-1">
           {rows.map((item) => {
             const Icon = item.icon;
@@ -273,7 +273,7 @@ export function MoreSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
                   onClick={() => onOpenChange(false)}
                   aria-current={on ? "page" : undefined}
                   className={cn(
-                    "pressable flex h-14 items-center gap-3.5 px-3 text-[17px] font-semibold select-none [-webkit-touch-callout:none]",
+                    "pressable flex h-14 items-center gap-3.5 rounded-field px-3.5 text-[17px] font-semibold select-none [-webkit-touch-callout:none]",
                     on ? "bg-ink text-paper" : "text-ink hover:bg-ink/8 active:bg-ink/10",
                   )}
                 >

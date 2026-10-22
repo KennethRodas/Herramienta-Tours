@@ -103,7 +103,7 @@ export function WhatsAppPhone({
               >
                 {showDay && now !== null && (
                   <div className="my-2 flex justify-center">
-                    <span className="bg-sand-300 px-2.5 py-0.5 font-sans text-[12px] font-semibold text-cobalt-700">
+                    <span className="rounded-full bg-sand-300 px-2.5 py-0.5 font-sans text-[12px] font-semibold text-cobalt-700">
                       {formatRelativeDay(m.createdAt, now)}
                     </span>
                   </div>
@@ -121,7 +121,7 @@ export function WhatsAppPhone({
                           href={`https://www.google.com/maps/search/?api=1&query=${m.location.lat},${m.location.lng}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="mb-2 block overflow-hidden rounded-[10px] bg-sand-200 text-cobalt-800"
+                          className="mb-2 block overflow-hidden rounded-field bg-sand-200 text-cobalt-800"
                         >
                           <span className="relative block h-24">
                             <svg className="absolute inset-0 size-full text-cobalt-800/20" aria-hidden>
@@ -153,7 +153,7 @@ export function WhatsAppPhone({
                             type="button"
                             disabled={!onSend || mine}
                             onClick={() => send(b)}
-                            className="pressable rounded-[10px] bg-sand-50 px-3 py-1.5 text-center font-sans text-[13px] font-semibold text-cobalt-700 enabled:hover:bg-sand-300 disabled:opacity-60"
+                            className="pressable rounded-field bg-sand-50 px-3 py-1.5 text-center font-sans text-[13px] font-semibold text-cobalt-700 enabled:hover:bg-sand-300 disabled:opacity-60"
                           >
                             {b}
                           </button>

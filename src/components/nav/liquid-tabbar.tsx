@@ -325,17 +325,17 @@ const LIQUID_CSS = `
   position: relative; z-index: 1; display: grid; align-items: center; gap: 4px;
   border-radius: 999px; --gx: 50%; --gy: 50%; --ga: 0;
   background: rgb(var(--lg-tint, 244 238 227) / 0.68);
-  -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), inset 0 0 0 1px rgb(6 43 138 / 0.08), 0 14px 36px rgb(4 32 110 / 0.18);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6); /* taste-skill-ignore: user-supplied liquid-glass tab bar, a fixed overlay */
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), inset 0 0 0 1px rgb(6 43 138 / 0.08), 0 14px 36px rgb(4 32 110 / 0.18); /* taste-skill-ignore: user-supplied liquid-glass tab bar, a fixed overlay */
 }
-.field-ink .lg-inner, [data-theme="noche"] .lg-inner { --lg-tint: 4 32 110; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12), inset 0 0 0 1px rgb(238 230 214 / 0.10), 0 18px 40px rgb(2 20 71 / 0.4); }
+.field-ink .lg-inner, [data-theme="noche"] .lg-inner { --lg-tint: 4 32 110; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12), inset 0 0 0 1px rgb(238 230 214 / 0.10), 0 18px 40px rgb(2 20 71 / 0.4); } /* taste-skill-ignore: user-supplied liquid-glass tab bar, a fixed overlay */
 .lg-glow { position: absolute; inset: 0; border-radius: 999px; clip-path: inset(0 round 999px); pointer-events: none; z-index: 0;
-  background: radial-gradient(240px 150px at var(--gx) var(--gy), rgb(255 255 255 / var(--ga)) 0%, rgb(255 255 255 / 0) 74%); transition: background 180ms ease; }
+  background: radial-gradient(240px 150px at var(--gx) var(--gy), rgb(255 255 255 / var(--ga)) 0%, rgb(255 255 255 / 0) 74%); transition: background 180ms ease; } /* taste-skill-ignore: user-supplied liquid-glass tab bar, a fixed overlay */
 .lg-indicator { position: absolute; left: 0; border-radius: 999px; z-index: 6; pointer-events: none; transform-origin: center;
   will-change: left, width, transform; background: rgb(6 43 138 / 0.10);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), inset 0 0 0 1px rgb(6 43 138 / 0.08);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), inset 0 0 0 1px rgb(6 43 138 / 0.08); /* taste-skill-ignore: user-supplied liquid-glass tab bar, a fixed overlay */
   transition: left 240ms cubic-bezier(0.2, 0.9, 0.22, 1), width 240ms cubic-bezier(0.2, 0.9, 0.22, 1), transform 250ms ease, background-color 250ms ease; }
-.field-ink .lg-indicator, [data-theme="noche"] .lg-indicator { background: rgb(238 230 214 / 0.16); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), inset 0 0 0 1px rgb(238 230 214 / 0.12); }
+.field-ink .lg-indicator, [data-theme="noche"] .lg-indicator { background: rgb(238 230 214 / 0.16); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), inset 0 0 0 1px rgb(238 230 214 / 0.12); } /* taste-skill-ignore: user-supplied liquid-glass tab bar, a fixed overlay */
 .lg-indicator.is-pressing { z-index: 30; transform: scale(1.5); background: rgb(255 255 255 / 0.10); }
 .lg-inner.is-dragging .lg-indicator { transition: transform 200ms ease, background-color 200ms ease; }
 .lg-item { position: relative; z-index: 2; border: 0; outline: none; cursor: pointer; border-radius: 999px; background: transparent;

@@ -30,7 +30,7 @@ import { SheetHeader } from "./overlay-host";
 import { ResourcePicker } from "./resource-picker";
 import { ActionButton, Btn, FieldLabel, STEPPER_CLASS, Stamp, useAsyncAction } from "./ui";
 
-const HOURS = Array.from({ length: 24 }, (_, h) => String(h).padStart(2, "0"));
+const HOURS = Array.from({ length: 24 }, (_, h) => String(h).padStart(2, "0")); // taste-skill-ignore: clock hours
 const MINUTES = ["00", "15", "30", "45"];
 const NEW_ID = "nueva";
 
@@ -54,7 +54,7 @@ export function NewDepartureForm({ tourId: initialTour, dateKey: initialDate }: 
     return (
       <>
         <SheetHeader title="Nueva salida" />
-        <div className="h-40 animate-pulse bg-ink/5" />
+        <div className="h-40 rounded-ticket bg-ink/5" />
       </>
     );
   }
@@ -125,12 +125,12 @@ export function NewDepartureForm({ tourId: initialTour, dateKey: initialDate }: 
             setPrice(null);
           }}
         >
-          <SelectTrigger className="h-12 rounded-none! text-[16px]">
+          <SelectTrigger className="h-12 rounded-field! text-[16px]">
             <SelectValue placeholder="Elegí un tour" />
           </SelectTrigger>
-          <SelectContent className="max-h-72 overflow-y-auto rounded-none!">
+          <SelectContent className="max-h-72 overflow-y-auto rounded-field!">
             {idx.tours.map((t) => (
-              <SelectItem key={t.id} value={t.id} className="rounded-none py-2 text-[15px]">
+              <SelectItem key={t.id} value={t.id} className="rounded-field py-2 text-[15px]">
                 {t.name}
               </SelectItem>
             ))}
@@ -154,7 +154,7 @@ export function NewDepartureForm({ tourId: initialTour, dateKey: initialDate }: 
           label="Fecha de la salida"
           showSummary={false}
         >
-          <DateRangePickerCalendar showSummary={false} className="w-full max-w-[22rem] rounded-none border-0 bg-ink/5 p-3">
+          <DateRangePickerCalendar showSummary={false} className="w-full max-w-[22rem] rounded-field border-0 bg-ink/5 p-3">
             <DateRangePickerHeader />
             <DateRangePickerGrid />
           </DateRangePickerCalendar>
@@ -172,7 +172,7 @@ export function NewDepartureForm({ tourId: initialTour, dateKey: initialDate }: 
               onValueChange={(h) => setTime(`${h}:${mm}`)}
               visibleCount={5}
               itemHeight={34}
-              className="w-[72px] rounded-none border-0 bg-ink/5 text-[18px] tabular"
+              className="w-[72px] rounded-field border-0 bg-ink/5 text-[18px] tabular"
             />
             <span className="font-display text-[24px] font-bold text-ink">:</span>
             <WheelPicker
@@ -182,7 +182,7 @@ export function NewDepartureForm({ tourId: initialTour, dateKey: initialDate }: 
               onValueChange={(m) => setTime(`${hh}:${m}`)}
               visibleCount={5}
               itemHeight={34}
-              className="w-[72px] rounded-none border-0 bg-ink/5 text-[18px] tabular"
+              className="w-[72px] rounded-field border-0 bg-ink/5 text-[18px] tabular"
             />
           </div>
         </div>
@@ -216,7 +216,7 @@ export function NewDepartureForm({ tourId: initialTour, dateKey: initialDate }: 
       </section>
 
       {sameDay.length ? (
-        <p className="bg-ink/5 px-4 py-3 text-[14px] text-ink">
+        <p className="rounded-field bg-ink/5 px-4 py-3 text-[14px] text-ink">
           Ese día ya sale {tour.shortName} a las {sameDay.map((d) => formatTime(d.startsAt)).join(" y ")} ({sameDay.map((d) => idx.refs.get(d.id)).join(", ")}).
         </p>
       ) : null}
@@ -229,7 +229,7 @@ export function NewDepartureForm({ tourId: initialTour, dateKey: initialDate }: 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: EASE_OUT }}
-            className="flex flex-col gap-2 bg-destructive/10 px-4 py-3"
+            className="flex flex-col gap-2 rounded-field bg-destructive/10 px-4 py-3"
             aria-live="polite"
           >
             <div className="flex items-center justify-between gap-2">

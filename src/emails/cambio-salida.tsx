@@ -37,6 +37,7 @@ export function CambioSalida({ c, change }: { c: BookingCtx; change: ChangeInfo 
           </Text>
           {change.detail ? <Text style={{ ...text, marginTop: 12 }}>Motivo: {change.detail}</Text> : null}
         </Sheet>
+        <Gap h={8} />
         <Band>Escribile a Wilber por WhatsApp para elegir otra fecha.</Band>
         <Gap h={18} />
         <Section>

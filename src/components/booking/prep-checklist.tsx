@@ -28,9 +28,9 @@ export function PrepChecklist({ code, items }: { code: string; items: string[] }
           {done} de {items.length} listos
         </p>
       </div>
-      <div aria-hidden className="h-1.5 bg-sand-300">
+      <div aria-hidden className="h-1.5 overflow-hidden rounded-full bg-sand-300">
         <motion.div
-          className="h-full origin-left bg-cobalt-800"
+          className="h-full origin-left rounded-full bg-cobalt-800"
           initial={false}
           animate={{ scaleX: items.length ? done / items.length : 0 }}
           transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 30 }}
@@ -40,7 +40,7 @@ export function PrepChecklist({ code, items }: { code: string; items: string[] }
         {items.map((item, i) => {
           const on = ticked.has(i);
           return (
-            <li key={item} className={cx("print-corners -mx-2 px-2 py-2 transition-colors duration-200", on ? "bg-transparent" : "hover:bg-sand-100")}>
+            <li key={item} className={cx("-mx-2 rounded-field px-2 py-2 transition-colors duration-200", on ? "bg-transparent" : "hover:bg-sand-100")}>
               <Checkbox
                 checked={on}
                 onCheckedChange={(v) => toggle(i, v)}

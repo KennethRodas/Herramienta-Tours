@@ -9,13 +9,14 @@ import { formatDayLong, formatDayShort, formatTime, formatUsd, plural } from "@/
 import { useDeparture, useTours, type DepartureView } from "@/lib/sim/hooks";
 import { MeetingPointMap } from "@/components/map";
 import { BottomSheet } from "@/components/motion/bottom-sheet";
-import { NumberTicker } from "@/components/motion/number-ticker";
+import { AnimatedNumber } from "@/components/motion/animated-number";
 import { buttonClass } from "@/components/ui/button";
 import { BoletoStrip } from "./boleto-strip";
 import { useBookingFlow, type BookingFlow, type FormState } from "./booking-flow";
 import { BookingPanel } from "./booking-panel";
 import { cx } from "./cx";
 import { HoldBand } from "./hold-band";
+import { PhotoPlate } from "./photo-plate";
 import { Field, PaperStyles, SplitTicket, Stamp } from "./paper";
 import { useMedia } from "./use-media";
 import { devWorstCase, WORST_FORM } from "./worst-case";
@@ -44,21 +45,22 @@ function Loaded({ dep, tour, prefill }: { dep: DepartureView; tour: Tour; prefil
       <PaperStyles />
       <Link
         href={`/aventuras/${tour.slug}#salidas`}
-        className="group -ml-2 inline-flex items-center gap-2 px-2 py-2 text-body font-semibold transition-colors hover:bg-sand-300"
+        className="group -ml-3 inline-flex items-center gap-2 rounded-full px-3 py-2 text-body font-semibold transition-colors hover:bg-sand-300"
       >
         <ArrowLeft aria-hidden className="size-5 transition-transform duration-200 group-hover:-translate-x-1" strokeWidth={2.5} />
         Fechas de {tour.shortName}
       </Link>
 
-      <div className="mt-4 grid grid-cols-[minmax(0,1fr)] items-start gap-10 lg:grid-cols-12 lg:gap-12">
+      <div className="mt-8 grid grid-cols-[minmax(0,1fr)] items-start gap-10 sm:mt-4 lg:grid-cols-12 lg:gap-12">
         <div className="flex flex-col gap-12 lg:col-span-7">
           <DepartureTicket dep={dep} tour={tour} />
           {!desktop ? <MobileEntry flow={flow} onOpen={() => setSheet(true)} /> : null}
           {dep.notes ? (
-            <p className="bk-rise bg-sand-300 px-5 py-4 text-body leading-snug">
+            <p className="bk-rise rounded-field bg-sand-300 px-5 py-4 text-body leading-snug">
               <span className="font-semibold">Nota de Wilber:</span> {dep.notes}
             </p>
           ) : null}
+          <PhotoPlate photo={tour.photo} className="aspect-[16/9] w-full" />
           <MeetingBlock dep={dep} tour={tour} />
         </div>
 
@@ -72,7 +74,7 @@ function Loaded({ dep, tour, prefill }: { dep: DepartureView; tour: Tour; prefil
             onOpenChange={setSheet}
             snapPoints={[0.94]}
             title={`${tour.shortName} · ${formatDayLong(dep.startsAt)}`}
-            className="paper print-corners max-w-xl rounded-none border-0"
+            className="paper print-corners max-w-xl rounded-t-ticket rounded-b-none border-0"
           >
             <BookingPanel flow={flow} variant="sheet" />
           </BottomSheet>
@@ -91,8 +93,8 @@ function DepartureTicket({ dep, tour }: { dep: DepartureView; tour: Tour }) {
       split="sm"
       stubWidth="13.5rem"
       className="bk-rise"
-      bodyClassName="px-5 pb-8 pt-6 sm:px-8 sm:pb-9 sm:pt-8"
-      stubClassName="px-5 pb-6 pt-7 sm:flex sm:flex-col sm:justify-between sm:px-7 sm:py-8"
+      bodyClassName="px-5 pb-10 pt-6 sm:px-8 sm:pb-9 sm:pt-8"
+      stubClassName="px-5 pb-6 pt-12 sm:flex sm:flex-col sm:justify-between sm:px-7 sm:py-8"
       body={
         <>
           <h1 className="flex flex-col gap-3">
@@ -123,7 +125,7 @@ function DepartureTicket({ dep, tour }: { dep: DepartureView; tour: Tour }) {
             <span className="text-small">por persona</span>
           </p>
           <p className="flex flex-col items-end sm:items-start" aria-live="polite">
-            <NumberTicker value={dep.left} className="font-display text-head font-bold leading-none" blur />
+            <AnimatedNumber value={dep.left} format={(n) => String(Math.round(n))} className="font-display text-head font-bold leading-none" />
             <span className="text-small">
               {dep.left === 1 ? "cupo libre" : "cupos libres"} de <span className="tabular">{dep.capacity}</span>
             </span>
@@ -174,7 +176,7 @@ function MeetingBlock({ dep, tour }: { dep: DepartureView; tour: Tour }) {
       <h2 id="encuentro-salida" className="font-display text-head font-bold uppercase">
         Punto de encuentro
       </h2>
-      <div className="paper print-corners flex flex-col">
+      <div className="paper print-corners flex flex-col overflow-hidden">
         <MeetingPointMap point={point} className="h-72 w-full sm:h-80" />
         <div className="flex flex-col gap-5 px-5 py-6 sm:flex-row sm:items-end sm:justify-between sm:px-7">
           <div className="flex min-w-0 flex-col gap-2">
@@ -200,13 +202,13 @@ function DetailSkeleton() {
   return (
     <div aria-busy="true" aria-label="Cargando salida" className="mx-auto w-full max-w-[1240px] px-(--gutter) pt-8 lg:pt-12">
       <PaperStyles />
-      <div className="bk-skeleton h-10 w-56 bg-sand-300" />
+      <div className="bk-skeleton h-10 w-56 rounded-full bg-sand-300" />
       <div className="mt-4 grid gap-10 lg:grid-cols-12 lg:gap-12">
         <div className="flex flex-col gap-6 lg:col-span-7">
-          <div className="bk-skeleton h-72 bg-sand-50" />
-          <div className="bk-skeleton h-80 bg-sand-50" style={{ animationDelay: "160ms" }} />
+          <div className="bk-skeleton h-72 rounded-ticket bg-sand-50" />
+          <div className="bk-skeleton h-80 rounded-ticket bg-sand-50" style={{ animationDelay: "160ms" }} />
         </div>
-        <div className="bk-skeleton hidden h-[520px] bg-sand-50 lg:col-span-5 lg:block" style={{ animationDelay: "80ms" }} />
+        <div className="bk-skeleton hidden h-[520px] rounded-ticket bg-sand-50 lg:col-span-5 lg:block" style={{ animationDelay: "80ms" }} />
       </div>
     </div>
   );

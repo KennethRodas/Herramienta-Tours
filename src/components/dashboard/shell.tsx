@@ -20,44 +20,47 @@ import { OverlayHost } from "./overlay-host";
 // tab bar on the phone, sidebar on the desktop), ⌘K, live events and the one
 // sheet every record opens in.
 
-// The night scope in globals.css lives in @layer components, which loses to the
-// unlayered :root tokens when data-theme sits on <html> itself. This unlayered
-// copy of the same token set makes the night ink reach <body> and every portal
-// (sheets, ⌘K, tooltips). Same values as globals.css; drop it if that scope
-// moves out of the layer.
-const NIGHT_TOKENS = `
-html[data-theme="noche"] {
-  --background: var(--cobalt-800); --foreground: var(--sand-100); --card: var(--cobalt-900); --card-foreground: var(--sand-100);
-  --popover: var(--cobalt-950); --popover-foreground: var(--sand-100); --primary: var(--sand-100); --primary-foreground: var(--cobalt-800);
-  --secondary: var(--cobalt-900); --secondary-foreground: var(--sand-100); --muted: var(--cobalt-900); --muted-foreground: var(--cobalt-300);
-  --accent: var(--cobalt-700); --accent-foreground: var(--sand-50); --destructive: #ff8b7e; --success: var(--cobalt-200);
-  --border: rgb(238 230 214 / 0.16); --border-strong: rgb(238 230 214 / 0.34); --input: rgb(238 230 214 / 0.26); --ring: var(--sand-100);
-  --ink: var(--sand-100); --ink-soft: var(--cobalt-300); --ground: var(--cobalt-800); --surface: var(--cobalt-900); --surface-2: var(--cobalt-700);
-  --paper: var(--cobalt-900); --paper-ink: var(--sand-100); --chart-1: var(--sand-100); --chart-2: var(--cobalt-300); --chart-3: var(--cobalt-600);
-  color-scheme: dark;
-}`;
-
-const SHELL_CSS = `${NIGHT_TOKENS}
+// Night tokens live unlayered in globals.css ([data-theme="noche"]); the shell only
+// flips the attribute. Toasts come from the root Toaster, rounded here for the panel.
+const SHELL_CSS = `
 html, body { overscroll-behavior: none; }
+[data-sonner-toast][data-styled="true"] { border-radius: var(--radius-field) !important; }
 [data-sonner-toast][data-styled="true"] [data-description] { color: var(--cobalt-200) !important; }
-[data-sonner-toast][data-styled="true"] [data-button] { border-radius: 0 !important; height: 30px !important; padding: 0 12px !important; font-size: 14px !important; font-weight: 600 !important; background: var(--sand-50) !important; color: var(--cobalt-800) !important; }
+[data-sonner-toast][data-styled="true"] [data-button] { border-radius: 9999px !important; height: 30px !important; padding: 0 14px !important; font-size: 14px !important; font-weight: 600 !important; background: var(--sand-50) !important; color: var(--cobalt-800) !important; }
 [data-theme="noche"] [data-sonner-toast][data-styled="true"] { background: var(--sand-100) !important; color: var(--cobalt-800) !important; }
 [data-theme="noche"] [data-sonner-toast][data-styled="true"] [data-description] { color: var(--cobalt-600) !important; }
 [data-theme="noche"] [data-sonner-toast][data-styled="true"] [data-button] { background: var(--cobalt-800) !important; color: var(--sand-50) !important; }
+.lg-wrap.dash-seg .lg-inner { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; } /* taste-skill-ignore: in-page switchers sit flat, only the tab bar floats */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 260ms; animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
 `;
 
+type TransitionDoc = Document & { startViewTransition?: (update: () => void) => unknown };
+
 function useApplyTheme(theme: "dia" | "noche" | undefined, pathname: string) {
+  const applied = useRef(false);
   useLayoutEffect(() => {
     if (!theme) return;
     const html = document.documentElement;
-    if (theme === "noche") html.setAttribute("data-theme", "noche");
-    else html.removeAttribute("data-theme");
-    // Status bar and browser chrome follow the ground colour.
-    const ground = getComputedStyle(html).getPropertyValue("--ground").trim();
-    document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((m) => {
-      if (m.dataset.wilberPrev === undefined) m.dataset.wilberPrev = m.content;
-      if (ground) m.content = ground;
-    });
+    const apply = () => {
+      if (theme === "noche") html.setAttribute("data-theme", "noche");
+      else html.removeAttribute("data-theme");
+      // Status bar and browser chrome follow the ground colour.
+      const ground = getComputedStyle(html).getPropertyValue("--ground").trim();
+      document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((m) => {
+        if (m.dataset.wilberPrev === undefined) m.dataset.wilberPrev = m.content;
+        if (ground) m.content = ground;
+      });
+    };
+    const changing = (html.getAttribute("data-theme") === "noche") !== (theme === "noche");
+    const first = !applied.current;
+    applied.current = true;
+    const doc = document as TransitionDoc;
+    // Day to night cross-fades the whole page once; first paint and reduced motion switch instantly.
+    if (changing && !first && typeof doc.startViewTransition === "function" && document.visibilityState === "visible" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      doc.startViewTransition(apply);
+    } else {
+      apply();
+    }
   }, [theme, pathname]);
 
   useEffect(

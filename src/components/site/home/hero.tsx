@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { ButtonLink } from "@/components/ui/button";
 import { BUSINESS } from "@/content/catalog";
+import { FolderTab } from "../folder-tab";
 import { CatalogSummary } from "./catalog-summary";
 import { HeroDepartures } from "./hero-departures";
 
@@ -24,7 +25,7 @@ type Vars = CSSProperties & Record<`--${string}`, string | number>;
 
 export function Hero() {
   return (
-    <section aria-labelledby="hero-name" className="field-ink relative overflow-x-clip">
+    <section aria-labelledby="hero-name" className="field-ink relative overflow-x-clip pb-[clamp(40px,5vw,72px)]">
       <style>{HERO_CSS}</style>
       <div className="mx-auto max-w-[1760px] px-[var(--gutter)]">
         <h1 id="hero-name" aria-label="Wilber" className="hero-name flex justify-center pt-2 font-display font-bold uppercase md:pt-1">
@@ -51,7 +52,7 @@ export function Hero() {
               className="folder folder-link hero-folder"
               style={{ "--c": f.c, "--t": f.t, "--x": f.x, "--x-md": f.xmd, "--f": i } as Vars}
             >
-              <span className="folder-tab">{f.label}</span>
+              <FolderTab>{f.label}</FolderTab>
               <span className="folder-note">{f.note}</span>
             </a>
           ))}
@@ -61,11 +62,11 @@ export function Hero() {
           id="salidas"
           aria-labelledby="salidas-titulo"
           className="folder folder-front hero-folder ink-paper"
-          style={{ "--c": "var(--sand-50)", "--t": "var(--cobalt-800)", "--x": "0%", "--x-md": "0%", "--f": FOLDERS.length } as Vars}
+          style={{ "--c": "var(--sand-50)", "--t": "var(--cobalt-800)", "--x": "0px", "--x-md": "0px", "--f": FOLDERS.length } as Vars}
         >
-          <h2 id="salidas-titulo" className="folder-tab">
+          <FolderTab as="h2" id="salidas-titulo">
             Próximas salidas
-          </h2>
+          </FolderTab>
           <div className="px-4 pt-5 pb-10 sm:px-6 md:px-8 md:pt-7 md:pb-12 xl:grid xl:grid-cols-12 xl:gap-x-8">
             <div className="flex flex-col items-stretch gap-3 sm:items-start xl:col-span-3">
               <ButtonLink href="/aventuras">Ver todas las salidas</ButtonLink>
@@ -87,30 +88,28 @@ const HERO_CSS = `
 .hero-mask { display: inline-block; overflow: clip; padding: 0.1em 0.004em 0.02em; margin: -0.1em 0 -0.02em; }
 .hero-letter { display: inline-block; }
 
-.folders { --strip: 44px; --tab-h: 34px; }
-@media (min-width: 768px) { .folders { --strip: 48px; --tab-h: 40px; } }
-.folder { position: relative; display: block; height: var(--strip); background: var(--c); color: var(--t); }
-.folder-tab {
-  position: absolute; bottom: calc(100% - 1px); left: var(--x); height: calc(var(--tab-h) + 1px);
-  display: flex; align-items: center; padding: 0 22px; white-space: nowrap;
-  background: var(--c); color: var(--t);
-  font-family: var(--font-sans); font-size: 17px; font-weight: 600; line-height: 1;
-  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 100%, 0 100%);
+/* Folder bodies: rounded at the top, each one running --fr under the folder
+   in front of it, so the front folder's rounded corners show the one behind. */
+.folders { --strip: 48px; --fr: var(--radius-ticket); }
+.folder {
+  position: relative; display: block; height: calc(var(--strip) + var(--fr)); margin-bottom: calc(-1 * var(--fr));
+  background: var(--c); color: var(--t); border-radius: var(--fr) var(--fr) 0 0;
 }
-@media (min-width: 768px) { .folder-tab { left: var(--x-md); padding: 0 28px; clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 100%, 0 100%); } }
+.folder > .ft { left: max(20px, var(--x)); }
+@media (min-width: 768px) { .folder > .ft { left: max(20px, var(--x-md)); } }
 .folder-note { display: none; }
 @media (min-width: 1024px) {
-  .folder-note { display: flex; position: absolute; inset: 0 24px 0 auto; align-items: center; font-size: var(--step-small); font-weight: 500; }
+  .folder-note { display: flex; position: absolute; top: 0; right: 28px; height: var(--strip); align-items: center; font-size: var(--step-small); font-weight: 500; }
 }
-.folder-front { height: auto; }
+.folder-front { height: auto; margin-bottom: 0; border-radius: var(--fr); }
 .folder-link { transition: transform var(--dur-base) var(--ease-out); outline-offset: -4px; }
-.folder-link:active { transform: translateY(-2px); }
+.folder-link:active { transform: translateY(-2px); transition-duration: var(--dur-press); }
 @media (hover: hover) and (pointer: fine) { .folder-link:hover { transform: translateY(-7px); } }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hero-letter { animation: hero-rise 1s var(--ease-out) backwards; animation-delay: calc(var(--i) * 55ms + 80ms); }
-  .hero-line { animation: hero-fade 0.9s var(--ease-out) backwards; animation-delay: 460ms; }
-  .hero-folder { animation: hero-folder 0.95s var(--ease-drawer) backwards; animation-delay: calc(var(--f) * 75ms + 540ms); }
+  .hero-letter { animation: hero-rise 0.9s var(--ease-out) backwards; animation-delay: calc(var(--i) * 50ms + 60ms); }
+  .hero-line { animation: hero-fade 0.7s var(--ease-out) backwards; animation-delay: 340ms; }
+  .hero-folder { animation: hero-folder 0.8s var(--ease-drawer) backwards; animation-delay: calc(var(--f) * 60ms + 380ms); }
 }
 @keyframes hero-rise { from { transform: translateY(108%); } }
 @keyframes hero-fade { from { opacity: 0; transform: translateY(16px); } }

@@ -49,9 +49,9 @@ export function LazyMount({
 /** Sand box with the shape of what is coming: a map, and a profile strip if any. */
 export function MapSkeleton({ profile = false, label = "Cargando mapa" }: { profile?: boolean; label?: string }) {
   return (
-    <div className="absolute inset-0 flex flex-col bg-sand-300" role="status" aria-label={label}>
-      <div className="relative grid min-h-0 flex-1 place-items-center">
-        <span aria-hidden className="text-[15px] font-semibold text-cobalt-600">
+    <div className="absolute inset-0 flex flex-col gap-2" role="status" aria-label={label}>
+      <div className="relative grid min-h-0 flex-1 place-items-center rounded-ticket bg-sand-300">
+        <span aria-hidden className="text-[15px] font-semibold text-cobalt-800">
           {label}
         </span>
       </div>
@@ -66,11 +66,11 @@ export function LoadingVeil({ ready }: { ready: boolean }) {
     <div
       aria-hidden
       className={cn(
-        "pointer-events-none absolute inset-0 grid place-items-center bg-sand-300 transition-opacity duration-300 ease-out",
+        "pointer-events-none absolute inset-0 grid place-items-center bg-sand-300 transition-opacity duration-300 ease-out-strong",
         ready ? "opacity-0" : "opacity-100",
       )}
     >
-      <span className="text-[15px] font-semibold text-cobalt-600">Cargando mapa</span>
+      <span className="text-[15px] font-semibold text-cobalt-800">Cargando mapa</span>
     </div>
   );
 }
@@ -78,8 +78,8 @@ export function LoadingVeil({ ready }: { ready: boolean }) {
 export function EditorSkeleton() {
   return (
     <div className="absolute inset-0 grid grid-rows-[auto_1fr] gap-3" role="status" aria-label="Cargando editor">
-      <div className="h-12 bg-sand-300" />
-      <div className="bg-sand-300" />
+      <div className="h-10 w-2/3 rounded-full bg-sand-300" />
+      <div className="rounded-ticket bg-sand-300" />
     </div>
   );
 }

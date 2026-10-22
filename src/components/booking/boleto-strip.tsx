@@ -134,7 +134,7 @@ export function BoletoStrip({ capacity, taken, selected = 0, held = 0, size = "m
             }
             transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.42, bounce: 0.25 }}
             className={cn(
-              "ticket-notch relative grid shrink-0 place-items-center transition-colors duration-150",
+              "ticket-notch relative grid shrink-0 place-items-center rounded-stub transition-colors duration-150",
               state === "free" && "bg-cobalt-800",
               state === "taken" && "bg-cobalt-600",
               state === "held" && "bg-cobalt-300",
@@ -171,7 +171,7 @@ export function StripKey({ taken, held = 0, selected = 0, free, className }: { t
     <ul aria-hidden className={cn("flex flex-wrap gap-x-4 gap-y-1 text-small text-ink-soft", className)}>
       {items.map((x) => (
         <li key={x.label} className="inline-flex items-center gap-1.5">
-          <span className={cn("ticket-notch inline-block h-3.5 w-2.5", x.swatch)} style={{ "--n": "2px" } as CSSProperties} />
+          <span className={cn("ticket-notch inline-block h-3.5 w-2.5 rounded-stub", x.swatch)} style={{ "--n": "2px" } as CSSProperties} />
           <span className="tabular">{x.n}</span> {x.label}
         </li>
       ))}

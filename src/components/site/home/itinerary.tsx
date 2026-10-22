@@ -61,7 +61,7 @@ export function Itinerary() {
           <ul data-reveal className="mt-4 flex max-w-[36ch] flex-col gap-1.5 text-body leading-snug">
             {tour.bring.map((item) => (
               <li key={item} className="flex gap-3">
-                <span aria-hidden className="mt-[0.55em] size-1.5 shrink-0 bg-sand-50" />
+                <span aria-hidden className="mt-[0.5em] size-2 shrink-0 rounded-full bg-sand-50" />
                 {item}
               </li>
             ))}
@@ -74,7 +74,7 @@ export function Itinerary() {
         <div className="flex justify-center lg:col-span-5 lg:col-start-8 lg:justify-start">
           <div
             data-reveal="slip"
-            className="ink-paper edge-zigzag-b w-full max-w-[480px] bg-sand-50 pb-8 text-ink"
+            className="ink-paper edge-zigzag-b w-full max-w-[480px] rounded-t-ticket bg-sand-50 pb-8 text-ink"
             style={{ ["--z" as string]: "18px" } as CSSProperties}
           >
             <div className="px-6 pt-8 pb-5 text-center sm:px-8">
@@ -100,7 +100,7 @@ export function Itinerary() {
                 </div>
               ))}
             </div>
-            <div className="flex h-11 items-center justify-between bg-cobalt-800 px-6 text-[17px] font-semibold text-sand-50 sm:px-8">
+            <div className="mx-3 flex h-12 items-center justify-between rounded-field bg-cobalt-800 px-5 text-[17px] font-semibold text-sand-50 sm:mx-4 sm:px-6">
               <span>Regreso {last.time}</span>
               <span className="tabular">{formatDuration(tour.durationHours)}</span>
             </div>

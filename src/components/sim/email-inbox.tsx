@@ -50,8 +50,8 @@ export function EmailInbox({ className }: { className?: string }) {
   }, [open?.id]);
 
   return (
-    <div className={cn("grid min-h-0 gap-px bg-cobalt-700 font-sans md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]", className)}>
-      <ul data-lenis-prevent className="min-h-0 overflow-y-auto bg-cobalt-900">
+    <div className={cn("grid min-h-0 gap-2 font-sans md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]", className)}>
+      <ul data-lenis-prevent className="min-h-0 space-y-1 overflow-y-auto rounded-ticket bg-cobalt-900 p-1.5">
         {list.length === 0 && <li className="p-4 text-[15px] text-cobalt-300">Sin correos. Las reservas con correo y los resúmenes de las 6 p. m. llegan aquí.</li>}
         {list.map((m: Message) => (
           <li key={m.id}>
@@ -59,7 +59,7 @@ export function EmailInbox({ className }: { className?: string }) {
               type="button"
               onClick={() => setOpenId(m.id)}
               className={cn(
-                "pressable block w-full px-3.5 py-3 text-left",
+                "pressable block w-full rounded-field px-3.5 py-3 text-left",
                 open?.id === m.id ? "bg-cobalt-700" : "hover:bg-cobalt-800",
               )}
             >
@@ -71,7 +71,7 @@ export function EmailInbox({ className }: { className?: string }) {
           </li>
         ))}
       </ul>
-      <div className="relative min-h-[420px] bg-sand-100">
+      <div className="relative min-h-[420px] overflow-hidden rounded-ticket bg-sand-100">
         <AnimatePresence mode="wait">
           {html ? (
             <motion.iframe

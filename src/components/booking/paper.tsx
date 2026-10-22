@@ -28,7 +28,7 @@ const CSS = `
 .bk-split-sm>.bk-body{${pair("100% 0", "100% 100%", "x")}}
 .bk-split-sm>.bk-stub{${pair("0 0", "0 100%", "x")}}
 }
-.bk-tag{clip-path:polygon(22px 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%,0 22px);${mask(hole("50% 30px", "9px"))}}
+.bk-tag{${mask(hole("50% 30px", "9px"))}}
 @keyframes bk-pulse{0%,100%{opacity:1}50%{opacity:.45}}
 .bk-skeleton{animation:bk-pulse 1.6s var(--ease-in-out) infinite}
 @keyframes bk-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
@@ -68,13 +68,19 @@ export function SplitTicket({
   as?: "div" | "article" | "section";
 }) {
   const row = split === "lg" ? "lg:flex-row" : "sm:flex-row";
+  // Rounded paper everywhere except along the tear line, where body and stub meet.
+  const corners =
+    split === "lg"
+      ? { body: "rounded-t-ticket rounded-b-none lg:rounded-tr-none lg:rounded-bl-ticket", stub: "rounded-t-none rounded-b-ticket lg:rounded-tr-ticket lg:rounded-bl-none" }
+      : { body: "rounded-t-ticket rounded-b-none sm:rounded-tr-none sm:rounded-bl-ticket", stub: "rounded-t-none rounded-b-ticket sm:rounded-tr-ticket sm:rounded-bl-none" };
   return (
     <Tag className={cn("relative flex flex-col", row, split === "lg" ? "bk-split-lg" : "bk-split-sm", className)} style={{ "--stub": stubWidth } as CSSProperties}>
       <PaperStyles />
-      <div className={cn("bk-body paper min-w-0 flex-1", bodyClassName)}>{body}</div>
+      <div className={cn("bk-body paper min-w-0 flex-1", corners.body, bodyClassName)}>{body}</div>
       <div
         className={cn(
           "bk-stub paper relative shrink-0",
+          corners.stub,
           split === "lg" ? "lg:w-(--stub)" : "sm:w-(--stub)",
           stubClassName,
         )}
@@ -100,5 +106,5 @@ export function Field({ label, children, className }: { label: string; children:
 
 /** Rubber stamp. Stamp red is only for full, cancelled and errors. */
 export function Stamp({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn("stamp text-lead leading-none", className)}>{children}</span>;
+  return <span className={cn("stamp rounded-stub text-lead leading-none", className)}>{children}</span>;
 }

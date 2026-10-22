@@ -103,7 +103,7 @@ export function ResourcePicker({
             disabled={disabled}
             onClick={() => !on && onChange(o.id)}
             className={cn(
-              "pressable relative isolate flex min-h-[64px] flex-col items-start justify-center gap-0.5 px-3 py-2 text-left select-none disabled:opacity-50",
+              "pressable relative isolate flex min-h-[64px] flex-col items-start justify-center gap-0.5 rounded-field px-3.5 py-2 text-left select-none disabled:opacity-50",
               !on && "bg-ink/6 hover:bg-ink/12",
             )}
           >
@@ -111,6 +111,8 @@ export function ResourcePicker({
               <motion.span
                 layoutId={`${group}-on`}
                 transition={reduce ? { duration: 0 } : SPRING_LAYOUT}
+                // Radius in style so Motion keeps the corners true while the highlight travels.
+                style={{ borderRadius: 14 }}
                 className={cn("absolute inset-0 -z-10", bad ? "bg-destructive" : "bg-ink")}
               />
             ) : null}

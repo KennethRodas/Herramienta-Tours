@@ -203,6 +203,11 @@ export function easeInOut(t: number): number {
   return cubicBezier(0.77, 0, 0.175, 1, clamp(t, 0, 1));
 }
 
+/** Ease for responses to a press (zoom keys): the codebase's ease-out curve, (0.23, 1, 0.32, 1). */
+export function easeOut(t: number): number {
+  return cubicBezier(0.23, 1, 0.32, 1, clamp(t, 0, 1));
+}
+
 function cubicBezier(x1: number, y1: number, x2: number, y2: number, x: number): number {
   // Solve x(t) = x with Newton, falling back to bisection, then return y(t).
   const cx = 3 * x1;

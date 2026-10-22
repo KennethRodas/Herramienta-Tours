@@ -67,6 +67,7 @@ export function CodeInput({ id, value, onChange, onComplete, status = "idle", de
           autoCorrect="off"
           spellCheck={false}
           maxLength={9}
+          aria-label="Código del boleto: los 4 caracteres después de WIL-"
           aria-invalid={status === "error" || undefined}
           aria-describedby={describedBy}
           className="absolute inset-0 z-10 h-full w-full cursor-text opacity-0"
@@ -78,7 +79,7 @@ export function CodeInput({ id, value, onChange, onComplete, status = "idle", de
               <span
                 key={i}
                 className={cx(
-                  "relative grid h-14 w-10 place-items-center overflow-hidden border-2 font-display text-head font-bold leading-none transition-[background-color,border-color,color] duration-200 min-[380px]:h-16 min-[380px]:w-12 sm:h-[4.5rem] sm:w-14",
+                  "relative grid h-14 w-10 place-items-center overflow-hidden rounded-field border-2 font-display text-head font-bold leading-none transition-[background-color,border-color,color] duration-200 min-[380px]:h-16 min-[380px]:w-12 sm:h-[4.5rem] sm:w-14",
                   status === "error"
                     ? "border-stamp bg-sand-50 text-stamp"
                     : status === "success"

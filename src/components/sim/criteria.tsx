@@ -212,9 +212,9 @@ export function CriteriaList({ className }: { className?: string }) {
   const [busy, setBusy] = useState<number | null>(null);
   const [done, setDone] = useState<Record<number, string>>({});
   return (
-    <ol className={cn("grid gap-px bg-cobalt-700 font-sans md:grid-cols-2", className)}>
+    <ol className={cn("grid gap-2 font-sans md:grid-cols-2", className)}>
       {CRITERIA.map((c, i) => (
-        <li key={i} className="flex flex-col justify-between gap-3 bg-cobalt-900 p-4">
+        <li key={i} className="flex flex-col justify-between gap-3 rounded-ticket bg-cobalt-900 p-4">
           <div>
             <p className="text-[14px] font-semibold text-cobalt-300">{c.story}</p>
             <p className="mt-1 text-[16px] leading-snug">

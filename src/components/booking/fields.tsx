@@ -17,7 +17,7 @@ const INPUT_CLASSES = {
   root: "gap-2",
   label: "px-0 text-(length:--step-small) font-semibold",
   field:
-    "h-[52px] rounded-none border-2 bg-sand-100 transition-[background-color,border-color,box-shadow] duration-200 hover:bg-sand-50 focus-within:bg-sand-50",
+    "h-[52px] rounded-field border-2 bg-sand-100 transition-[background-color,border-color,box-shadow] duration-200 hover:bg-sand-50 focus-within:bg-sand-50",
   input: "text-(length:--step-body)",
   errorMessage: "px-0 text-(length:--step-small) font-semibold",
   successIcon: "text-cobalt-700",
@@ -97,7 +97,7 @@ export function NotesField({ id, label, value, onChange, max = 280 }: { id: stri
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="pressable -mx-1 inline-flex items-center gap-2 self-start px-1 py-1.5 text-small font-semibold underline decoration-2 underline-offset-4 hover:bg-sand-300"
+        className="pressable -mx-2 inline-flex items-center gap-2 self-start rounded-full px-2 py-1.5 text-small font-semibold underline decoration-2 underline-offset-4 hover:bg-sand-300"
       >
         <Plus aria-hidden className="size-4" strokeWidth={3} />
         {label}
@@ -123,7 +123,7 @@ export function NotesField({ id, label, value, onChange, max = 280 }: { id: stri
           autoFocus={open && !value}
           onChange={(e) => onChange(e.target.value)}
           aria-describedby={`${id}-count`}
-          className="block w-full resize-none rounded-none border-2 border-border bg-sand-100 px-3.5 pb-7 pt-3 text-body leading-snug text-ink outline-none transition-[background-color,border-color,box-shadow] duration-200 hover:bg-sand-50 focus:border-cobalt-800/40 focus:bg-sand-50 focus:ring-2 focus:ring-ring/40"
+          className="block w-full resize-none rounded-field border-2 border-border bg-sand-100 px-3.5 pb-7 pt-3 text-body leading-snug text-ink outline-none transition-[background-color,border-color,box-shadow] duration-200 hover:bg-sand-50 focus:border-cobalt-800/40 focus:bg-sand-50 focus:ring-2 focus:ring-ring/40"
         />
         <span
           id={`${id}-count`}
@@ -167,7 +167,7 @@ export function PayChoice({
               key={o.value}
               onClick={() => onChange(o.value)}
               className={cx(
-                "print-corners flex cursor-pointer items-start gap-3.5 px-4 py-3.5 transition-[background-color,color,transform] duration-200 active:scale-[0.99]",
+                "print-corners flex cursor-pointer items-start gap-3.5 rounded-field px-4 py-3.5 transition-[background-color,color,transform] duration-200 active:scale-[0.99]",
                 selected ? "field-ink" : "bg-sand-100 hover:bg-sand-300",
               )}
             >

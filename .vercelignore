@@ -1,0 +1,9 @@
+# Never upload local secrets or working files with `vercel deploy`.
+.env*
+!.env.example
+.taste-skill
+.next
+node_modules
+.vercel
+tsconfig.tsbuildinfo
+*.log

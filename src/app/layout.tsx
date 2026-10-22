@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { SimEngineBoot } from "@/components/sim/engine-boot";
 import { SimDock } from "@/components/sim/sim-dock";
 import { ServiceWorkerRegistration } from "@/components/pwa/sw-register";
+import { AppMotionConfig } from "@/components/motion-config";
 import "./globals.css";
 
 const barlow = Barlow({
@@ -62,7 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es-SV" className={`${barlow.variable} ${barlowCondensed.variable}`} suppressHydrationWarning>
       <body className="min-h-dvh">
-        {children}
+        <AppMotionConfig>{children}</AppMotionConfig>
         <SimEngineBoot />
         <SimDock />
         <ServiceWorkerRegistration />
@@ -74,7 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               background: "var(--cobalt-800)",
               color: "var(--sand-50)",
               border: "0",
-              borderRadius: "0",
+              borderRadius: "14px",
               fontFamily: "var(--font-sans)",
               fontSize: "15px",
             },

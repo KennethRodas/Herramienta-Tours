@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -11,6 +12,7 @@ import { LogoMark } from "@/components/brand/logo";
 import { formatPhone, normalizePhone } from "@/lib/domain/format";
 import { setCustomerSession, useCustomer } from "@/lib/sim/customer";
 import { sim } from "@/lib/sim/store";
+import { PHOTO_CREDITS } from "@/content/photo-credits";
 
 // Login and sign-up in one flow: WhatsApp number → 6-digit code → (first time) name and email.
 // No passwords: in El Salvador the WhatsApp number is the account.
@@ -114,13 +116,34 @@ export function LoginFlow() {
   const panel = {
     initial: reduce ? { opacity: 0 } : { opacity: 0, x: 24 },
     animate: { opacity: 1, x: 0 },
-    exit: reduce ? { opacity: 0 } : { opacity: 0, x: -24 },
-    transition: { duration: 0.24, ease: [0.23, 1, 0.32, 1] as const },
+    exit: reduce ? { opacity: 0, transition: { duration: 0.1 } } : { opacity: 0, x: -16, transition: { duration: 0.12, ease: [0.23, 1, 0.32, 1] as const } },
+    transition: { duration: 0.22, ease: [0.23, 1, 0.32, 1] as const },
   };
 
+  const photo = PHOTO_CREDITS["santa-ana"];
+  const rise = (i: number) =>
+    reduce
+      ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.2, delay: i * 0.06 } }
+      : { initial: { opacity: 0, y: 18 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.42, delay: 0.08 + i * 0.07, ease: [0.23, 1, 0.32, 1] as const } };
+
   return (
-    <main className="mx-auto grid min-h-[70dvh] max-w-[560px] place-items-center px-[var(--gutter)] pb-32 pt-10">
-      <div className="paper ticket-notch w-full px-7 pb-10 pt-8 sm:px-10 [--ny:96px]">
+    <main className="mx-auto grid max-w-[1200px] items-center gap-8 px-[var(--gutter)] pb-32 pt-8 lg:grid-cols-[1.15fr_1fr] lg:gap-14 lg:pt-12">
+      <motion.figure {...rise(0)} className="order-2 lg:order-1">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-ticket lg:aspect-[4/5]">
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            fill
+            priority
+            sizes="(min-width: 1024px) 600px, 100vw"
+            className="object-cover"
+          />
+        </div>
+        <figcaption className="mt-2 text-small text-ink-soft">
+          Cráter del volcán de Santa Ana. Foto: {photo.author}, {photo.licence}.
+        </figcaption>
+      </motion.figure>
+      <motion.div {...rise(1)} className="paper ticket-notch order-1 w-full px-7 pb-10 pt-8 sm:px-10 lg:order-2 [--ny:96px]">
         <LogoMark className="mb-6 size-12" paper="var(--cobalt-800)" ink="var(--sand-50)" />
         <AnimatePresence mode="wait" initial={false}>
           {step === "telefono" && (
@@ -207,7 +230,7 @@ export function LoginFlow() {
             </motion.form>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
     </main>
   );
 }

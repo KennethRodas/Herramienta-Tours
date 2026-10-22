@@ -78,7 +78,7 @@ export function RouteAdmin() {
                     onClick={() => setSelectedId(t.id)}
                     aria-current={on ? "true" : undefined}
                     className={cn(
-                      "pressable flex h-12 items-center gap-2 px-3 text-left focus-visible:outline-2 focus-visible:-outline-offset-2",
+                      "pressable flex h-12 items-center gap-2 rounded-full px-4 text-left focus-visible:outline-2 focus-visible:-outline-offset-2",
                       on ? "bg-primary text-primary-foreground" : "bg-muted text-foreground hover:bg-accent",
                     )}
                   >
@@ -92,7 +92,7 @@ export function RouteAdmin() {
                     {mark ? (
                       <span
                         className={cn(
-                          "shrink-0 px-1.5 py-0.5 text-[13px] font-semibold",
+                          "shrink-0 rounded-stub px-1.5 py-0.5 text-[13px] font-semibold",
                           on ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground",
                         )}
                       >
@@ -117,7 +117,7 @@ export function RouteAdmin() {
                   type="button"
                   onClick={restore}
                   disabled={busy}
-                  className="pressable inline-flex h-10 items-center gap-2 bg-muted px-3 text-[15px] font-semibold text-foreground hover:bg-accent disabled:opacity-45"
+                  className="pressable inline-flex h-10 items-center gap-2 rounded-full bg-muted pl-3.5 pr-4 text-[15px] font-semibold text-foreground hover:bg-accent disabled:opacity-45"
                 >
                   <RotateCcw size={16} strokeWidth={2.25} aria-hidden />
                   Restaurar ruta original
@@ -127,7 +127,7 @@ export function RouteAdmin() {
             {state ? (
               <RouteEditor key={`${tour.id}:${restored}`} tour={tour} onSave={save} />
             ) : (
-              <div className="h-[640px] bg-muted" role="status" aria-label="Cargando simulación" />
+              <div className="h-[640px] rounded-ticket bg-muted" role="status" aria-label="Cargando simulación" />
             )}
           </>
         ) : (

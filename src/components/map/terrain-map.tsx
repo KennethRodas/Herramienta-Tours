@@ -8,8 +8,9 @@ import { ArrowLeft, Satellite } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavKeys, Segmented, ToggleKey, setBasemap, setDimension, type Basemap, type Dimension } from "./controls";
 import { TerrainFallback } from "./fallback";
+import { easeInOut } from "./geo";
 import { readInks } from "./inks";
-import { flagMarker, placeLabels } from "./labels";
+import { flagMarker, watchLabels } from "./labels";
 import { LoadingVeil } from "./lazy";
 import { createMap, MAP_BOX, supportsWebGL2 } from "./maplibre";
 import { KIND_PRIORITY, TourPin, WaypointPin, useMarkerSlots, type MarkerSpec } from "./markers";
@@ -17,7 +18,7 @@ import { addRouteLayers, removeRouteLayers, routeFeatures } from "./route-layers
 import { OVERVIEW_BEARING, OVERVIEW_PITCH, overviewCamera, routeCamera, routeView, settleOnIdle, toPadding, useStableRoutes, type Pad } from "./routes";
 import { buildStyle } from "./style";
 import type { TerrainMapProps } from "./types";
-import { frameThrottle, useMap } from "./use-map";
+import { useMap } from "./use-map";
 
 const SOURCE = "routes";
 
@@ -146,10 +147,10 @@ export default function TerrainMapImpl({
     if (!map) return;
     const three = dimension === "3d";
     if (focus) {
-      map.flyTo({ ...routeView(map, focus, withTickets(pad), three), speed: 1.1, curve: 1.42, maxDuration: 4500 });
+      map.flyTo({ ...routeView(map, focus, withTickets(pad), three), speed: 1.2, curve: 1.42, easing: easeInOut, maxDuration: 6000 });
     } else {
       const cam = overviewCamera(map, routes, pad, three ? OVERVIEW_PITCH : 0);
-      if (cam) map.flyTo({ ...cam, speed: 1.1, curve: 1.42, maxDuration: 4500 });
+      if (cam) map.flyTo({ ...cam, speed: 1.2, curve: 1.42, easing: easeInOut, maxDuration: 6000 });
     }
     settleFocus();
   });
@@ -172,7 +173,7 @@ export default function TerrainMapImpl({
   const refit = useEffectEvent(() => {
     if (!map || focus) return;
     const cam = overviewCamera(map, routes, pad, dimension === "3d" ? OVERVIEW_PITCH : 0);
-    if (cam) map.flyTo({ ...cam, speed: 1.2, curve: 1.42, maxDuration: 3000 });
+    if (cam) map.flyTo({ ...cam, speed: 1.2, curve: 1.42, easing: easeInOut, maxDuration: 6000 });
   });
   const idsRef = useRef<string | null>(null);
   useEffect(() => {
@@ -207,15 +208,7 @@ export default function TerrainMapImpl({
         return { el: s.el, lngLat: s.lngLat, priority: KIND_PRIORITY[kind] - i * 0.01 };
       }),
     ];
-    const run = frameThrottle(() => placeLabels(map, items));
-    run();
-    map.on("move", run);
-    map.on("resize", run);
-    return () => {
-      map.off("move", run);
-      map.off("resize", run);
-      run.cancel();
-    };
+    return watchLabels(map, items);
   }, [map, tourSlots, wpSlots, focus, hover]);
 
   if (status === "unsupported" || status === "error") {
@@ -235,7 +228,7 @@ export default function TerrainMapImpl({
   };
 
   return (
-    <div className={cn("wm-map bg-sand-300", className)} data-lenis-prevent={card ? undefined : ""}>
+    <div className={cn("wm-map rounded-ticket bg-sand-300", className)} data-lenis-prevent={card ? undefined : ""}>
       <div ref={containerRef} style={MAP_BOX} />
       <LoadingVeil ready={status === "ready"} />
       {status === "loading" ? (
@@ -298,7 +291,7 @@ export default function TerrainMapImpl({
             <button
               type="button"
               onClick={onClearFocus}
-              className="pressable absolute left-3 top-3 inline-flex h-10 items-center gap-2 bg-sand-50 px-3 text-[15px] font-semibold text-cobalt-800 hover:bg-sand-100"
+              className="pressable absolute left-3 top-3 inline-flex h-10 items-center gap-2 rounded-full bg-sand-50 pl-3 pr-4 text-[15px] font-semibold text-cobalt-800 hover:bg-sand-100"
               style={{ top: Math.max(12, pad.top - 40) }}
             >
               <ArrowLeft size={18} strokeWidth={2.25} aria-hidden />

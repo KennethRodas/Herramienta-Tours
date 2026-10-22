@@ -25,6 +25,7 @@ export function Confirmacion({ c }: { c: BookingCtx }) {
           ["Encuentro", c.point?.name ?? "Por confirmar"],
         ]}
       />
+      <Gap h={8} />
       <Band tone={pending ? "sand" : "ink"}>{paymentText(c)}</Band>
       <Gap h={14} />
       {c.point ? (

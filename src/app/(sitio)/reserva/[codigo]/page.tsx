@@ -23,8 +23,8 @@ export default async function TicketPage({ params, searchParams }: Props) {
   const worst = dev && query.data === "peor";
   return (
     <div className="pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-32">
-      <TicketView code={codigo} fresh={query.nueva === "1"} payment={pago} worst={worst} />
       {dev ? <DevDataToggle worst={worst} /> : null}
+      <TicketView code={codigo} fresh={query.nueva === "1"} payment={pago} worst={worst} />
     </div>
   );
 }

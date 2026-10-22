@@ -79,7 +79,7 @@ export function PaymentReturn({ query }: { query: ReturnQuery }) {
         {result.kind === "loading" ? (
           <>
             <p className="text-lead font-semibold">Verificando el pago con Wompi.</p>
-            <span className="bk-skeleton block h-5 w-2/3 bg-sand-300" />
+            <span className="bk-skeleton block h-5 w-2/3 rounded-full bg-sand-300" />
           </>
         ) : result.kind === "missing" ? (
           <p className="text-lead font-semibold">Falta el identificador de la transacción en el enlace.</p>

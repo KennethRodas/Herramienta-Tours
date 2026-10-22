@@ -82,7 +82,7 @@ export function ArrivalMeter({ bookings, pending, className }: { bookings: Booki
             <span
               key={i}
               className={cn(
-                "ticket-notch block h-[22px] w-[14px] transition-colors duration-200 [--n:3px]",
+                "ticket-notch block h-[22px] w-[14px] rounded-stub transition-colors duration-200 [--n:3px]",
                 c === "in" ? "bg-ink" : c === "out" ? "bg-destructive/60" : "bg-ink/15",
               )}
             />
@@ -116,7 +116,7 @@ function RowBody({ b, status, price, onOpen }: { b: Booking; status: BookingStat
         animate={{ scale: arrived && !reduce ? [1, 1.08, 1] : 1 }}
         transition={{ duration: 0.3 }}
         className={cn(
-          "grid w-12 shrink-0 place-items-center font-display text-[26px] font-bold leading-none transition-colors duration-200",
+          "grid w-12 shrink-0 place-items-center rounded-stub font-display text-[26px] font-bold leading-none transition-colors duration-200",
           arrived ? "bg-ink text-paper" : status === "no_show" ? "bg-destructive/15 text-destructive" : "bg-ink/8 text-ink",
           status === "cancelada" && "opacity-50",
         )}
@@ -170,7 +170,7 @@ export function Manifest({
     return (
       <ul className={cn("flex flex-col gap-1.5", className)}>
         {list.map((b) => (
-          <li key={b.id} className="bg-paper">
+          <li key={b.id} className="rounded-field bg-paper">
             <RowBody b={b} status={pending[b.id] ?? b.status} price={departure.priceUsd} onOpen={onOpen} />
           </li>
         ))}
@@ -213,12 +213,12 @@ export function Manifest({
           return <RowBody b={b} status={pending[b.id] ?? b.status} price={departure.priceUsd} onOpen={onOpen} />;
         }}
         classNames={{
-          item: "rounded-none bg-transparent",
+          item: "rounded-field bg-transparent",
           // Inset by a pixel so the coloured rails never bleed through the row's antialiased edges at rest.
-          rail: "inset-px rounded-none [&>[data-side=left]]:rounded-none [&>[data-side=left]]:bg-ink [&>[data-side=right]]:rounded-none [&>[data-side=right]]:bg-destructive",
+          rail: "inset-px rounded-field [&>[data-side=left]]:rounded-l-field [&>[data-side=left]]:bg-ink [&>[data-side=right]]:rounded-r-field [&>[data-side=right]]:bg-destructive",
           action:
-            "text-paper [&>span:first-child]:h-auto [&>span:first-child]:w-auto [&>span:first-child]:rounded-none [&>span:first-child]:bg-transparent [&>span:first-child]:px-2 [&>span:first-child]:text-[15px] [&>span:first-child]:font-semibold [&>span:first-child]:text-paper",
-          surface: "min-h-[68px] rounded-none border-0 bg-paper px-0 py-0 shadow-none",
+            "text-paper [&>span:first-child]:h-auto [&>span:first-child]:w-auto [&>span:first-child]:rounded-full [&>span:first-child]:bg-transparent [&>span:first-child]:px-2 [&>span:first-child]:text-[15px] [&>span:first-child]:font-semibold [&>span:first-child]:text-paper",
+          surface: "min-h-[68px] rounded-field border-0 bg-paper px-0 py-0 shadow-none",
         }}
       />
     );
@@ -230,7 +230,7 @@ export function Manifest({
         const status = pending[b.id] ?? b.status;
         const marked = status === "check_in" || status === "no_show";
         return (
-          <li key={b.id} className="flex items-stretch gap-2 bg-paper pr-2">
+          <li key={b.id} className="flex items-stretch gap-2 rounded-field bg-paper pr-2">
             <div className="min-w-0 flex-1">
               <RowBody b={b} status={status} price={departure.priceUsd} onOpen={onOpen} />
             </div>

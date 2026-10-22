@@ -282,7 +282,7 @@ export function CommandPalette({
                       <div key={group} className="mb-1 last:mb-0">
                         <div
                           aria-hidden
-                          className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
+                          className="px-2 pb-1 pt-2 text-[13px] font-semibold text-muted-foreground"
                         >
                           {group}
                         </div>

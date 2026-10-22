@@ -35,9 +35,9 @@ export function TourMenu() {
       <div className="menu-wrap mx-auto max-w-[1760px] px-[var(--gutter)] py-[var(--section-gap)]">
         {!empty && (
           <div className="menu-frame-col">
-            <div className="sticky top-[8svh] -ml-[var(--gutter)]">
+            <div className="sticky top-[8svh]">
               <div data-reveal="plate">
-                <PreviewFrame tours={ordered} activeId={activeId} boxClassName="h-[min(80svh,880px)]" captionClassName="pl-[var(--gutter)]" />
+                <PreviewFrame tours={ordered} activeId={activeId} boxClassName="h-[min(80svh,880px)]" />
               </div>
             </div>
           </div>
@@ -45,7 +45,7 @@ export function TourMenu() {
 
         <div
           data-reveal="card"
-          className="menu-sheet ink-paper edge-scallop-y w-full max-w-[640px] bg-sand-50 px-5 pt-12 pb-14 text-ink sm:px-10 md:px-16 md:pt-16 md:pb-16"
+          className="menu-sheet ink-paper edge-scallop-y w-full max-w-[640px] rounded-ticket bg-sand-50 px-5 pt-12 pb-14 text-ink sm:px-10 md:px-16 md:pt-16 md:pb-16"
         >
           <h2 id="aventuras-titulo" className="text-center font-display text-head font-bold uppercase leading-none">
             Aventuras
@@ -72,7 +72,7 @@ export function TourMenu() {
                             onFocus={() => setActiveId(t.id)}
                           >
                             {photo && (
-                              <Image src={photo.srcSmall} alt="" width={64} height={64} sizes="64px" className="menu-thumb size-16 object-cover" />
+                              <Image src={photo.srcSmall} alt="" width={64} height={64} sizes="64px" className="menu-thumb size-16 rounded-field object-cover" />
                             )}
                             <span className="text-body font-semibold leading-tight">{t.name}</span>
                             <span className="text-body font-semibold leading-tight tabular">{formatUsd(t.priceUsd)}</span>
@@ -111,7 +111,7 @@ const MENU_CSS = `
 .menu-frame-col { display: none; }
 .menu-row {
   display: grid; grid-template-columns: 4rem minmax(0, 1fr) auto; column-gap: 14px; row-gap: 4px; align-items: baseline;
-  padding: 10px 8px; margin: 0 -8px;
+  padding: 10px 10px; margin: 0 -10px; border-radius: var(--radius-field);
   transition: opacity var(--dur-fast) ease, background-color var(--dur-fast) ease, transform var(--dur-press) var(--ease-out);
 }
 .menu-row:active { transform: scale(0.985); }

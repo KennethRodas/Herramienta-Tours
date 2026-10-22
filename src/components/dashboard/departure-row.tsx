@@ -39,14 +39,14 @@ export function DepartureRow({
       type="button"
       onClick={onOpen}
       className={cn(
-        "pressable group relative flex w-full items-stretch gap-3 bg-paper py-3 pr-2 pl-3 text-left text-paper-ink hover:bg-surface-2",
+        "pressable group relative flex w-full items-stretch gap-3 overflow-hidden rounded-field bg-paper py-3 pr-2 pl-3 text-left text-paper-ink hover:bg-surface-2",
         cancelled && "opacity-60",
         className,
       )}
     >
       {crossed ? <span aria-hidden className="absolute inset-y-0 left-0 w-1.5 bg-destructive" /> : null}
       <span className="flex w-[58px] shrink-0 flex-col justify-center">
-        {showDay ? <span className="text-[12px] font-semibold uppercase text-ink-soft">{showDay}</span> : null}
+        {showDay ? <span className="text-[13px] font-semibold text-ink-soft">{showDay}</span> : null}
         <span className={cn("font-display text-[24px] font-bold leading-none tabular", cancelled && "line-through")}>{formatTime24(dep.startsAt)}</span>
       </span>
       <span className="flex min-w-0 flex-1 flex-col justify-center gap-1">

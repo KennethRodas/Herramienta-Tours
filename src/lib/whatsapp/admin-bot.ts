@@ -172,7 +172,7 @@ function availability(data: BotData, query: string): BotReply {
     const line = next.length
       ? next.map((d) => `${formatDayShort(d.startsAt)}: ${seatsLeft(d, data.holds, data.now)} libres`).join(" · ")
       : "sin salidas abiertas";
-    return `*${t.shortName}* — ${line}`;
+    return `*${t.shortName}* · ${line}`;
   });
   return { text: blocks.join("\n") };
 }

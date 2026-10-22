@@ -47,8 +47,8 @@ export function OverlayHost() {
         onOpenChange={(o) => !o && close()}
         side="right"
         ariaLabel={label}
-        className="w-[min(560px,94vw)] border-0 bg-paper text-paper-ink shadow-[0_0_0_1px_var(--border)]"
-        backdropClassName="bg-cobalt-950/25 backdrop-blur-[2px]"
+        className="w-[min(560px,94vw)] overflow-hidden rounded-l-ticket border-0 bg-paper text-paper-ink"
+        backdropClassName="bg-cobalt-950/30 backdrop-blur-none" /* taste-skill-ignore: switches off beui's default blur */
       >
         <div className="h-full overflow-y-auto overscroll-contain px-6 pb-12">{body}</div>
       </Drawer>
@@ -61,7 +61,7 @@ export function OverlayHost() {
       onOpenChange={(o) => !o && close()}
       snapPoints={[0.94]}
       title={label}
-      className="max-h-[calc(100dvh-10px)] rounded-t-[22px] border-0 bg-paper text-paper-ink [&_h2[id$='-title']]:sr-only"
+      className="max-h-[calc(100dvh-10px)] rounded-t-ticket border-0 bg-paper text-paper-ink [&_h2[id$='-title']]:sr-only"
     >
       <div className="pb-[calc(env(safe-area-inset-bottom)+12px)]">{body}</div>
     </BottomSheet>

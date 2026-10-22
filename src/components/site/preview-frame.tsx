@@ -28,7 +28,7 @@ export function PreviewFrame({
 
   return (
     <figure className={cn("w-full", className)}>
-      <div className={cn("relative w-full overflow-hidden bg-cobalt-900", boxClassName)}>
+      <div className={cn("relative isolate w-full overflow-hidden rounded-ticket bg-cobalt-900", boxClassName)}>
         {tours.map((t) => {
           const photo = PHOTO_CREDITS[t.photo];
           if (!photo) return null;

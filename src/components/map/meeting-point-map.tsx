@@ -41,7 +41,7 @@ export default function MeetingPointMapImpl({ point, className }: MeetingPointMa
   if (status === "unsupported" || status === "error") return <MeetingFallback point={point} className={className} />;
 
   return (
-    <div className={cn("wm-map bg-sand-300", className)}>
+    <div className={cn("wm-map rounded-ticket bg-sand-300", className)}>
       <div ref={containerRef} style={MAP_BOX} />
       <LoadingVeil ready={status === "ready"} />
       <a

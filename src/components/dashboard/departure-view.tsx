@@ -95,7 +95,7 @@ export function DepartureView({ id }: { id: string }) {
     return (
       <>
         <SheetHeader title="Salida" />
-        <div className="h-40 animate-pulse bg-ink/5" />
+        <div className="h-40 rounded-ticket bg-ink/5" />
       </>
     );
   }
@@ -208,7 +208,7 @@ export function DepartureView({ id }: { id: string }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.16 } }}
             transition={{ duration: 0.2, ease: EASE_OUT }}
-            className="flex flex-col gap-2 bg-destructive/10 px-4 py-3"
+            className="flex flex-col gap-2 rounded-field bg-destructive/10 px-4 py-3"
           >
             <div className="flex items-start justify-between gap-3">
               <p className="text-[15px] font-semibold leading-snug text-destructive">{c.title}</p>
@@ -316,7 +316,7 @@ export function DepartureView({ id }: { id: string }) {
 
       {editable ? (
         <>
-          <section className="flex items-center justify-between gap-3 bg-ink/5 px-4 py-3">
+          <section className="flex items-center justify-between gap-3 rounded-field bg-ink/5 px-4 py-3">
             <div className="flex flex-col">
               <span className="text-[15px] font-semibold text-ink">Indicaciones listas</span>
               <span className="text-[13px] text-ink-soft">{dep.prepReady ? "Publicadas" : "Sin publicar"}</span>
@@ -392,7 +392,7 @@ export function DepartureView({ id }: { id: string }) {
 
       {editable ? (
         <>
-          <section className="flex flex-wrap items-center justify-between gap-3 bg-ink/5 px-4 py-3">
+          <section className="flex flex-wrap items-center justify-between gap-3 rounded-field bg-ink/5 px-4 py-3">
             <div className="flex flex-col">
               <span className="text-[15px] font-semibold text-ink">Llenar salida</span>
               <span className="text-[13px] text-ink-soft">Simulación: reservas de prueba hasta el último cupo.</span>
@@ -435,7 +435,7 @@ export function DepartureView({ id }: { id: string }) {
               onHoldComplete={() => void cancel()}
               holdingLabel="Seguí presionando"
               completeLabel="Cancelada"
-              className="h-14 w-full min-w-0 rounded-none bg-destructive text-paper [--hold-radius:0px] [&_svg]:text-cobalt-950/30!"
+              className="h-14 w-full min-w-0 rounded-full bg-destructive text-paper [--hold-radius:9999px] [&_svg]:text-cobalt-950/30!"
               fillClassName="bg-cobalt-950/30"
               labelClassName="text-[16px] font-semibold"
             >

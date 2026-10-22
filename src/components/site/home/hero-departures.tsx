@@ -62,13 +62,13 @@ export function HeroDepartures() {
               layout={reduce ? false : "position"}
               initial={reduce ? { opacity: 0 } : { opacity: 0, transform: "translateY(14px)" }}
               animate={{ opacity: 1, transform: "translateY(0px)" }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, transform: "translateY(-10px)" }}
+              exit={reduce ? { opacity: 0, transition: { duration: 0.15 } } : { opacity: 0, transform: "translateY(-10px)", transition: { duration: 0.2, ease: EASE_OUT } }}
               transition={{ duration: 0.34, ease: EASE_OUT }}
             >
               {i > 0 && <div aria-hidden className="perforation-x mx-3" style={{ ["--perf" as string]: "var(--cobalt-800)" }} />}
               <Link
                 href={`/salidas/${d.id}`}
-                className="group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-1.5 px-3 py-4 transition-[background-color,transform] duration-[var(--dur-fast)] ease-[var(--ease-out)] hover:bg-sand-100 active:scale-[0.99] lg:grid-cols-[8.75rem_minmax(0,1fr)_auto_4.5rem] lg:gap-y-0 lg:py-3.5"
+                className="group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-1.5 rounded-field px-3 py-4 [transition:background-color_var(--dur-fast)_ease,transform_var(--dur-press)_var(--ease-out)] hover:bg-sand-100 active:scale-[0.99] lg:grid-cols-[8.75rem_minmax(0,1fr)_auto_4.5rem] lg:gap-y-0 lg:py-3.5"
               >
                 <span className="col-start-1 row-start-1 flex items-baseline gap-2 lg:block">
                   <span className="font-display text-lead font-bold uppercase leading-none">{formatDayShort(d.startsAt)}</span>
@@ -106,13 +106,13 @@ function Skeleton() {
         <div key={i}>
           {i > 0 && <div aria-hidden className="perforation-x mx-3" style={{ ["--perf" as string]: "var(--cobalt-800)" }} />}
           <div aria-hidden className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-5 gap-y-2 px-3 py-4 lg:grid-cols-[8.75rem_minmax(0,1fr)_15rem_4.5rem] lg:py-3.5">
-            <span className="h-6 w-28 bg-sand-200" />
+            <span className="h-6 w-28 rounded-full bg-sand-200" />
             <span className="col-span-2 row-start-2 flex flex-col gap-2 lg:col-span-1 lg:col-start-2 lg:row-start-1">
-              <span className="h-5 w-[70%] bg-sand-200" />
-              <span className="h-3.5 w-[45%] bg-sand-200" />
+              <span className="h-5 w-[70%] rounded-full bg-sand-200" />
+              <span className="h-3.5 w-[45%] rounded-full bg-sand-200" />
             </span>
-            <span className="col-span-2 row-start-3 h-[22px] w-full max-w-[235px] bg-sand-200 lg:col-span-1 lg:col-start-3 lg:row-start-1 lg:justify-self-end" />
-            <span className="col-start-2 row-start-1 h-6 w-12 justify-self-end bg-sand-200 lg:col-start-4" />
+            <span className="col-span-2 row-start-3 h-[22px] w-full max-w-[235px] rounded-stub bg-sand-200 lg:col-span-1 lg:col-start-3 lg:row-start-1 lg:justify-self-end" />
+            <span className="col-start-2 row-start-1 h-6 w-12 justify-self-end rounded-full bg-sand-200 lg:col-start-4" />
           </div>
         </div>
       ))}

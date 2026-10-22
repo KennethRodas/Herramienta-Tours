@@ -294,6 +294,9 @@ export function buildStyle(ink: Inks, opts: StyleOptions = {}): StyleSpecificati
         "text-size": 13,
         "text-max-width": 8,
         "text-padding": 6,
+        // Below the summit: the route tickets stand above their points.
+        "text-anchor": "top",
+        "text-offset": [0, 0.7],
         "symbol-sort-key": ["get", "rank"],
       },
       paint: { "text-color": ink.cobalt800, "text-halo-color": halo, "text-halo-width": 1.4 },

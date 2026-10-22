@@ -74,20 +74,18 @@ export function ResourceTimeline({
   const dayKeys = Array.from({ length: days }, (_, i) => addDays(todayKey, i));
 
   return (
-    <div className="overflow-x-auto overscroll-x-contain bg-paper text-paper-ink" role="region" aria-label="Guías y vehículos, próximos 14 días" tabIndex={0}>
+    <div className="overflow-x-auto overscroll-x-contain rounded-ticket bg-paper text-paper-ink" role="region" aria-label="Guías y vehículos, próximos 14 días" tabIndex={0}>
       <div className="relative" style={{ width: LABEL_W + width }}>
         {/* Day header */}
         <div className="sticky top-0 z-20 flex h-11 bg-paper">
-          <div className="sticky left-0 z-30 flex shrink-0 items-end bg-paper px-3 pb-2 text-[12px] font-semibold uppercase text-ink-soft" style={{ width: LABEL_W }}>
-            Recurso
-          </div>
+          <div aria-hidden className="sticky left-0 z-30 shrink-0 bg-paper" style={{ width: LABEL_W }} />
           {dayKeys.map((k, i) => (
             <div
               key={k}
               className={cn("flex shrink-0 items-end px-2 pb-2 text-[13px] font-semibold", i % 2 ? "bg-ink/[0.035]" : "", k === todayKey ? "text-ink" : "text-ink-soft")}
               style={{ width: dayWidth }}
             >
-              <span className={cn("px-1 py-0.5", k === todayKey && "bg-ink text-paper")}>{dayLabel(k)}</span>
+              <span className={cn("rounded-full px-2 py-0.5", k === todayKey && "bg-ink text-paper")}>{dayLabel(k)}</span>
             </div>
           ))}
         </div>
@@ -122,7 +120,7 @@ export function ResourceTimeline({
                     initial={reduce ? { opacity: 0 } : { opacity: 0, scaleY: 0.6 }}
                     animate={{ opacity: 1, scaleY: 1 }}
                     transition={{ duration: 0.3, ease: EASE_OUT }}
-                    className="absolute inset-y-1 z-[1] bg-destructive/30"
+                    className="absolute inset-y-1 z-[1] rounded-stub bg-destructive/30"
                     style={{ left: Math.max(0, x(c.from)), width: Math.max(4, x(c.to) - Math.max(0, x(c.from))) }}
                   />
                 ))}
@@ -156,11 +154,11 @@ export function ResourceTimeline({
                         className="pressable group absolute top-1/2 z-[2] h-8 -translate-y-1/2"
                         style={{ left: x(s - BUFFER), width: x(e + BUFFER) - x(s - BUFFER) }}
                       >
-                        <span aria-hidden className={cn("absolute inset-0", isCrossed ? "bg-destructive/25" : "bg-ink/14")} />
+                        <span aria-hidden className={cn("absolute inset-0 rounded-stub", isCrossed ? "bg-destructive/25" : "bg-ink/14")} />
                         <span
                           aria-hidden
                           className={cn(
-                            "absolute inset-y-0 flex items-center overflow-hidden px-1 text-[12px] font-bold leading-none whitespace-nowrap transition-[filter] duration-150 group-hover:brightness-125",
+                            "absolute inset-y-0 flex items-center overflow-hidden rounded-stub px-1 text-[12px] font-bold leading-none whitespace-nowrap transition-[filter] duration-150 group-hover:brightness-125",
                             isCrossed ? "bg-destructive text-paper" : "bg-ink text-paper",
                           )}
                           style={{ left: x(s) - x(s - BUFFER), width: barW }}
@@ -172,7 +170,7 @@ export function ResourceTimeline({
                   );
                 })}
                 {/* Now */}
-                <span aria-hidden className="absolute inset-y-0 z-[3] w-0.5 bg-ink/60" style={{ left: x(now) }} />
+                <span aria-hidden className="absolute inset-y-0 z-[3] w-0.5 rounded-full bg-ink/60" style={{ left: x(now) }} />
               </div>
             </div>
           );
