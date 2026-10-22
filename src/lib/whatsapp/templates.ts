@@ -21,7 +21,7 @@ export interface WaMessage {
 export function siteUrl() {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
   if (typeof window !== "undefined") return window.location.origin;
-  return "https://wilber-aventuras.vercel.app";
+  return "https://wilbertours.vercel.app";
 }
 
 export const ticketUrl = (code: string) => `${siteUrl()}/reserva/${code}`;
@@ -55,7 +55,8 @@ export function reminder24h(b: Booking, dep: Departure, tour: Tour, mp: MeetingP
   return {
     body: [
       `*Mañana: ${tour.name}*`,
-      `Salida ${formatTime(dep.startsAt)} desde ${mp.name}. Llegar a las ${arrivalTime(dep, tour)}.`,
+      `Salida: ${formatTime(dep.startsAt)}, ${mp.name}`,
+      `Llegar: ${arrivalTime(dep, tour)}`,
       weather ? `Clima: ${weather}` : null,
       `Llevar: ${tour.bring.slice(0, 4).join(", ").toLowerCase()}.`,
       dep.notes ? `Nota: ${dep.notes}` : null,

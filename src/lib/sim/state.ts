@@ -44,7 +44,7 @@ export interface SimStats {
 }
 
 export interface SimState {
-  version: 1;
+  version: 2;
   seed: number;
   rev: number;
   createdAt: number;
@@ -74,7 +74,8 @@ export const DEFAULT_SETTINGS: SimSettings = {
   wompiOutcome: "aprobar",
   trafficPerHour: 0,
   adminPin: "2381",
-  wilberPhone: "50370000000",
+  // Wilber's personal phone (different from the business number the bots answer on).
+  wilberPhone: "50371112233",
 };
 
 export const EMPTY_STATS: SimStats = {

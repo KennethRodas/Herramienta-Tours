@@ -5,6 +5,11 @@ import { formatDayShort, formatTime, HOUR } from "./format";
 // sent with the same guide and microbus, and fixing it on the spot cost $120.
 export const CROSS_COST = { guide: 60, vehicle: 120 } as const;
 
+/** Tours that meet on location (Juayúa, Suchitoto, El Tunco) do not use the microbus. */
+export function needsTransport(tour: Pick<Tour, "includes">) {
+  return tour.includes.some((i) => /^transporte/i.test(i));
+}
+
 /** Transfer time added on both ends: a microbus is not free the minute a hike ends. */
 const BUFFER_MS = 1.5 * HOUR;
 
@@ -131,7 +136,7 @@ export function detectConflicts(ctx: Ctx): Conflict[] {
         fix: alt ? { label: `Asignar a ${alt.name}`, departureId: d.id, guideId: alt.id } : undefined,
       });
     }
-    if (soon && d.seatsTaken > 0 && !d.vehicleId) {
+    if (soon && d.seatsTaken > 0 && !d.vehicleId && tour && needsTransport(tour)) {
       const alt = freeVehicle(d, ctx, d.seatsTaken, active);
       out.push({
         id: `sinvehiculo:${d.id}`,

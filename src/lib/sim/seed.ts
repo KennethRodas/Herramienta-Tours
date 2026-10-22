@@ -1,7 +1,7 @@
 import type { Booking, Departure, Tour } from "@/lib/domain/types";
 import { GUIDES, TOURS, VEHICLES } from "@/content/catalog";
 import { makeBookingCode } from "@/lib/domain/availability";
-import { overlaps } from "@/lib/domain/conflicts";
+import { needsTransport, overlaps } from "@/lib/domain/conflicts";
 import { addDays, DAY, HOUR, svDateKey, svISO, svParts } from "@/lib/domain/format";
 import { between, fakePerson, mulberry32, pick, weighted, type Rng } from "./rng";
 import { DEFAULT_SETTINGS, EMPTY_STATS, type SimState } from "./state";
@@ -65,8 +65,11 @@ function assignResources(deps: Departure[], rng: Rng) {
     const hard = tour.difficulty === "exigente" || tour.difficulty === "extrema";
     const guides = [...GUIDES].sort(() => rng() - 0.5).filter((g) => !hard || g.senior);
     d.guideId = guides.find((g) => !sorted.some((o) => o !== d && o.guideId === g.id && overlaps(o, d)))?.id ?? null;
-    const needs = Math.max(d.capacity, 1);
-    const vehicles = VEHICLES.filter((v) => v.seats >= Math.min(needs, 14)).sort((a, b) => a.seats - b.seats);
+    if (!needsTransport(tour)) {
+      d.vehicleId = null;
+      continue;
+    }
+    const vehicles = VEHICLES.filter((v) => v.seats >= Math.min(d.capacity, 14)).sort((a, b) => a.seats - b.seats);
     d.vehicleId = vehicles.find((v) => !sorted.some((o) => o !== d && o.vehicleId === v.id && overlaps(o, d)))?.id ?? null;
   }
 }
@@ -80,10 +83,17 @@ export function createSeedState(seed: number, realNow = Date.now()): SimState {
   for (let offset = -PAST_DAYS; offset <= FUTURE_DAYS; offset++) {
     const dateKey = addDays(today, offset);
     const parts = svParts(Date.parse(svISO(dateKey, "12:00")));
-    for (const tour of TOURS) {
-      if (!tour.active || !tour.weekdays.includes(parts.weekday) || !runsInMonth(tour, parts.month)) continue;
-      // Not every scheduled weekday runs: Wilber skips some weekdays in low season.
-      if (parts.weekday !== 0 && parts.weekday !== 6 && rng() < 0.35) continue;
+    // Three guides: at most three departures on a weekend day, one or two on weekdays.
+    const weekend = parts.weekday === 0 || parts.weekday === 6;
+    const candidates = TOURS.filter((t) => t.active && t.weekdays.includes(parts.weekday) && runsInMonth(t, parts.month));
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    // Santa Ana is the classic: it leaves every weekend.
+    candidates.sort((a, b) => Number(b.id === "t-santa-ana") - Number(a.id === "t-santa-ana"));
+    const max = weekend ? 3 : rng() < 0.55 ? 1 : 2;
+    for (const tour of candidates.slice(0, max)) {
       const dep = makeDeparture(tour, dateKey, createdAt, {
         prepReady: offset < 18 || rng() < 0.4,
         notes: rng() < 0.3 ? pick(rng, NOTES) : undefined,
@@ -100,7 +110,11 @@ export function createSeedState(seed: number, realNow = Date.now()): SimState {
     .filter((d) => Date.parse(d.startsAt) > realNow + 20 * HOUR && svParts(d.startsAt).weekday === 6)
     .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
   const sa = nextSat.find((d) => d.tourId === "t-santa-ana");
-  const iz = nextSat.find((d) => d.tourId === "t-izalco" && sa && svDateKey(d.startsAt) === svDateKey(sa.startsAt));
+  let iz = nextSat.find((d) => d.tourId === "t-izalco" && sa && svDateKey(d.startsAt) === svDateKey(sa.startsAt));
+  if (sa && !iz) {
+    iz = makeDeparture(TOURS.find((t) => t.id === "t-izalco")!, svDateKey(sa.startsAt), createdAt);
+    departures.push(iz);
+  }
   if (sa && iz) {
     sa.guideId = "wilber";
     iz.guideId = "wilber";
@@ -109,7 +123,7 @@ export function createSeedState(seed: number, realNow = Date.now()): SimState {
   }
   // A weekday departure two days out without a guide.
   const unguided = departures.find(
-    (d) => Date.parse(d.startsAt) > realNow + 30 * HOUR && Date.parse(d.startsAt) < realNow + 60 * HOUR && d !== sa && d !== iz,
+    (d) => Date.parse(d.startsAt) > realNow + 30 * HOUR && Date.parse(d.startsAt) < realNow + 72 * HOUR && d !== sa && d !== iz,
   );
   if (unguided) unguided.guideId = null;
 
@@ -193,7 +207,7 @@ export function createSeedState(seed: number, realNow = Date.now()): SimState {
   if (soon[3]) fillTo(soon[3], 2);
 
   return {
-    version: 1,
+    version: 2,
     seed,
     rev: 1,
     createdAt: realNow,

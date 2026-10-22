@@ -60,7 +60,9 @@ function dueJobs(s: SimState, now: number): Job[] {
   const dk = svDateKey(now);
   if (p.hour >= 18 && !s.fired[`digest:${dk}`]) jobs.push({ kind: "digest", dateKey: dk });
   const conflicts = detectConflicts({ departures: s.departures, tours: effectiveTours(s), guides: GUIDES, vehicles: VEHICLES, now, horizonMs: 7 * DAY });
-  for (const c of conflicts) if (!s.fired[`conflict:${c.id}`]) jobs.push({ kind: "conflict", id: c.id });
+  // WhatsApp alerts only for real crosses (double-booked guide or vehicle, unsafe or too small);
+  // missing assignments stay on the dashboard.
+  for (const c of conflicts) if (c.severity === "alta" && !s.fired[`conflict:${c.id}`]) jobs.push({ kind: "conflict", id: c.id });
   return jobs;
 }
 
@@ -68,6 +70,16 @@ async function runJobs(jobs: Job[]) {
   await sim.commit((d, now) => {
     const tours = effectiveTours(d);
     for (const job of jobs) {
+      // Jobs were planned on a snapshot: skip any another tab already fired.
+      const key =
+        job.kind === "r24" || job.kind === "rday" || job.kind === "review"
+          ? `${job.kind}:${job.bookingId}`
+          : job.kind === "digest"
+            ? `digest:${job.dateKey}`
+            : job.kind === "conflict"
+              ? `conflict:${job.id}`
+              : null;
+      if (key && d.fired[key]) continue;
       if (job.kind === "holds") d.holds = d.holds.filter((h) => Date.parse(h.expiresAt) > now);
       if (job.kind === "finish") {
         const dep = d.departures.find((x) => x.id === job.departureId);
@@ -100,7 +112,7 @@ async function runJobs(jobs: Job[]) {
         d.fired[`review:${booking.id}`] = now;
         sim.queueWa(d, now, booking.phone, "resena", wa.reviewRequest(booking, tour), { bookingId: booking.id });
       }
-      if (job.kind === "abandon" && booking && dep) {
+      if (job.kind === "abandon" && booking && dep && booking.status === "pendiente_pago") {
         booking.status = "confirmada";
         booking.payment = { method: "en_sitio", status: "no_aplica", amountUsd: 0 };
         sim.logEvent(d, now, "pago.rechazado", "sistema", `${booking.code} no completó el anticipo: queda con pago el día de la salida.`);
@@ -187,9 +199,14 @@ async function dispatch(s: SimState) {
   const queued = s.messages.filter((m) => m.status === "en_cola" && !inFlight.has(m.id));
   if (!queued.length) return;
   const simulated: string[] = [];
+  const testPhone = s.settings.testPhone.replace(/\D/g, "");
+  const testEmail = s.settings.testEmail.trim().toLowerCase();
   for (const m of queued) {
+    // Only what is addressed to the tester (a booking made with their number)
+    // or to Wilber goes out for real; simulated customers never flood the phone.
     const wantsReal =
-      (m.channel === "whatsapp" && s.settings.realWhatsApp && s.settings.testPhone) || (m.channel === "email" && s.settings.realEmail && s.settings.testEmail);
+      (m.channel === "whatsapp" && s.settings.realWhatsApp && testPhone && (m.to === testPhone || m.to === s.settings.wilberPhone)) ||
+      (m.channel === "email" && s.settings.realEmail && testEmail && (m.to.toLowerCase() === testEmail || m.kind === "wilber_resumen"));
     if (!wantsReal) {
       simulated.push(m.id);
       continue;
@@ -209,7 +226,14 @@ async function sendReal(m: Message, s: SimState) {
         ? await fetch("/api/whatsapp/send", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ to: s.settings.testPhone, originalTo: m.to, body: m.body, buttons: m.buttons, location: m.location }),
+            body: JSON.stringify({
+              to: s.settings.testPhone,
+              // Wilber's own messages go to the tester as-is; customers' get a "para +503…" prefix.
+              originalTo: m.kind.startsWith("wilber_") ? undefined : m.to,
+              body: m.body,
+              buttons: m.buttons,
+              location: m.location,
+            }),
           })
         : await fetch("/api/email/send", {
             method: "POST",
@@ -245,6 +269,25 @@ async function tick() {
   if (fresh) await dispatch(fresh);
 }
 
+const LEADER_LOCK = "wilber-sim-leader";
+
+/**
+ * Leader election with Web Locks. The visible tab steals leadership, so the
+ * engine never runs in a throttled background tab; a tab that loses it queues
+ * up again and takes over if the leader closes.
+ */
+function acquireLeadership(steal: boolean) {
+  navigator.locks
+    .request(LEADER_LOCK, { steal }, () => {
+      leader = true;
+      return new Promise<void>(() => undefined);
+    })
+    .catch(() => {
+      leader = false;
+      acquireLeadership(false);
+    });
+}
+
 /** Starts the engine once per tab; only the elected leader actually runs. */
 export function startEngine() {
   if (started || typeof window === "undefined") return;
@@ -254,9 +297,9 @@ export function startEngine() {
   };
   const interval = window.setInterval(loop, TICK_MS);
   if ("locks" in navigator && navigator.locks) {
-    void navigator.locks.request("wilber-sim-leader", () => {
-      leader = true;
-      return new Promise<void>(() => undefined);
+    acquireLeadership(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && !leader) acquireLeadership(true);
     });
   } else {
     leader = true;

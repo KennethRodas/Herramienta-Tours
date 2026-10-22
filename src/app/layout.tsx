@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Barlow, Barlow_Condensed } from "next/font/google";
 import { Toaster } from "sonner";
 import { SimEngineBoot } from "@/components/sim/engine-boot";
+import { SimDock } from "@/components/sim/sim-dock";
 import { ServiceWorkerRegistration } from "@/components/pwa/sw-register";
 import "./globals.css";
 
@@ -63,6 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh">
         {children}
         <SimEngineBoot />
+        <SimDock />
         <ServiceWorkerRegistration />
         <Toaster
           position="top-center"

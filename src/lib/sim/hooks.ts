@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { Booking, Conflict, Departure, Message, SimEvent, Tour } from "@/lib/domain/types";
 import { GUIDES, VEHICLES } from "@/content/catalog";
 import { departureState, seatsLeft, type DepartureState } from "@/lib/domain/availability";
@@ -27,8 +27,6 @@ export function useHydrated() {
 export function useNow(everyMs = 1000): number | null {
   const s = useSimState();
   const [, force] = useState(0);
-  const clockRef = useRef(s?.clock);
-  clockRef.current = s?.clock;
   useEffect(() => {
     const id = window.setInterval(() => force((n) => n + 1), everyMs);
     return () => window.clearInterval(id);

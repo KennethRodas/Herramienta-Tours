@@ -35,7 +35,7 @@ import { MAX_EVENTS, MAX_MESSAGES, simNow, type SimSettings, type SimState, type
 // Two tabs (or forty bots) booking the last seat at once are serialised,
 // which is exactly the guarantee the Supabase `create_booking` RPC gives.
 
-const KEY = "wilber.sim.v1";
+const KEY = "wilber.sim.v2";
 const CHANNEL = "wilber-sim";
 const LOCK = "wilber-sim-write";
 
@@ -51,7 +51,7 @@ function read(): SimState | null {
     const raw = window.localStorage.getItem(KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as SimState;
-    return parsed?.version === 1 ? parsed : null;
+    return parsed?.version === 2 ? parsed : null;
   } catch {
     return null;
   }
