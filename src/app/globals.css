@@ -1,0 +1,485 @@
+@import "tailwindcss";
+
+/*
+  Tours de Aventura de Wilber — design tokens
+  Direction: "the page is the object". Wilber's paperwork (boletos, itinerary
+  slips, folders, index cards) printed as a two-ink job: cobalt (the flag's
+  blue) on sand paper. Stamp red is reserved for "lleno" and errors.
+  Type: Barlow / Barlow Condensed — slightly rounded transit-sign grotesk that
+  matches the round-capped W of the logo.
+  House rules: no gradients, no glass (except the user-supplied liquid glass
+  navigation), no shadows at rest, no thin rules, no eyebrows, no monospace.
+*/
+
+:root {
+  /* Raw palette */
+  --sand-50: #f4eee3;
+  --sand-100: #eee6d6;
+  --sand-200: #e6dbc7;
+  --sand-300: #ddd0b9;
+  --sand-400: #cdbd9c;
+  --cobalt-950: #021447;
+  --cobalt-900: #04206e;
+  --cobalt-800: #062b8a;
+  --cobalt-700: #0b3db0;
+  --cobalt-600: #3a5aa8;
+  --cobalt-300: #a9b6de;
+  --cobalt-200: #c9d1ec;
+  --stamp: #c4352a;
+
+  /* Roles: sand page, cobalt ink */
+  --ground: var(--sand-200);
+  --surface: var(--sand-300);
+  --surface-2: var(--sand-100);
+  --ink: var(--cobalt-800);
+  --ink-soft: var(--cobalt-600);
+  --paper: var(--sand-50);
+  --paper-ink: var(--cobalt-800);
+  --field: var(--cobalt-800);
+  --field-ink: var(--sand-100);
+
+  /* Type steps */
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-body: clamp(1.125rem, 1.05rem + 0.3vw, 1.3125rem);
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-head: clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem);
+  --step-display: clamp(5rem, 13vw, 13rem);
+
+  /* Motion (Emil Kowalski's curves) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-press: 140ms;
+  --dur-fast: 180ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+
+  /* Layout */
+  --gutter: clamp(16px, 2.2vw, 32px);
+  --section-gap: clamp(96px, 12vw, 200px);
+
+  /* shadcn-compatible tokens: beui components read these. */
+  --background: var(--sand-200);
+  --foreground: var(--cobalt-800);
+  --card: var(--sand-100);
+  --card-foreground: var(--cobalt-800);
+  --popover: var(--sand-50);
+  --popover-foreground: var(--cobalt-800);
+  --primary: var(--cobalt-800);
+  --primary-foreground: var(--sand-50);
+  --secondary: var(--sand-300);
+  --secondary-foreground: var(--cobalt-800);
+  --muted: var(--sand-300);
+  --muted-foreground: var(--cobalt-600);
+  --accent: var(--sand-300);
+  --accent-foreground: var(--cobalt-900);
+  --destructive: var(--stamp);
+  --success: var(--cobalt-700);
+  --border: rgb(6 43 138 / 0.16);
+  --border-strong: rgb(6 43 138 / 0.34);
+  --input: rgb(6 43 138 / 0.26);
+  --ring: var(--cobalt-800);
+  --chart-1: var(--cobalt-800);
+  --chart-2: var(--cobalt-600);
+  --chart-3: var(--cobalt-300);
+  --chart-4: var(--sand-400);
+  --chart-5: var(--stamp);
+  --sidebar-width: 15rem;
+  --sidebar-width-icon: 3.5rem;
+
+  color-scheme: light;
+}
+
+/* Lighter paper: the stationery objects (tickets, slips, cards). */
+.paper {
+  --background: var(--sand-50);
+  --card: var(--sand-100);
+  --muted: var(--sand-100);
+  background-color: var(--sand-50);
+  color: var(--cobalt-800);
+}
+
+/* Cobalt field with sand ink (inverted print; Wilber's app at night). */
+.field-ink,
+[data-theme="noche"] {
+  --background: var(--cobalt-800);
+  --foreground: var(--sand-100);
+  --card: var(--cobalt-900);
+  --card-foreground: var(--sand-100);
+  --popover: var(--cobalt-950);
+  --popover-foreground: var(--sand-100);
+  --primary: var(--sand-100);
+  --primary-foreground: var(--cobalt-800);
+  --secondary: var(--cobalt-900);
+  --secondary-foreground: var(--sand-100);
+  --muted: var(--cobalt-900);
+  --muted-foreground: var(--cobalt-300);
+  --accent: var(--cobalt-700);
+  --accent-foreground: var(--sand-50);
+  --destructive: #ff8b7e;
+  --success: var(--cobalt-200);
+  --border: rgb(238 230 214 / 0.16);
+  --border-strong: rgb(238 230 214 / 0.34);
+  --input: rgb(238 230 214 / 0.26);
+  --ring: var(--sand-100);
+  --ink: var(--sand-100);
+  --ink-soft: var(--cobalt-300);
+  --ground: var(--cobalt-800);
+  --surface: var(--cobalt-900);
+  --surface-2: var(--cobalt-700);
+  --paper: var(--cobalt-900);
+  --paper-ink: var(--sand-100);
+  --chart-1: var(--sand-100);
+  --chart-2: var(--cobalt-300);
+  --chart-3: var(--cobalt-600);
+  color-scheme: dark;
+}
+.field-ink {
+  background-color: var(--cobalt-800);
+  color: var(--sand-100);
+}
+
+/* Square corners for printed things; app screens keep beui's radii. */
+.print-corners {
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-paper-ink: var(--paper-ink);
+  --color-field: var(--field);
+  --color-field-ink: var(--field-ink);
+  --color-stamp: var(--stamp);
+  --color-sand-50: var(--sand-50);
+  --color-sand-100: var(--sand-100);
+  --color-sand-200: var(--sand-200);
+  --color-sand-300: var(--sand-300);
+  --color-sand-400: var(--sand-400);
+  --color-cobalt-950: var(--cobalt-950);
+  --color-cobalt-900: var(--cobalt-900);
+  --color-cobalt-800: var(--cobalt-800);
+  --color-cobalt-700: var(--cobalt-700);
+  --color-cobalt-600: var(--cobalt-600);
+  --color-cobalt-300: var(--cobalt-300);
+  --color-cobalt-200: var(--cobalt-200);
+
+  --font-sans: var(--font-barlow), "Barlow", system-ui, sans-serif;
+  --font-display: var(--font-barlow-condensed), "Barlow Condensed", "Barlow", system-ui, sans-serif;
+  /* No serif and no monospace in this system: both fall back to Barlow. */
+  --font-serif: var(--font-barlow), "Barlow", system-ui, sans-serif;
+  --font-mono: var(--font-barlow), "Barlow", system-ui, sans-serif;
+
+  --text-small: var(--step-small);
+  --text-body: var(--step-body);
+  --text-lead: var(--step-lead);
+  --text-head: var(--step-head);
+  --text-display: var(--step-display);
+
+  --ease-out-strong: var(--ease-out);
+  --ease-in-out-strong: var(--ease-in-out);
+  --ease-drawer: var(--ease-drawer);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-color: var(--cobalt-600) var(--sand-300);
+    scrollbar-width: thin;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--step-body);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern", "liga";
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--cobalt-800);
+    color: var(--sand-50);
+  }
+  .field-ink ::selection,
+  [data-theme="noche"] ::selection {
+    background: var(--sand-100);
+    color: var(--cobalt-900);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  button,
+  [role="button"],
+  a {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  input,
+  textarea,
+  select {
+    /* 16px+ prevents iOS zoom on focus */
+    font-size: max(16px, 1em);
+  }
+}
+
+/* Custom scrollbar: a cobalt thumb riding a sand rail. */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: var(--sand-300);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cobalt-600);
+  border: 3px solid var(--sand-300);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cobalt-800);
+}
+::-webkit-scrollbar-corner {
+  background: var(--sand-300);
+}
+.field-ink ::-webkit-scrollbar-track,
+[data-theme="noche"] ::-webkit-scrollbar-track {
+  background: var(--cobalt-900);
+}
+.field-ink ::-webkit-scrollbar-thumb,
+[data-theme="noche"] ::-webkit-scrollbar-thumb {
+  background: var(--cobalt-300);
+  border-color: var(--cobalt-900);
+}
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* Every pressable thing answers the finger. */
+  .pressable {
+    transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+  .pressable:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  /* --- Paper edges ------------------------------------------------------ */
+
+  /* Convex scallops along the bottom edge. */
+  .edge-scallop-b {
+    --r: 12px;
+    -webkit-mask:
+      radial-gradient(circle var(--r) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r)) var(--r) repeat-x,
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--r) + 1px) no-repeat;
+    mask:
+      radial-gradient(circle var(--r) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r)) var(--r) repeat-x,
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--r) + 1px) no-repeat;
+  }
+  .edge-scallop-t {
+    --r: 12px;
+    -webkit-mask:
+      radial-gradient(circle var(--r) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r)) var(--r) repeat-x,
+      linear-gradient(#000 0 0) 0 100% / 100% calc(100% - var(--r) + 1px) no-repeat;
+    mask:
+      radial-gradient(circle var(--r) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r)) var(--r) repeat-x,
+      linear-gradient(#000 0 0) 0 100% / 100% calc(100% - var(--r) + 1px) no-repeat;
+  }
+  .edge-scallop-y {
+    --r: 12px;
+    -webkit-mask:
+      radial-gradient(circle var(--r) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r)) var(--r) repeat-x,
+      radial-gradient(circle var(--r) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r)) var(--r) repeat-x,
+      linear-gradient(#000 0 0) 0 50% / 100% calc(100% - 2 * var(--r) + 2px) no-repeat;
+    mask:
+      radial-gradient(circle var(--r) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r)) var(--r) repeat-x,
+      radial-gradient(circle var(--r) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r)) var(--r) repeat-x,
+      linear-gradient(#000 0 0) 0 50% / 100% calc(100% - 2 * var(--r) + 2px) no-repeat;
+  }
+
+  /* Zigzag cut along the bottom edge (receipts, itinerary slips). */
+  .edge-zigzag-b {
+    --z: 18px;
+    -webkit-mask:
+      conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 50% 100% / var(--z) calc(var(--z) / 2) repeat-x,
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--z) / 2 + 1px) no-repeat;
+    mask:
+      conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 50% 100% / var(--z) calc(var(--z) / 2) repeat-x,
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--z) / 2 + 1px) no-repeat;
+  }
+
+  /* Ticket: half-circle notches cut into both long sides. */
+  .ticket-notch {
+    --n: 14px;
+    --ny: 50%;
+    -webkit-mask:
+      radial-gradient(circle var(--n) at 0 var(--ny), #0000 98%, #000 101%) 0 0 / 51% 100% no-repeat,
+      radial-gradient(circle var(--n) at 100% var(--ny), #0000 98%, #000 101%) 100% 0 / 51% 100% no-repeat;
+    mask:
+      radial-gradient(circle var(--n) at 0 var(--ny), #0000 98%, #000 101%) 0 0 / 51% 100% no-repeat,
+      radial-gradient(circle var(--n) at 100% var(--ny), #0000 98%, #000 101%) 100% 0 / 51% 100% no-repeat;
+  }
+  /* Ticket stub notches at the top and bottom of a vertical tear line (at --nx). */
+  .ticket-notch-x {
+    --n: 14px;
+    --nx: 70%;
+    -webkit-mask:
+      radial-gradient(circle var(--n) at var(--nx) 0, #0000 98%, #000 101%) 0 0 / 100% 51% no-repeat,
+      radial-gradient(circle var(--n) at var(--nx) 100%, #0000 98%, #000 101%) 0 100% / 100% 51% no-repeat;
+    mask:
+      radial-gradient(circle var(--n) at var(--nx) 0, #0000 98%, #000 101%) 0 0 / 100% 51% no-repeat,
+      radial-gradient(circle var(--n) at var(--nx) 100%, #0000 98%, #000 101%) 0 100% / 100% 51% no-repeat;
+  }
+
+  /* Tear line of round 5px dots, in the colour of the ground behind. */
+  .perforation-x {
+    background-image: radial-gradient(circle, var(--perf, var(--ground)) 2.6px, transparent 3px);
+    background-size: 13px 10px;
+    background-repeat: repeat-x;
+    background-position: 0 50%;
+    height: 10px;
+  }
+  .perforation-y {
+    background-image: radial-gradient(circle, var(--perf, var(--ground)) 2.6px, transparent 3px);
+    background-size: 10px 13px;
+    background-repeat: repeat-y;
+    background-position: 50% 0;
+    width: 10px;
+  }
+
+  /* Dot leaders for the itinerary slip. */
+  .dot-leader {
+    flex: 1;
+    min-width: 1.5rem;
+    margin: 0 0.5rem;
+    align-self: center;
+    height: 4px;
+    background-image: radial-gradient(circle, currentColor 1.6px, transparent 2px);
+    background-size: 8px 4px;
+    background-repeat: repeat-x;
+    opacity: 0.55;
+  }
+
+  /* Rubber stamp ("LLENA", "PAGADO"). */
+  .stamp {
+    display: inline-block;
+    color: var(--stamp);
+    border: 3px solid currentColor;
+    padding: 0.15em 0.55em;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    transform: rotate(-6deg);
+    mix-blend-mode: multiply;
+  }
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* MapLibre: keep controls on-brand */
+.maplibregl-ctrl-group {
+  background: var(--sand-50) !important;
+  border-radius: 999px !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-attrib {
+  font-family: var(--font-sans);
+  font-size: 11px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

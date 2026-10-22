@@ -1,0 +1,182 @@
+{
+  "formato": "el-camino-emprendedor/canvas",
+  "version": 1,
+  "exportado": "2026-10-22T20:26:12.790Z",
+  "canvas": {
+    "tipo": "story_map",
+    "titulo": "Story Map (User Story Mapping de Patton)",
+    "emoji": "🧱",
+    "semana": 9
+  },
+  "equipo": "losquefaltan",
+  "negocio": "Tours de aventura de Wilber",
+  "problema": "Wilber gestiona las reservas por WhatsApp y de memoria, así que en temporada alta se le cruzan grupos: un cruce ya le costó $120 en guía y transporte.",
+  "campos": [
+    {
+      "key": "mapa",
+      "etiqueta": "Story Map (Patton): actividad (JTBD) → historias → criterios de aceptación",
+      "tipo": "storymap",
+      "valor": {
+        "cols": [
+          {
+            "nombre": "Explorar aventuras",
+            "resultado": "para elegir una experiencia adecuada para mi grupo",
+            "situacion": "Cuando estoy planificando una salida de aventura",
+            "motivacion": "quiero conocer los tours disponibles"
+          },
+          {
+            "nombre": "Elegir fecha y grupo",
+            "resultado": "para elegir una salida que podamos realizar",
+            "situacion": "Cuando ya elegí un tour",
+            "motivacion": "quiero ver fechas, horarios y cupos reales"
+          },
+          {
+            "nombre": "Reservar cupo",
+            "resultado": "para asegurar los cupos sin cruces de reservas",
+            "situacion": "Cuando encuentro una fecha disponible",
+            "motivacion": "quiero registrar los datos de mi grupo"
+          },
+          {
+            "nombre": "Confirmar y prepararme",
+            "resultado": "para llegar preparado al punto de encuentro",
+            "situacion": "Cuando mi reserva queda registrada",
+            "motivacion": "quiero recibir la confirmación e indicaciones"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "texto": "Como visitante, quiero ver los tours disponibles con duración, dificultad y precio, para identificar la experiencia que quiero reservar.",
+              "criterios": [
+                {
+                  "dado": "Dado que ingresé al catálogo de aventuras",
+                  "cuando": "cuando la página carga correctamente",
+                  "entonces": "entonces veo cada tour con nombre, duración, dificultad, precio y una breve descripción."
+                },
+                {
+                  "dado": "Dado que no hay tours activos",
+                  "cuando": "cuando cargo el catálogo",
+                  "entonces": "entonces veo un mensaje claro indicando que no hay aventuras disponibles por ahora."
+                }
+              ]
+            },
+            {
+              "texto": "Como visitante, quiero consultar las próximas fechas y cupos de un tour, para elegir una salida disponible para mi grupo.",
+              "criterios": [
+                {
+                  "dado": "Dado que seleccioné un tour",
+                  "cuando": "cuando consulto sus salidas",
+                  "entonces": "entonces veo solo fechas futuras con horario y cupos disponibles."
+                },
+                {
+                  "dado": "Dado que una fecha ya no tiene cupos",
+                  "cuando": "cuando consulto las salidas del tour",
+                  "entonces": "entonces la fecha aparece sin disponibilidad y no puedo seleccionarla."
+                }
+              ]
+            },
+            {
+              "texto": "Como visitante, quiero ingresar mis datos y la cantidad de personas, para reservar cupos en la fecha elegida.",
+              "criterios": [
+                {
+                  "dado": "Dado que elegí una fecha con cupos",
+                  "cuando": "cuando completo nombre, contacto y tamaño del grupo y confirmo",
+                  "entonces": "entonces se registra una reserva con código único y los cupos se descuentan."
+                },
+                {
+                  "dado": "Dado que la cantidad de personas supera los cupos restantes",
+                  "cuando": "cuando intento confirmar la reserva",
+                  "entonces": "entonces el sistema no crea la reserva y me informa los cupos disponibles."
+                }
+              ]
+            },
+            {
+              "texto": "Como viajero con reserva, quiero recibir una confirmación con el punto de encuentro, para saber que mi salida quedó asegurada.",
+              "criterios": [
+                {
+                  "dado": "Dado que mi reserva se registró correctamente",
+                  "cuando": "cuando el sistema la confirma",
+                  "entonces": "entonces recibo una confirmación con código, fecha, horario y punto de encuentro."
+                },
+                {
+                  "dado": "Dado que ocurre un error al enviar la confirmación",
+                  "cuando": "cuando termina el registro de la reserva",
+                  "entonces": "entonces veo la reserva registrada y una instrucción clara para contactar a Wilber."
+                }
+              ]
+            }
+          ],
+          [
+            {
+              "texto": "Como visitante, quiero filtrar tours por nivel de dificultad, para encontrar opciones apropiadas para mi grupo.",
+              "criterios": [
+                {
+                  "dado": "Dado que estoy viendo el catálogo",
+                  "cuando": "cuando filtro por nivel de dificultad",
+                  "entonces": "entonces solo se muestran los tours que cumplen el filtro elegido."
+                },
+                {
+                  "dado": "Dado que ningún tour coincide con mi filtro",
+                  "cuando": "cuando aplico el filtro",
+                  "entonces": "entonces veo un mensaje y una opción para limpiar el filtro."
+                }
+              ]
+            },
+            {
+              "texto": "Como visitante, quiero ver el detalle de una salida antes de elegirla, para confirmar horario, precio y lugares disponibles.",
+              "criterios": [
+                {
+                  "dado": "Dado que veo una salida disponible",
+                  "cuando": "cuando abro su detalle",
+                  "entonces": "entonces veo el horario, precio, punto de encuentro y cupos restantes."
+                },
+                {
+                  "dado": "Dado que la salida se llenó mientras revisaba el detalle",
+                  "cuando": "cuando intento seleccionarla",
+                  "entonces": "entonces se me informa que ya no hay cupos y puedo volver a las fechas."
+                }
+              ]
+            },
+            {
+              "texto": "Como visitante, quiero revisar el resumen de mi reserva antes de enviarla, para corregir cualquier dato del grupo.",
+              "criterios": [
+                {
+                  "dado": "Dado que completé los datos de la reserva",
+                  "cuando": "cuando reviso el resumen antes de enviarlo",
+                  "entonces": "entonces veo el tour, fecha, tamaño del grupo y contacto ingresados."
+                },
+                {
+                  "dado": "Dado que falta un dato obligatorio",
+                  "cuando": "cuando intento enviar la reserva",
+                  "entonces": "entonces el sistema marca el campo faltante y no envía la solicitud."
+                }
+              ]
+            },
+            {
+              "texto": "Como viajero con reserva, quiero consultar qué llevar y cuándo llegar, para prepararme para la aventura.",
+              "criterios": [
+                {
+                  "dado": "Dado que tengo una reserva confirmada",
+                  "cuando": "cuando abro las indicaciones de mi salida",
+                  "entonces": "entonces veo qué llevar, a qué hora llegar y el punto de encuentro."
+                },
+                {
+                  "dado": "Dado que las indicaciones de una salida aún no están disponibles",
+                  "cuando": "cuando las consulto",
+                  "entonces": "entonces veo un aviso con el contacto de Wilber para resolver la duda."
+                }
+              ]
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "key": "walking_skeleton",
+      "etiqueta": "Walking skeleton",
+      "tipo": "texto",
+      "valor": "MVP: un visitante puede explorar tours, elegir una fecha con cupos, registrar una reserva para su grupo y recibir una confirmación con código, horario y punto de encuentro. No incluye pago en línea, cancelaciones ni edición de reservas."
+    }
+  ],
+  "camposDeVersionesAnteriores": []
+}

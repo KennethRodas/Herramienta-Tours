@@ -1,0 +1,41 @@
+{
+  "formato": "el-camino-emprendedor/canvas",
+  "version": 1,
+  "exportado": "2026-10-22T20:26:27.691Z",
+  "canvas": {
+    "tipo": "ai_design",
+    "titulo": "Canvas de Diseño IA (PRD + specs)",
+    "emoji": "🤖",
+    "semana": 9
+  },
+  "equipo": "losquefaltan",
+  "negocio": "Tours de aventura de Wilber",
+  "problema": "Wilber gestiona las reservas por WhatsApp y de memoria, así que en temporada alta se le cruzan grupos: un cruce ya le costó $120 en guía y transporte.",
+  "campos": [
+    {
+      "key": "prd_para_quien",
+      "etiqueta": "Para quién es tu producto, y su ÚNICA acción clave",
+      "tipo": "texto",
+      "valor": "Personas en El Salvador que organizan una salida de aventura para su grupo y necesitan asegurar cupos antes de coordinar el viaje. Acción clave: reservar los cupos de su grupo en una fecha disponible."
+    },
+    {
+      "key": "prd_stack",
+      "etiqueta": "El stack con el que construís",
+      "tipo": "texto",
+      "valor": "Aplicación web en TypeScript, desplegada en Vercel, con Neon PostgreSQL conectado mediante Vercel. Implementación asistida por Claude Fable o GPT Astra."
+    },
+    {
+      "key": "no_es",
+      "etiqueta": "Es / No es · Hace / No hace",
+      "tipo": "texto",
+      "valor": "SÍ HACE\n• Muestra tours con duración, dificultad, precio y descripción.\n• Permite filtrar tours por dificultad.\n• Muestra fechas futuras, horarios, cupos reales y detalle de cada salida.\n• Registra reservas con nombre, contacto y tamaño de grupo; descuenta cupos y genera un código.\n• Muestra resumen, confirmación e indicaciones de preparación.\n\nNO HACE\n• No procesa pagos en línea.\n• No permite cancelar ni editar reservas.\n• No incorpora otras funciones fuera de la reserva y preparación de la salida."
+    },
+    {
+      "key": "prd_generado",
+      "etiqueta": "El PRD que armó la IA",
+      "tipo": "texto",
+      "valor": "1) PRODUCTO\nTours de aventura de Wilber es una aplicación web para consultar y reservar salidas de aventura en El Salvador. Centraliza tours, fechas y cupos para evitar cruces de grupos causados por reservas manejadas por WhatsApp y de memoria.\n\n2) PARA QUIÉN\nPersonas en El Salvador que organizan una salida de aventura para su grupo y necesitan asegurar cupos antes de coordinar el viaje.\nAcción clave: reservar los cupos de su grupo en una fecha disponible.\n\n3) ALCANCE\nSÍ hace: muestra el catálogo de tours; filtra por dificultad; presenta fechas futuras, horarios, precios y cupos reales; registra reservas con nombre, contacto y tamaño de grupo; descuenta cupos, genera código de reserva, muestra resumen, confirmación e indicaciones.\nNO hace: pagos en línea, cancelaciones, edición de reservas ni funciones fuera de la reserva y preparación de la salida.\n\n4) HISTORIAS INCLUIDAS\nExplorar aventuras\n• Como visitante, quiero ver los tours disponibles con duración, dificultad y precio, para identificar la experiencia que quiero reservar.\n• Como visitante, quiero filtrar tours por nivel de dificultad, para encontrar opciones apropiadas para mi grupo.\n\nElegir fecha y grupo\n• Como visitante, quiero consultar las próximas fechas y cupos de un tour, para elegir una salida disponible para mi grupo.\n• Como visitante, quiero ver el detalle de una salida antes de elegirla, para confirmar horario, precio y lugares disponibles.\n\nReservar cupo\n• Como visitante, quiero ingresar mis datos y la cantidad de personas, para reservar cupos en la fecha elegida.\n• Como visitante, quiero revisar el resumen de mi reserva antes de enviarla, para corregir cualquier dato del grupo.\n\nConfirmar y prepararme\n• Como viajero con reserva, quiero recibir una confirmación con el punto de encuentro, para saber que mi salida quedó asegurada.\n• Como viajero con reserva, quiero consultar qué llevar y cuándo llegar, para prepararme para la aventura.\n\n5) REBANADA V1 (WALKING SKELETON)\nMVP: un visitante puede explorar tours, elegir una fecha con cupos, registrar una reserva para su grupo y recibir una confirmación con código, horario y punto de encuentro. No incluye pago en línea, cancelaciones ni edición de reservas.\n\n6) STACK\nAplicación web en TypeScript, desplegada en Vercel, con Neon PostgreSQL conectado mediante Vercel. Implementación asistida por Claude Fable o GPT Astra; no se usa Lovable."
+    }
+  ],
+  "camposDeVersionesAnteriores": []
+}
