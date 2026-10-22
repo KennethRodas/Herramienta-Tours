@@ -1,61 +1,58 @@
 "use client";
 
 // Public API of the map module. Pages import ONLY from "@/components/map".
-// The MAP agent replaces these placeholders with MapLibre implementations
-// (loaded with next/dynamic, ssr: false) without changing the props.
+// Each map loads maplibre-gl (client only) when its box nears the viewport;
+// until then, and while the chunk loads, a sand placeholder holds the size.
 
-import type { MeetingPoint, Route, Tour } from "@/lib/domain/types";
-import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
+import { EditorSkeleton, FILL, LazyMount, MapSkeleton, shellClass } from "./lazy";
+import type { MeetingPointMapProps, RouteEditorProps, RouteMapProps, TerrainMapProps } from "./types";
 
-export interface TerrainMapProps {
-  /** Tours whose routes are drawn. */
-  tours: Tour[];
-  /** Tour to frame and highlight. */
-  focusTourId?: string;
-  onSelectTour?: (tourId: string) => void;
-  /** "full": page-size explorer · "card": square/inline panel, fewer controls. */
-  variant?: "full" | "card";
-  className?: string;
-}
+export type { MapPadding, MeetingPointMapProps, RouteEditorProps, RouteMapProps, TerrainMapProps } from "./types";
 
-export interface RouteMapProps {
-  tour: Tour;
-  /** Shows the "Recorrer la ruta" flyover control and the synced elevation profile. */
-  flyover?: boolean;
-  className?: string;
-}
+const TerrainMapImpl = dynamic(() => import("./terrain-map"), { ssr: false, loading: () => <MapSkeleton /> });
+const RouteMapImpl = dynamic(() => import("./route-map"), { ssr: false, loading: () => <MapSkeleton /> });
+const RouteMapFlyoverImpl = dynamic(() => import("./route-map"), { ssr: false, loading: () => <MapSkeleton profile /> });
+const MeetingPointMapImpl = dynamic(() => import("./meeting-point-map"), { ssr: false, loading: () => <MapSkeleton /> });
+const RouteEditorImpl = dynamic(() => import("./route-editor"), { ssr: false, loading: () => <EditorSkeleton /> });
 
-export interface MeetingPointMapProps {
-  point: MeetingPoint;
-  className?: string;
-}
-
-export interface RouteEditorProps {
-  tour: Tour;
-  onSave: (route: Route) => void;
-  className?: string;
-}
-
-function Placeholder({ label, className }: { label: string; className?: string }) {
+/** Every route on a 3D relief of El Salvador; `focusTourId` flies to one. */
+export function TerrainMap(props: TerrainMapProps) {
+  const full = (props.variant ?? "full") === "full";
   return (
-    <div className={cn("grid min-h-64 place-items-center bg-sand-300 text-cobalt-600", className)} role="img" aria-label={label}>
-      <span className="font-sans text-sm">{label}</span>
-    </div>
+    <LazyMount className={shellClass("min-h-64 bg-sand-300", props.className)} placeholder={<MapSkeleton />} lenisPrevent={full}>
+      <TerrainMapImpl {...props} className={FILL} />
+    </LazyMount>
   );
 }
 
-export function TerrainMap(props: TerrainMapProps) {
-  return <Placeholder label="Mapa de rutas" className={props.className} />;
-}
-
+/** One tour in 3D; with `flyover`, "Recorrer la ruta" and the elevation profile. */
 export function RouteMap(props: RouteMapProps) {
-  return <Placeholder label={`Ruta: ${props.tour.name}`} className={props.className} />;
+  const Impl = props.flyover ? RouteMapFlyoverImpl : RouteMapImpl;
+  return (
+    <LazyMount
+      className={shellClass(props.flyover ? "min-h-[480px] bg-sand-300" : "min-h-64 bg-sand-300", props.className)}
+      placeholder={<MapSkeleton profile={props.flyover} />}
+    >
+      <Impl {...props} className={FILL} />
+    </LazyMount>
+  );
 }
 
+/** Flat street map of a meeting point with a link to Google Maps. */
 export function MeetingPointMap(props: MeetingPointMapProps) {
-  return <Placeholder label={props.point.name} className={props.className} />;
+  return (
+    <LazyMount className={shellClass("min-h-64 bg-sand-300", props.className)} placeholder={<MapSkeleton />}>
+      <MeetingPointMapImpl {...props} className={FILL} />
+    </LazyMount>
+  );
 }
 
+/** Wilber's route editor: trace, waypoints, undo, preview and save. */
 export function RouteEditor(props: RouteEditorProps) {
-  return <Placeholder label={`Editor de ruta: ${props.tour.name}`} className={props.className} />;
+  return (
+    <LazyMount className={shellClass("min-h-[640px]", props.className)} placeholder={<EditorSkeleton />} lenisPrevent>
+      <RouteEditorImpl {...props} className="" />
+    </LazyMount>
+  );
 }

@@ -154,7 +154,7 @@ export function BottomSheet({
           {({ gate }) => (
             <motion.button
               type="button"
-              aria-label="Close bottom sheet"
+              aria-label="Cerrar"
               // Outside the sheet, so the focus trap never lands on it; it is
               // a pointer target, and Escape closes from the keyboard.
               tabIndex={-1}

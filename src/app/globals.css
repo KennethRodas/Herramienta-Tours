@@ -121,8 +121,7 @@
 
   /* Cobalt field with sand ink (inverted print; Wilber's app at night). */
   .field-ink,
-  .ink-night,
-  [data-theme="noche"] {
+  .ink-night {
     --background: var(--cobalt-800);
     --foreground: var(--sand-100);
     --card: var(--cobalt-900);
@@ -169,6 +168,43 @@
     --radius-xl: 0px;
     --radius-2xl: 0px;
   }
+}
+
+/* Wilber's app at night. Unlayered and specific enough to beat :root when
+   data-theme sits on <html>. */
+:root[data-theme="noche"],
+[data-theme="noche"] {
+  --background: var(--cobalt-800);
+  --foreground: var(--sand-100);
+  --card: var(--cobalt-900);
+  --card-foreground: var(--sand-100);
+  --popover: var(--cobalt-950);
+  --popover-foreground: var(--sand-100);
+  --primary: var(--sand-100);
+  --primary-foreground: var(--cobalt-800);
+  --secondary: var(--cobalt-900);
+  --secondary-foreground: var(--sand-100);
+  --muted: var(--cobalt-900);
+  --muted-foreground: var(--cobalt-300);
+  --accent: var(--cobalt-700);
+  --accent-foreground: var(--sand-50);
+  --destructive: #ff8b7e;
+  --success: var(--cobalt-200);
+  --border: rgb(238 230 214 / 0.16);
+  --border-strong: rgb(238 230 214 / 0.34);
+  --input: rgb(238 230 214 / 0.26);
+  --ring: var(--sand-100);
+  --ink: var(--sand-100);
+  --ink-soft: var(--cobalt-300);
+  --ground: var(--cobalt-800);
+  --surface: var(--cobalt-900);
+  --surface-2: var(--cobalt-700);
+  --paper: var(--cobalt-900);
+  --paper-ink: var(--sand-100);
+  --chart-1: var(--sand-100);
+  --chart-2: var(--cobalt-300);
+  --chart-3: var(--cobalt-600);
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -477,14 +513,9 @@ html.lenis body {
 }
 
 /* MapLibre: keep controls on-brand */
-.maplibregl-ctrl-group {
-  background: var(--sand-50) !important;
-  border-radius: 999px !important;
-  overflow: hidden;
-}
 .maplibregl-ctrl-attrib {
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 @media (prefers-reduced-motion: reduce) {

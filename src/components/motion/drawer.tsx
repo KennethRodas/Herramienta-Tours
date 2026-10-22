@@ -64,7 +64,7 @@ export function Drawer({
           {({ gate }) => (
             <motion.button
               type="button"
-              aria-label="Close"
+              aria-label="Cerrar"
               // Outside the panel, so the focus trap never lands on it; it is
               // a pointer target only.
               tabIndex={-1}

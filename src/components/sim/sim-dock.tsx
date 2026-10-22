@@ -46,7 +46,7 @@ export function SimDock() {
       ref={ref}
       data-theme="noche"
       className={cn(
-        "fixed bottom-[calc(env(safe-area-inset-bottom)+92px)] left-3 z-[60] font-sans text-sand-50 md:bottom-4 md:left-4",
+        "fixed bottom-[calc(env(safe-area-inset-bottom)+92px)] left-3 z-[45] font-sans text-sand-50 md:bottom-4 md:left-4",
         // Wilber's desktop top bar already shows the simulated clock.
         pathname?.startsWith("/wilber") && "lg:hidden",
       )}

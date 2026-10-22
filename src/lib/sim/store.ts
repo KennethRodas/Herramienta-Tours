@@ -458,8 +458,27 @@ export const sim = {
       const { tour } = ctxFor(d, dep);
       for (const b of d.bookings.filter((x) => x.departureId === id && x.status !== "cancelada")) {
         queueWa(d, now, b.phone, "cambio_salida", wa.departureChanged(b, dep, tour, "cancelada", reason), { bookingId: b.id, departureId: id });
+        if (b.email) queueEmail(d, now, b.email, "cambio_salida", `Salida cancelada · ${tour.shortName} ${formatDayShort(dep.startsAt)}`, { bookingId: b.id, departureId: id });
+        // The group is notified and its seats released; Wilber reschedules from the chat.
+        b.status = "cancelada";
       }
+      dep.seatsTaken = 0;
       logEvent(d, now, "salida.cerrada", "wilber", `${tour.shortName} ${formatDayShort(dep.startsAt)} cancelada: ${reason}`);
+    });
+  },
+
+  /** Weather notice to every group of a departure (WhatsApp, with "change date" buttons). */
+  async weatherAlert(departureId: string, detail: string) {
+    return commit((d, now) => {
+      const dep = d.departures.find((x) => x.id === departureId);
+      if (!dep) return 0;
+      const { tour } = ctxFor(d, dep);
+      const list = d.bookings.filter((x) => x.departureId === departureId && x.status !== "cancelada");
+      for (const b of list) {
+        queueWa(d, now, b.phone, "alerta_clima", wa.weatherAlert(b, dep, tour, detail), { bookingId: b.id, departureId });
+      }
+      logEvent(d, now, "mensaje.enviado", "wilber", `Aviso de clima a ${plural(dep.seatsTaken, "persona", "personas")} de ${tour.shortName} ${formatDayShort(dep.startsAt)}.`);
+      return list.length;
     });
   },
 
