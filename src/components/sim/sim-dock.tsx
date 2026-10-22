@@ -55,10 +55,19 @@ export function SimDock() {
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="pressable flex h-9 items-center gap-2 rounded-full bg-cobalt-900 pl-2.5 pr-3.5 text-[13px] font-semibold"
+        className="pressable flex h-8 items-center gap-1.5 rounded-full bg-cobalt-950 pl-2.5 pr-3 text-[13px] font-semibold shadow-[0_0_0_2px_rgb(238_230_214/0.6)] md:h-9 md:gap-2 md:pr-3.5"
       >
         <span className={cn("size-2 rounded-full", clock?.paused ? "bg-cobalt-300" : "bg-sand-100", !clock?.paused && !reduce && "animate-pulse")} aria-hidden />
-        <span className="tabular">{now ? `${formatDayShort(now)} · ${formatTime(now)}` : "Simulación"}</span>
+        <span className="tabular">
+          {now ? (
+            <>
+              <span className="hidden md:inline">{formatDayShort(now)} · </span>
+              {formatTime(now)}
+            </>
+          ) : (
+            "Simulación"
+          )}
+        </span>
         {clock && !clock.paused && clock.speed > 1 && <span className="text-cobalt-300">×{clock.speed}</span>}
       </button>
       <AnimatePresence>

@@ -22,7 +22,7 @@ import {
 } from "@/lib/domain/availability";
 import { detectConflicts } from "@/lib/domain/conflicts";
 import { departureRef } from "@/lib/domain/refs";
-import { formatDayShort, formatUsd, plural, svISO, HOUR } from "@/lib/domain/format";
+import { formatDayShort, formatUsd, normalizePhone, plural, svISO, HOUR } from "@/lib/domain/format";
 import * as wa from "@/lib/whatsapp/templates";
 import { handleAdminMessage, type BotAction } from "@/lib/whatsapp/admin-bot";
 import { handleCustomerMessage } from "@/lib/whatsapp/customer-bot";
@@ -51,7 +51,12 @@ function read(): SimState | null {
     const raw = window.localStorage.getItem(KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as SimState;
-    return parsed?.version === 2 ? parsed : null;
+    if (parsed?.version !== 2) return null;
+    // Fields added after a state was saved.
+    parsed.customers ??= [];
+    parsed.loginCodes ??= [];
+    parsed.knownContacts ??= [];
+    return parsed;
   } catch {
     return null;
   }
@@ -155,6 +160,13 @@ export function effectiveTours(s: Pick<SimState, "tourOverrides" | "settings"> |
     const o = s?.tourOverrides[t.id] ?? {};
     return { ...t, ...o, active: s?.settings.catalogEmpty ? false : (o.active ?? t.active) };
   });
+}
+
+/** Contacts typed by a person in this browser: the only ones that may get real WhatsApp/email. */
+function remember(d: Draft, phone?: string, email?: string) {
+  for (const c of [phone ? normalizePhone(phone) : "", email?.trim().toLowerCase() ?? ""]) {
+    if (c && !d.knownContacts.includes(c)) d.knownContacts.push(c);
+  }
 }
 
 function logEvent(d: Draft, now: number, type: SimEventType, actor: SimEvent["actor"], summary: string, data?: Record<string, unknown>) {
@@ -329,7 +341,10 @@ function bookInDraft(d: Draft, now: number, input: BookingInput, actor: SimEvent
 
 export const sim = {
   async book(input: BookingInput, actor: SimEvent["actor"] = "visitante") {
-    return commit((d, now) => bookInDraft(d, now, input, actor));
+    return commit((d, now) => {
+      if (actor === "visitante") remember(d, input.phone, input.email);
+      return bookInDraft(d, now, input, actor);
+    });
   },
 
   /** Holds seats for 10 minutes while the visitor fills the form. */
@@ -486,6 +501,62 @@ export const sim = {
     return commit((d, now) => {
       d.tourOverrides[tourId] = { ...d.tourOverrides[tourId], ...patch };
       logEvent(d, now, "sistema", "wilber", `Tour actualizado: ${tourById(tourId)?.shortName}.`);
+    });
+  },
+
+  /**
+   * Visitor login, step 1: a 6-digit code goes to that WhatsApp number.
+   * In the simulation the code also comes back so the UI can show the
+   * "message received" banner; with Supabase it would never leave the server.
+   */
+  async requestLoginCode(rawPhone: string) {
+    return commit((d, now) => {
+      const phone = normalizePhone(rawPhone);
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      const expiresAt = new Date(now + 10 * 60_000).toISOString();
+      d.loginCodes = d.loginCodes.filter((c) => c.phone !== phone && Date.parse(c.expiresAt) > now);
+      d.loginCodes.push({ phone, code, expiresAt, attempts: 0 });
+      remember(d, phone);
+      queueWa(d, now, phone, "codigo", { body: `*${code}* es tu código para entrar a Wilber. Vence en 10 minutos.` });
+      logEvent(d, now, "mensaje.enviado", "sistema", `Código de acceso enviado a +${phone}.`);
+      return { phone, code, expiresAt };
+    });
+  },
+
+  /** Visitor login, step 2. New numbers come back with `isNew` to ask for name and email. */
+  async verifyLoginCode(rawPhone: string, code: string) {
+    return commit((d, now) => {
+      const phone = normalizePhone(rawPhone);
+      const entry = d.loginCodes.find((c) => c.phone === phone);
+      if (!entry || Date.parse(entry.expiresAt) <= now) return { ok: false as const, reason: "vencido" as const };
+      if (entry.attempts >= 5) return { ok: false as const, reason: "intentos" as const };
+      if (entry.code !== code.replace(/\D/g, "")) {
+        entry.attempts++;
+        return { ok: false as const, reason: "incorrecto" as const, left: 5 - entry.attempts };
+      }
+      d.loginCodes = d.loginCodes.filter((c) => c.phone !== phone);
+      let customer = d.customers.find((c) => c.phone === phone);
+      const isNew = !customer;
+      if (!customer) {
+        // A number that already booked is a known customer: reuse what we know.
+        const last = [...d.bookings].reverse().find((b) => b.phone === phone);
+        customer = { phone, name: last?.name ?? "", email: last?.email, createdAt: new Date(now).toISOString() };
+        d.customers.push(customer);
+      }
+      customer.lastLoginAt = new Date(now).toISOString();
+      logEvent(d, now, "sistema", "visitante", `${customer.name || `+${phone}`} entró a su cuenta.`);
+      return { ok: true as const, customer: { ...customer }, isNew: isNew || !customer.name };
+    });
+  },
+
+  async saveCustomer(input: { phone: string; name: string; email?: string }) {
+    return commit((d, now) => {
+      const phone = normalizePhone(input.phone);
+      const existing = d.customers.find((c) => c.phone === phone);
+      const record = { phone, name: input.name.trim(), email: input.email?.trim() || undefined };
+      if (existing) Object.assign(existing, record);
+      else d.customers.push({ ...record, createdAt: new Date(now).toISOString() });
+      return d.customers.find((c) => c.phone === phone)!;
     });
   },
 

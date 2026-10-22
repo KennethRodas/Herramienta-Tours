@@ -13,6 +13,8 @@ Reservas de tours de aventura en El Salvador y panel de operación para Wilber, 
 - Reserva en pasos: grupo (con cupos apartados 10 minutos), datos, resumen editable y confirmación. No permite reservar más cupos de los que hay.
 - Boleto con código, QR, hora de llegada, punto de encuentro en mapa, qué llevar, clima, calendario y botón a WhatsApp.
 - Mapa 3D con relieve real y recorrido animado de cada ruta (`/mapa`).
+- Cuenta sin contraseña (`/entrar`, `/cuenta`): número de WhatsApp, código de 6 dígitos y, la primera vez, nombre y correo. Muestra las reservas de ese número y llena el formulario de reserva.
+- Confirmación por WhatsApp y correo de marca. En la simulación llegan al simulador; a un número o correo de prueba autorizado (`WHATSAPP_TEST_NUMBERS`, `EMAIL_TEST_ADDRESSES`) llegan de verdad.
 
 **Wilber** (`/wilber`, app instalable)
 - Hoy: salida en curso, lista con llegada de cada grupo, clima y alertas.

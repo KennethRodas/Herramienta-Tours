@@ -1,4 +1,4 @@
-import type { Booking, Departure, Hold, Message, SimEvent, Tour } from "@/lib/domain/types";
+import type { Booking, Customer, Departure, Hold, Message, SimEvent, Tour } from "@/lib/domain/types";
 
 export type TourOverride = Partial<Pick<Tour, "active" | "priceUsd" | "capacity" | "route" | "departureTime">>;
 
@@ -60,6 +60,12 @@ export interface SimState {
   /** Dedupe keys of automations already fired ("r24:<bookingId>"). */
   fired: Record<string, number>;
   scenario: string | null;
+  /** Visitor accounts (login with a WhatsApp code). */
+  customers: Customer[];
+  /** Pending login codes, one per phone. */
+  loginCodes: { phone: string; code: string; expiresAt: string; attempts: number }[];
+  /** Phones and emails a person typed in this browser (only these may get real messages). */
+  knownContacts: string[];
 }
 
 export const DEFAULT_SETTINGS: SimSettings = {

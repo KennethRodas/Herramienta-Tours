@@ -195,29 +195,59 @@ export async function rush(departureId: string, count: number) {
   };
 }
 
+/** Server allowlist answers per contact, cached for the life of the tab. */
+const allowCache = new Map<string, Promise<{ whatsapp: boolean; email: boolean }>>();
+function allowed(to: string) {
+  let p = allowCache.get(to);
+  if (!p) {
+    p = fetch(`/api/estado/destinatario?to=${encodeURIComponent(to)}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { whatsapp: false, email: false }))
+      .catch(() => ({ whatsapp: false, email: false }));
+    allowCache.set(to, p);
+  }
+  return p;
+}
+
+type Route = { real: false } | { real: true; to: string; originalTo?: string };
+
+/**
+ * Where a queued message really goes. Everything stays simulated except:
+ * messages to a contact a person typed in this browser that is on the
+ * server's test allowlist (it reaches that very phone or inbox), and, with
+ * the simulator switch on, Wilber's own messages (they reach the tester).
+ */
+async function route(m: Message, s: SimState): Promise<Route> {
+  const to = m.channel === "email" ? m.to.toLowerCase() : m.to;
+  if (s.knownContacts.includes(to)) {
+    const ok = await allowed(to);
+    if (m.channel === "whatsapp" ? ok.whatsapp : ok.email) return { real: true, to };
+  }
+  const testPhone = s.settings.testPhone.replace(/\D/g, "");
+  const testEmail = s.settings.testEmail.trim().toLowerCase();
+  if (m.channel === "whatsapp" && s.settings.realWhatsApp && testPhone && (to === testPhone || to === s.settings.wilberPhone)) {
+    return { real: true, to: testPhone, originalTo: m.kind.startsWith("wilber_") || to === testPhone ? undefined : to };
+  }
+  if (m.channel === "email" && s.settings.realEmail && testEmail && (to === testEmail || m.kind === "wilber_resumen")) {
+    return { real: true, to: testEmail, originalTo: to };
+  }
+  return { real: false };
+}
+
 async function dispatch(s: SimState) {
   const queued = s.messages.filter((m) => m.status === "en_cola" && !inFlight.has(m.id));
   if (!queued.length) return;
-  const simulated: string[] = [];
-  const testPhone = s.settings.testPhone.replace(/\D/g, "");
-  const testEmail = s.settings.testEmail.trim().toLowerCase();
-  for (const m of queued) {
-    // Only what is addressed to the tester (a booking made with their number)
-    // or to Wilber goes out for real; simulated customers never flood the phone.
-    const wantsReal =
-      (m.channel === "whatsapp" && s.settings.realWhatsApp && testPhone && (m.to === testPhone || m.to === s.settings.wilberPhone)) ||
-      (m.channel === "email" && s.settings.realEmail && testEmail && (m.to.toLowerCase() === testEmail || m.kind === "wilber_resumen"));
-    if (!wantsReal) {
-      simulated.push(m.id);
-      continue;
-    }
-    inFlight.add(m.id);
-    void sendReal(m, s).finally(() => inFlight.delete(m.id));
-  }
+  for (const m of queued) inFlight.add(m.id);
+  const routes = await Promise.all(queued.map((m) => route(m, s)));
+  const simulated = queued.filter((_, i) => !routes[i].real).map((m) => m.id);
   if (simulated.length) await sim.markMessages(simulated, "simulado", false);
+  for (const id of simulated) inFlight.delete(id);
+  queued.forEach((m, i) => {
+    const r = routes[i];
+    if (r.real) void sendReal(m, s, r.to, r.originalTo).finally(() => inFlight.delete(m.id));
+  });
 }
 
-async function sendReal(m: Message, s: SimState) {
+async function sendReal(m: Message, s: SimState, to: string, originalTo?: string) {
   try {
     const booking = s.bookings.find((b) => b.id === m.bookingId);
     const departure = booking ? s.departures.find((d) => d.id === booking.departureId) : undefined;
@@ -226,19 +256,12 @@ async function sendReal(m: Message, s: SimState) {
         ? await fetch("/api/whatsapp/send", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              to: s.settings.testPhone,
-              // Wilber's own messages go to the tester as-is; customers' get a "para +503…" prefix.
-              originalTo: m.kind.startsWith("wilber_") ? undefined : m.to,
-              body: m.body,
-              buttons: m.buttons,
-              location: m.location,
-            }),
+            body: JSON.stringify({ to, originalTo, body: m.body, buttons: m.buttons, location: m.location }),
           })
         : await fetch("/api/email/send", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ to: s.settings.testEmail, originalTo: m.to, kind: m.kind, subject: m.body, booking, departure }),
+            body: JSON.stringify({ to, originalTo, kind: m.kind, subject: m.body, booking, departure }),
           });
     await sim.markMessages([m.id], res.ok ? "enviado" : "fallido", res.ok);
   } catch {

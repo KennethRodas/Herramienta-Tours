@@ -230,5 +230,8 @@ export function createSeedState(seed: number, realNow = Date.now()): SimState {
     stats: { ...EMPTY_STATS },
     fired: {},
     scenario: null,
+    customers: [],
+    loginCodes: [],
+    knownContacts: [],
   };
 }

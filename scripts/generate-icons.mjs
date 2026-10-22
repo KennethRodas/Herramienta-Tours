@@ -30,6 +30,21 @@ async function png(svg, out) {
   console.log("wrote", out);
 }
 
+/** Square brand mark for profiles (Wompi, Kapso, Instagram…): ticket on a flat ground or transparent. */
+function brandSvg(size, ground, ticket, trail) {
+  const s = (size * 0.78) / 64;
+  const off = (size - 64 * s) / 2;
+  const bg = ground ? `<rect width="${size}" height="${size}" fill="${ground}"/>` : "";
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${bg}
+  <g transform="translate(${off} ${off}) scale(${s})">
+    <path d="${TICKET}" fill="${ticket}"/>
+    <path d="${TRAIL}" fill="none" stroke="${trail}" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g></svg>`;
+}
+
+await png(brandSvg(1024, GREEN, GOLD, GREEN), "public/brand/wilber-logo-cobalto.png");
+await png(brandSvg(1024, "#e6dbc7", GREEN, "#e6dbc7"), "public/brand/wilber-logo-arena.png");
+await png(brandSvg(1024, null, GREEN, GOLD), "public/brand/wilber-logo-transparente.png");
 await png(iconSvg(192, 0.82), "public/icons/icon-192.png");
 await png(iconSvg(512, 0.82), "public/icons/icon-512.png");
 await png(iconSvg(512, 0.6), "public/icons/maskable-512.png");

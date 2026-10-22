@@ -180,6 +180,7 @@ export type MessageKind =
   | "wilber_cruce"
   | "wilber_bot"
   | "cliente_bot"
+  | "codigo"
   | "entrante";
 
 export interface Message {
@@ -253,6 +254,15 @@ export interface SimEvent {
   actor: "visitante" | "wilber" | "bot" | "sistema";
   summary: string;
   data?: Record<string, unknown>;
+}
+
+/** A visitor account: identified by WhatsApp number, created on first login. */
+export interface Customer {
+  phone: string;
+  name: string;
+  email?: string;
+  createdAt: string;
+  lastLoginAt?: string;
 }
 
 export interface Business {
