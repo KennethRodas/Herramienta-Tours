@@ -295,7 +295,7 @@ function bookInDraft(d: Draft, now: number, input: BookingInput, actor: SimEvent
   if (input.partySize > left) {
     return reject(
       "sin_cupos",
-      left === 0 ? "Se acaban de llenar los cupos de esta salida." : `Solo quedan ${plural(left, "cupo", "cupos")}: no alcanza para ${input.partySize} personas.`,
+      left === 0 ? "Se acaban de llenar los cupos de esta salida." : `Solo ${left === 1 ? "queda 1 cupo" : `quedan ${left} cupos`}: no alcanza para ${input.partySize} personas.`,
     );
   }
   const tour = effectiveTours(d).find((t) => t.id === dep.tourId)!;

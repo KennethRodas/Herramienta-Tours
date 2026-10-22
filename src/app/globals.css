@@ -90,63 +90,85 @@
   color-scheme: light;
 }
 
-/* Lighter paper: the stationery objects (tickets, slips, cards). */
-.paper {
-  --background: var(--sand-50);
-  --card: var(--sand-100);
-  --muted: var(--sand-100);
-  background-color: var(--sand-50);
-  color: var(--cobalt-800);
-}
+/*
+  Colour scopes. They live in a layer so utilities (bg-*, text-*) still win,
+  and each one sets the whole ink set so a light sheet inside a cobalt field
+  (or the reverse) reads correctly.
+*/
+@layer components {
+  /* Light paper: tickets, slips, cards. */
+  .paper,
+  .ink-paper {
+    --ink: var(--cobalt-800);
+    --ink-soft: var(--cobalt-600);
+    --foreground: var(--cobalt-800);
+    --muted-foreground: var(--cobalt-600);
+    --primary: var(--cobalt-800);
+    --primary-foreground: var(--sand-50);
+    --ring: var(--cobalt-800);
+    --border: rgb(6 43 138 / 0.16);
+    --border-strong: rgb(6 43 138 / 0.34);
+    --input: rgb(6 43 138 / 0.26);
+    color-scheme: light;
+  }
+  .paper {
+    --background: var(--sand-50);
+    --card: var(--sand-100);
+    --muted: var(--sand-100);
+    background-color: var(--sand-50);
+    color: var(--cobalt-800);
+  }
 
-/* Cobalt field with sand ink (inverted print; Wilber's app at night). */
-.field-ink,
-[data-theme="noche"] {
-  --background: var(--cobalt-800);
-  --foreground: var(--sand-100);
-  --card: var(--cobalt-900);
-  --card-foreground: var(--sand-100);
-  --popover: var(--cobalt-950);
-  --popover-foreground: var(--sand-100);
-  --primary: var(--sand-100);
-  --primary-foreground: var(--cobalt-800);
-  --secondary: var(--cobalt-900);
-  --secondary-foreground: var(--sand-100);
-  --muted: var(--cobalt-900);
-  --muted-foreground: var(--cobalt-300);
-  --accent: var(--cobalt-700);
-  --accent-foreground: var(--sand-50);
-  --destructive: #ff8b7e;
-  --success: var(--cobalt-200);
-  --border: rgb(238 230 214 / 0.16);
-  --border-strong: rgb(238 230 214 / 0.34);
-  --input: rgb(238 230 214 / 0.26);
-  --ring: var(--sand-100);
-  --ink: var(--sand-100);
-  --ink-soft: var(--cobalt-300);
-  --ground: var(--cobalt-800);
-  --surface: var(--cobalt-900);
-  --surface-2: var(--cobalt-700);
-  --paper: var(--cobalt-900);
-  --paper-ink: var(--sand-100);
-  --chart-1: var(--sand-100);
-  --chart-2: var(--cobalt-300);
-  --chart-3: var(--cobalt-600);
-  color-scheme: dark;
-}
-.field-ink {
-  background-color: var(--cobalt-800);
-  color: var(--sand-100);
-}
+  /* Cobalt field with sand ink (inverted print; Wilber's app at night). */
+  .field-ink,
+  .ink-night,
+  [data-theme="noche"] {
+    --background: var(--cobalt-800);
+    --foreground: var(--sand-100);
+    --card: var(--cobalt-900);
+    --card-foreground: var(--sand-100);
+    --popover: var(--cobalt-950);
+    --popover-foreground: var(--sand-100);
+    --primary: var(--sand-100);
+    --primary-foreground: var(--cobalt-800);
+    --secondary: var(--cobalt-900);
+    --secondary-foreground: var(--sand-100);
+    --muted: var(--cobalt-900);
+    --muted-foreground: var(--cobalt-300);
+    --accent: var(--cobalt-700);
+    --accent-foreground: var(--sand-50);
+    --destructive: #ff8b7e;
+    --success: var(--cobalt-200);
+    --border: rgb(238 230 214 / 0.16);
+    --border-strong: rgb(238 230 214 / 0.34);
+    --input: rgb(238 230 214 / 0.26);
+    --ring: var(--sand-100);
+    --ink: var(--sand-100);
+    --ink-soft: var(--cobalt-300);
+    --ground: var(--cobalt-800);
+    --surface: var(--cobalt-900);
+    --surface-2: var(--cobalt-700);
+    --paper: var(--cobalt-900);
+    --paper-ink: var(--sand-100);
+    --chart-1: var(--sand-100);
+    --chart-2: var(--cobalt-300);
+    --chart-3: var(--cobalt-600);
+    color-scheme: dark;
+  }
+  .field-ink {
+    background-color: var(--cobalt-800);
+    color: var(--sand-100);
+  }
 
-/* Square corners for printed things; app screens keep beui's radii. */
-.print-corners {
-  --radius-xs: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
+  /* Square corners for printed things; app screens keep beui's radii. */
+  .print-corners {
+    --radius-xs: 0px;
+    --radius-sm: 0px;
+    --radius-md: 0px;
+    --radius-lg: 0px;
+    --radius-xl: 0px;
+    --radius-2xl: 0px;
+  }
 }
 
 @theme inline {
@@ -340,67 +362,59 @@
 
   /* Convex scallops along the bottom edge. */
   .edge-scallop-b {
-    --r: 12px;
     -webkit-mask:
-      radial-gradient(circle var(--r) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r)) var(--r) repeat-x,
-      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--r) + 1px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--r, 12px) + 1px) no-repeat;
     mask:
-      radial-gradient(circle var(--r) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r)) var(--r) repeat-x,
-      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--r) + 1px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--r, 12px) + 1px) no-repeat;
   }
   .edge-scallop-t {
-    --r: 12px;
     -webkit-mask:
-      radial-gradient(circle var(--r) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r)) var(--r) repeat-x,
-      linear-gradient(#000 0 0) 0 100% / 100% calc(100% - var(--r) + 1px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
+      linear-gradient(#000 0 0) 0 100% / 100% calc(100% - var(--r, 12px) + 1px) no-repeat;
     mask:
-      radial-gradient(circle var(--r) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r)) var(--r) repeat-x,
-      linear-gradient(#000 0 0) 0 100% / 100% calc(100% - var(--r) + 1px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
+      linear-gradient(#000 0 0) 0 100% / 100% calc(100% - var(--r, 12px) + 1px) no-repeat;
   }
   .edge-scallop-y {
-    --r: 12px;
     -webkit-mask:
-      radial-gradient(circle var(--r) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r)) var(--r) repeat-x,
-      radial-gradient(circle var(--r) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r)) var(--r) repeat-x,
-      linear-gradient(#000 0 0) 0 50% / 100% calc(100% - 2 * var(--r) + 2px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
+      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
+      linear-gradient(#000 0 0) 0 50% / 100% calc(100% - 2 * var(--r, 12px) + 2px) no-repeat;
     mask:
-      radial-gradient(circle var(--r) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r)) var(--r) repeat-x,
-      radial-gradient(circle var(--r) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r)) var(--r) repeat-x,
-      linear-gradient(#000 0 0) 0 50% / 100% calc(100% - 2 * var(--r) + 2px) no-repeat;
+      radial-gradient(circle var(--r, 12px) at 50% 100%, #000 98%, #0000 101%) 50% 0 / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
+      radial-gradient(circle var(--r, 12px) at 50% 0, #000 98%, #0000 101%) 50% 100% / calc(2 * var(--r, 12px)) var(--r, 12px) repeat-x,
+      linear-gradient(#000 0 0) 0 50% / 100% calc(100% - 2 * var(--r, 12px) + 2px) no-repeat;
   }
 
   /* Zigzag cut along the bottom edge (receipts, itinerary slips). */
   .edge-zigzag-b {
-    --z: 18px;
     -webkit-mask:
-      conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 50% 100% / var(--z) calc(var(--z) / 2) repeat-x,
-      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--z) / 2 + 1px) no-repeat;
+      conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 50% 100% / var(--z, 18px) calc(var(--z, 18px) / 2) repeat-x,
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--z, 18px) / 2 + 1px) no-repeat;
     mask:
-      conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 50% 100% / var(--z) calc(var(--z) / 2) repeat-x,
-      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--z) / 2 + 1px) no-repeat;
+      conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 50% 100% / var(--z, 18px) calc(var(--z, 18px) / 2) repeat-x,
+      linear-gradient(#000 0 0) 0 0 / 100% calc(100% - var(--z, 18px) / 2 + 1px) no-repeat;
   }
 
   /* Ticket: half-circle notches cut into both long sides. */
   .ticket-notch {
-    --n: 14px;
-    --ny: 50%;
     -webkit-mask:
-      radial-gradient(circle var(--n) at 0 var(--ny), #0000 98%, #000 101%) 0 0 / 51% 100% no-repeat,
-      radial-gradient(circle var(--n) at 100% var(--ny), #0000 98%, #000 101%) 100% 0 / 51% 100% no-repeat;
+      radial-gradient(circle var(--n, 14px) at 0 var(--ny, 50%), #0000 98%, #000 101%) 0 0 / 51% 100% no-repeat,
+      radial-gradient(circle var(--n, 14px) at 100% var(--ny, 50%), #0000 98%, #000 101%) 100% 0 / 51% 100% no-repeat;
     mask:
-      radial-gradient(circle var(--n) at 0 var(--ny), #0000 98%, #000 101%) 0 0 / 51% 100% no-repeat,
-      radial-gradient(circle var(--n) at 100% var(--ny), #0000 98%, #000 101%) 100% 0 / 51% 100% no-repeat;
+      radial-gradient(circle var(--n, 14px) at 0 var(--ny, 50%), #0000 98%, #000 101%) 0 0 / 51% 100% no-repeat,
+      radial-gradient(circle var(--n, 14px) at 100% var(--ny, 50%), #0000 98%, #000 101%) 100% 0 / 51% 100% no-repeat;
   }
   /* Ticket stub notches at the top and bottom of a vertical tear line (at --nx). */
   .ticket-notch-x {
-    --n: 14px;
-    --nx: 70%;
     -webkit-mask:
-      radial-gradient(circle var(--n) at var(--nx) 0, #0000 98%, #000 101%) 0 0 / 100% 51% no-repeat,
-      radial-gradient(circle var(--n) at var(--nx) 100%, #0000 98%, #000 101%) 0 100% / 100% 51% no-repeat;
+      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 0, #0000 98%, #000 101%) 0 0 / 100% 51% no-repeat,
+      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 100%, #0000 98%, #000 101%) 0 100% / 100% 51% no-repeat;
     mask:
-      radial-gradient(circle var(--n) at var(--nx) 0, #0000 98%, #000 101%) 0 0 / 100% 51% no-repeat,
-      radial-gradient(circle var(--n) at var(--nx) 100%, #0000 98%, #000 101%) 0 100% / 100% 51% no-repeat;
+      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 0, #0000 98%, #000 101%) 0 0 / 100% 51% no-repeat,
+      radial-gradient(circle var(--n, 14px) at var(--nx, 70%) 100%, #0000 98%, #000 101%) 0 100% / 100% 51% no-repeat;
   }
 
   /* Tear line of round 5px dots, in the colour of the ground behind. */
