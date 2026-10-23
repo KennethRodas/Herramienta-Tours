@@ -24,7 +24,7 @@ export default async function TicketPage({ params, searchParams }: Props) {
   return (
     <div className="pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-32">
       {dev ? <DevDataToggle worst={worst} /> : null}
-      <TicketView code={codigo} fresh={query.nueva === "1"} payment={pago} worst={worst} />
+      <TicketView code={codigo} fresh={query.nueva === "1"} payment={pago} worst={worst} cancel={query.cancelar === "1"} />
     </div>
   );
 }

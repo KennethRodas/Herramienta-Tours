@@ -20,6 +20,7 @@ import {
   seatsLeft,
   validateBooking,
 } from "@/lib/domain/availability";
+import { CANCEL_CUTOFF_HOURS, canCancelOnline } from "@/lib/domain/cancel";
 import { detectConflicts } from "@/lib/domain/conflicts";
 import { departureRef } from "@/lib/domain/refs";
 import { formatDayShort, formatUsd, normalizePhone, plural, svISO, HOUR } from "@/lib/domain/format";
@@ -395,6 +396,35 @@ export const sim = {
 
   async cancelBooking(bookingId: string, actor: SimEvent["actor"] = "wilber") {
     return commit((d, now) => cancelInDraft(d, now, bookingId, actor));
+  },
+
+  /**
+   * The visitor cancels from the ticket, up to CANCEL_CUTOFF_HOURS before the departure.
+   * Checked again under the write lock; frees the seats and tells both sides.
+   */
+  async cancelByVisitor(bookingId: string): Promise<{ ok: true } | { ok: false; message: string }> {
+    return commit((d, now) => {
+      const b = d.bookings.find((x) => x.id === bookingId);
+      const dep = b ? d.departures.find((x) => x.id === b.departureId) : undefined;
+      if (!b || !dep) return { ok: false as const, message: "Esa reserva ya no existe." };
+      const check = canCancelOnline(b, dep, now);
+      if (!check.ok) {
+        return {
+          ok: false as const,
+          message:
+            check.reason === "tarde"
+              ? `Faltan menos de ${CANCEL_CUTOFF_HOURS} horas para la salida: escribile a Wilber.`
+              : "Esta reserva ya no se puede cancelar.",
+        };
+      }
+      cancelInDraft(d, now, b.id, "visitante");
+      const { tour, ref } = ctxFor(d, dep);
+      const links = { bookingId: b.id, departureId: dep.id };
+      queueWa(d, now, b.phone, "cancelacion", wa.bookingCancelled(b, dep, tour), links);
+      if (b.email) queueEmail(d, now, b.email, "cancelacion", `Reserva cancelada · ${b.code}`, links);
+      queueWa(d, now, d.settings.wilberPhone, "wilber_cancelacion", wa.wilberBookingCancelled(b, dep, tour, ref, seatsLeft(dep, d.holds, now)), links);
+      return { ok: true as const };
+    });
   },
 
   async checkIn(bookingId: string, count?: number) {

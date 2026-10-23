@@ -8,7 +8,7 @@ import { DAY, formatDayShort, formatTime, svStartOfDay } from "@/lib/domain/form
 import { simNow } from "@/lib/sim/state";
 import { cn } from "@/lib/utils";
 
-const EMAIL_KINDS = new Set(["confirmacion", "recordatorio_24h", "wilber_resumen", "pago", "cambio_salida"]);
+const EMAIL_KINDS = new Set(["confirmacion", "recordatorio_24h", "wilber_resumen", "pago", "cambio_salida", "cancelacion"]);
 
 /** Inbox of the branded emails the simulation sent; each one renders through /api/email/render. */
 export function EmailInbox({ className }: { className?: string }) {

@@ -13,6 +13,7 @@ import { useBookingByCode, useNow, useSimState, useTours } from "@/lib/sim/hooks
 import { MeetingPointMap } from "@/components/map";
 import { TextScramble } from "@/components/motion/text-scramble";
 import { buttonClass } from "@/components/ui/button";
+import { CancelBooking } from "./cancel-booking";
 import { buildIcs, downloadIcs } from "./ics";
 import { Field, PaperStyles, SplitTicket, Stamp } from "./paper";
 import { PhotoPlate } from "./photo-plate";
@@ -36,7 +37,7 @@ function countdown(start: number, now: number) {
   return days >= 2 ? `en ${days} días` : formatCountdown(start, now);
 }
 
-export function TicketView({ code: rawCode, fresh, payment, worst = false }: { code: string; fresh: boolean; payment?: string; worst?: boolean }) {
+export function TicketView({ code: rawCode, fresh, payment, worst = false, cancel = false }: { code: string; fresh: boolean; payment?: string; worst?: boolean; cancel?: boolean }) {
   const code = normalizeCode(decodeURIComponent(rawCode));
   const live = useBookingByCode(code);
   const s = useSimState();
@@ -50,10 +51,10 @@ export function TicketView({ code: rawCode, fresh, payment, worst = false }: { c
   const departure = fixture ? WORST_DEPARTURE : s?.departures.find((d) => d.id === booking.departureId);
   const tour = tours.find((t) => t.id === booking.tourId) ?? tourById(booking.tourId);
   if (!departure || !tour) return <UnknownCode code={code} />;
-  return <Ticket key={booking.id} booking={booking} departure={departure} tour={tour} fresh={fresh} payment={payment} />;
+  return <Ticket key={booking.id} booking={booking} departure={departure} tour={tour} fresh={fresh} payment={payment} cancel={cancel} />;
 }
 
-function Ticket({ booking, departure, tour, fresh, payment }: { booking: Booking; departure: Departure; tour: Tour; fresh: boolean; payment?: string }) {
+function Ticket({ booking, departure, tour, fresh, payment, cancel }: { booking: Booking; departure: Departure; tour: Tour; fresh: boolean; payment?: string; cancel: boolean }) {
   const now = useNow(1000) ?? Date.parse(booking.createdAt);
   const point = meetingPointById(departure.meetingPointId);
   const url = ticketUrl(booking.code);
@@ -177,7 +178,7 @@ function Ticket({ booking, departure, tour, fresh, payment }: { booking: Booking
         </TearOff>
       </div>
 
-      <TicketActions booking={booking} departure={departure} tour={tour} point={point} url={url} now={now} />
+      <TicketActions booking={booking} departure={departure} tour={tour} point={point} url={url} now={now} cancel={cancel} />
 
       {live ? <Indicaciones booking={booking} departure={departure} tour={tour} point={point} arrive={arrive} /> : <CancelledNote code={booking.code} />}
     </div>
@@ -194,7 +195,7 @@ function paymentLine(b: Booking, total: number) {
   return `Pago: ${formatUsd(total)} el día de la salida.`;
 }
 
-function TicketActions({ booking, departure, tour, point, url, now }: { booking: Booking; departure: Departure; tour: Tour; point?: MeetingPoint; url: string; now: number }) {
+function TicketActions({ booking, departure, tour, point, url, now, cancel }: { booking: Booking; departure: Departure; tour: Tour; point?: MeetingPoint; url: string; now: number; cancel: boolean }) {
   const [saved, setSaved] = useState(false);
   const share = `Boleto ${booking.code} · ${tour.name}, ${formatDayLong(departure.startsAt)}, ${formatTime(departure.startsAt)} · ${url}`;
   const icon = "size-5 shrink-0";
@@ -236,6 +237,7 @@ function TicketActions({ booking, departure, tour, point, url, now }: { booking:
         Compartir por WhatsApp
       </a>
       <WilberLink code={booking.code} label="Escribir a Wilber" />
+      <CancelBooking booking={booking} departure={departure} now={now} openAtStart={cancel} />
     </div>
   );
 }

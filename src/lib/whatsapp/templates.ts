@@ -99,6 +99,16 @@ export function departureChanged(b: Booking, dep: Departure, tour: Tour, what: "
   };
 }
 
+export function bookingCancelled(b: Booking, dep: Departure, tour: Tour): WaMessage {
+  return {
+    body: [
+      `*Reserva cancelada · ${b.code}*`,
+      `${tour.shortName} ${formatDayShort(dep.startsAt)} · ${plural(b.partySize, "persona", "personas")}. Los cupos quedaron libres.`,
+      b.payment.status === "aprobado" ? "Pagaste anticipo: respondé este mensaje para coordinar la devolución." : "Para elegir otra fecha, respondé este mensaje.",
+    ].join("\n"),
+  };
+}
+
 export function paymentReceived(b: Booking, tour: Tour): WaMessage {
   return {
     body: [`*Pago recibido · ${b.code}*`, `${formatUsd(b.payment.amountUsd)} de anticipo para ${tour.name}.`].join("\n"),
@@ -115,6 +125,18 @@ export function wilberNewBooking(b: Booking, dep: Departure, tour: Tour, ref: st
       `${tour.shortName} ${formatDayShort(dep.startsAt)} (${ref}) · ${plural(b.partySize, "persona", "personas")}`,
       `${b.name} · ${formatPhone(b.phone)}`,
       `Quedan ${left} de ${dep.capacity}.${b.payment.method === "wompi" ? " Pago en línea pendiente." : ""}`,
+    ].join("\n"),
+    buttons: [`Lista ${ref}`, "Hoy"],
+  };
+}
+
+export function wilberBookingCancelled(b: Booking, dep: Departure, tour: Tour, ref: string, left: number): WaMessage {
+  return {
+    body: [
+      `*Reserva cancelada · ${b.code}*`,
+      `${tour.shortName} ${formatDayShort(dep.startsAt)} (${ref}) · ${plural(b.partySize, "persona", "personas")}`,
+      `${b.name} · ${formatPhone(b.phone)} · cancelada desde el boleto`,
+      `Quedan ${left} de ${dep.capacity}.${b.payment.status === "aprobado" ? ` Tenía anticipo pagado (${formatUsd(b.payment.amountUsd)}).` : ""}`,
     ].join("\n"),
     buttons: [`Lista ${ref}`, "Hoy"],
   };

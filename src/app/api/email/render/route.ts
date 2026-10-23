@@ -4,7 +4,7 @@ import { siteUrlFromRequest } from "@/lib/integrations/config";
 
 export const dynamic = "force-dynamic";
 
-const KINDS: EmailKind[] = ["confirmacion", "recordatorio_24h", "wilber_resumen", "pago", "cambio_salida"];
+const KINDS: EmailKind[] = ["confirmacion", "recordatorio_24h", "wilber_resumen", "pago", "cambio_salida", "cancelacion"];
 
 /** Renders a branded email to HTML for the simulator inbox and previews. */
 export async function POST(req: Request) {

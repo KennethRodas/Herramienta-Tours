@@ -7,6 +7,7 @@ import { createElement } from "react";
 import { render } from "@react-email/render";
 import type { Booking, Departure, MessageKind } from "@/lib/domain/types";
 import { CambioSalida, cambioSubject, cambioText, changeOf, type ChangeInfo } from "./cambio-salida";
+import { Cancelacion, cancelacionSubject, cancelacionText } from "./cancelacion";
 import { Confirmacion, confirmacionSubject, confirmacionText } from "./confirmacion";
 import { bookingCtx, plain } from "./context";
 import { Pago, pagoSubject, pagoText } from "./pago";
@@ -14,7 +15,7 @@ import { Recordatorio, recordatorioSubject, recordatorioText } from "./recordato
 import { ResumenWilber, resumenSubject, resumenText } from "./resumen-wilber";
 import { Fallback } from "./parts";
 
-export type EmailKind = Extract<MessageKind, "confirmacion" | "recordatorio_24h" | "wilber_resumen" | "pago" | "cambio_salida">;
+export type EmailKind = Extract<MessageKind, "confirmacion" | "recordatorio_24h" | "wilber_resumen" | "pago" | "cambio_salida" | "cancelacion">;
 
 export interface EmailData {
   booking?: Booking;
@@ -59,6 +60,8 @@ export async function renderEmail(kind: EmailKind, data: EmailData): Promise<Ren
       const change = changeOf(c, data.change);
       return { subject: cambioSubject(c, change), html: await render(createElement(CambioSalida, { c, change })), text: cambioText(c, change) };
     }
+    case "cancelacion":
+      return { subject: cancelacionSubject(c), html: await render(createElement(Cancelacion, { c })), text: cancelacionText(c) };
   }
 }
 

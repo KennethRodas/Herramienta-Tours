@@ -10,6 +10,7 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { tourById } from "@/content/catalog";
 import { formatDayShort, formatPhone, formatTime, formatUsd, plural } from "@/lib/domain/format";
 import type { Booking } from "@/lib/domain/types";
+import { canCancelOnline } from "@/lib/domain/cancel";
 import { useCustomer } from "@/lib/sim/customer";
 import { useNow, useSimState } from "@/lib/sim/hooks";
 import { sim } from "@/lib/sim/store";
@@ -24,13 +25,13 @@ const STATUS: Record<Booking["status"], string> = {
   cancelada: "Cancelada",
 };
 
-function Row({ b, startsAt, price }: { b: Booking; startsAt?: string; price?: number }) {
+function Row({ b, startsAt, price, cancellable = false }: { b: Booking; startsAt?: string; price?: number; cancellable?: boolean }) {
   const tour = tourById(b.tourId);
   return (
-    <li>
+    <li className="flex flex-col gap-1.5 sm:flex-row sm:items-stretch">
       <Link
         href={`/reserva/${b.code}`}
-        className="pressable grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 rounded-field bg-sand-50 px-5 py-4 hover:bg-sand-100 sm:grid-cols-[9rem_1fr_auto]"
+        className="pressable grid flex-1 grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 rounded-field bg-sand-50 px-5 py-4 hover:bg-sand-100 sm:grid-cols-[9rem_1fr_auto]"
       >
         <span className="font-display text-2xl font-bold uppercase leading-none tabular">{b.code}</span>
         <span className="col-span-2 row-start-2 min-w-0 sm:col-span-1 sm:row-start-1">
@@ -42,6 +43,15 @@ function Row({ b, startsAt, price }: { b: Booking; startsAt?: string; price?: nu
         </span>
         <span className={cn("text-small font-semibold", b.status === "cancelada" ? "text-stamp" : "text-ink")}>{STATUS[b.status]}</span>
       </Link>
+      {cancellable ? (
+        <Link
+          href={`/reserva/${b.code}?cancelar=1`}
+          aria-label={`Cancelar la reserva ${b.code}`}
+          className="pressable grid place-items-center rounded-field bg-sand-50 px-5 py-3 text-body font-semibold text-stamp hover:bg-sand-100"
+        >
+          Cancelar
+        </Link>
+      ) : null}
     </li>
   );
 }
@@ -156,7 +166,7 @@ export function AccountView() {
         {upcoming.length ? (
           <ul className="space-y-1.5">
             {upcoming.map(({ b, d }) => (
-              <Row key={b.id} b={b} startsAt={d?.startsAt} price={d?.priceUsd} />
+              <Row key={b.id} b={b} startsAt={d?.startsAt} price={d?.priceUsd} cancellable={d !== undefined && now !== null && canCancelOnline(b, d, now).ok} />
             ))}
           </ul>
         ) : (

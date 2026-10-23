@@ -4,6 +4,7 @@ import { useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/motion/collapsible";
 import { ButtonLink } from "@/components/ui/button";
 import { BUSINESS } from "@/content/catalog";
+import { CANCEL_CUTOFF_HOURS } from "@/lib/domain/cancel";
 import { formatUsd, waLink } from "@/lib/domain/format";
 import type { Tour } from "@/lib/domain/types";
 import { useTours } from "@/lib/sim/hooks";
@@ -50,15 +51,12 @@ function buildItems(tours: Tour[]): Item[] {
       q: "¿Puedo cancelar?",
       a: (button) => (
         <>
-          <p>Escribile a Wilber por WhatsApp con tu código de reserva. No hay cancelación en línea.</p>
-          <ButtonLink
-            href={waLink(BUSINESS.whatsapp, "Hola Wilber, quiero cancelar mi reserva ")}
-            variant={button}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5"
-          >
-            Escribir a Wilber
+          <p>
+            Sí, desde tu boleto con «Cancelar reserva», hasta {CANCEL_CUTOFF_HOURS} horas antes de la salida: tus cupos quedan libres y te llega la
+            confirmación por WhatsApp. Con menos tiempo, o si pagaste anticipo y querés la devolución, escribile a Wilber con tu código.
+          </p>
+          <ButtonLink href="/reserva" variant={button} className="mt-5">
+            Buscar mi boleto
           </ButtonLink>
         </>
       ),
