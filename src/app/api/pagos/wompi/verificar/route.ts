@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
-import { integrations } from "@/lib/integrations/config";
+import { after, NextResponse } from "next/server";
+import { integrations, siteUrlFromRequest } from "@/lib/integrations/config";
 import { getTransaction, verifyRedirectHash } from "@/lib/integrations/wompi";
+import { currentShared, dispatchQueued, serverSim } from "@/lib/shared/server-sim";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,16 @@ export async function GET(req: Request) {
       // Logged to tune verifyRedirectHash against a real redirect (the hash is a MAC, not a secret).
       // Only the redirect query and the amount: the transaction also carries the payer's ID, phone and email.
       console.warn("wompi: redirect hash mismatch", JSON.stringify({ query: Object.fromEntries(params), monto: tx.monto, esReal: real }));
+    }
+    const reference = params.get("identificadorEnlaceComercio");
+    if (approved && reference && integrations.dataMode === "supabase") {
+      const { state } = await currentShared();
+      const booking = state.bookings.find((b) => b.code === reference && b.payment.status === "pendiente");
+      if (booking) {
+        await serverSim.settlePayment(booking.id, "aprobar");
+        const site = siteUrlFromRequest(req);
+        after(() => dispatchQueued(site).catch((e) => console.warn("dispatch:", (e as Error).message)));
+      }
     }
     return NextResponse.json({
       ok: true,

@@ -21,7 +21,7 @@ function H2({ children }: { children: React.ReactNode }) {
   return <h2 className="mb-4 font-display text-[2rem] font-semibold uppercase leading-none tracking-tight">{children}</h2>;
 }
 
-export default function SimuladorPage() {
+function Simulator() {
   const settings = useSettings();
   const now = useNow(2000);
   const wilber = settings?.wilberPhone ?? BUSINESS.whatsapp;
@@ -120,4 +120,22 @@ export default function SimuladorPage() {
       </div>
     </main>
   );
+}
+
+/** With shared data (real people, real messages) the simulator is off. */
+export default function SimuladorPage() {
+  if (process.env.NEXT_PUBLIC_DATA_MODE === "supabase") {
+    return (
+      <main className="grid min-h-dvh place-items-center px-[var(--gutter)] text-center font-sans">
+        <div className="max-w-md">
+          <h1 className="font-display text-[2.5rem] font-bold uppercase leading-none">Simulador apagado</h1>
+          <p className="mt-4 text-[18px]">El sitio usa datos compartidos: las reservas y los mensajes son reales.</p>
+          <Link href="/" className="pressable mt-6 inline-flex h-12 items-center rounded-full bg-cobalt-800 px-6 font-semibold text-sand-50">
+            Ir al sitio
+          </Link>
+        </div>
+      </main>
+    );
+  }
+  return <Simulator />;
 }

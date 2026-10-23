@@ -1,5 +1,3 @@
-"use client";
-
 import type {
   Booking,
   BookingInput,
@@ -30,11 +28,14 @@ import { handleCustomerMessage } from "@/lib/whatsapp/customer-bot";
 import { createSeedState, makeDeparture } from "./seed";
 import { MAX_EVENTS, MAX_MESSAGES, simNow, type SimSettings, type SimState, type TourOverride } from "./state";
 
-// The simulation runs entirely in the browser. Every write goes through
-// `commit`, which takes a Web Lock, re-reads the latest state from
-// localStorage, applies the change and broadcasts it to the other tabs.
-// Two tabs (or forty bots) booking the last seat at once are serialised,
-// which is exactly the guarantee the Supabase `create_booking` RPC gives.
+// Two modes share every action below.
+// - Simulation (default): the state lives in this browser. Every write goes
+//   through `commit`, which takes a Web Lock, re-reads the latest state from
+//   localStorage, applies the change and broadcasts it to the other tabs.
+// - Shared (NEXT_PUBLIC_DATA_MODE=supabase): the state lives in Supabase. The
+//   browser polls /api/sim/estado and sends each action to /api/sim/accion;
+//   the server runs the same action with a compare-and-swap commit
+//   (setCommitBackend), so two people booking the last seat are serialised.
 
 const KEY = "wilber.sim.v2";
 const CHANNEL = "wilber-sim";
@@ -46,6 +47,7 @@ let channel: BroadcastChannel | null = null;
 let booted = false;
 
 const isBrowser = () => typeof window !== "undefined";
+const SHARED = process.env.NEXT_PUBLIC_DATA_MODE === "supabase";
 
 function read(): SimState | null {
   try {
@@ -85,6 +87,10 @@ function emit() {
 function boot() {
   if (booted || !isBrowser()) return;
   booted = true;
+  if (SHARED) {
+    startRemote();
+    return;
+  }
   state = read();
   if (!state) {
     state = createSeedState(Math.floor(Math.random() * 1e9));
@@ -128,7 +134,160 @@ export function getServerState(): SimState | null {
 
 type Draft = SimState;
 
+// ---------------------------------------------------------------------------
+// Shared mode, browser side
+
+const CODES_KEY = "wilber.codigos.v1";
+let pulling = false;
+let pullAgain = false;
+let pending: Promise<void> | null = null;
+
+/** Booking codes this browser made or opened: the server shows their bookings. */
+function watchedCodes(): string[] {
+  try {
+    return (JSON.parse(window.localStorage.getItem(CODES_KEY) ?? "[]") as string[]).slice(-30);
+  } catch {
+    return [];
+  }
+}
+
+function codesHeader(): Record<string, string> {
+  const codes = watchedCodes();
+  return codes.length ? { "x-wilber-codigos": codes.join(",") } : {};
+}
+
+function adopt(next: SimState | undefined, force = false) {
+  if (!next) return;
+  if (force || !state || next.rev >= state.rev) {
+    state = next;
+    emit();
+  }
+}
+
+async function pull(force = false): Promise<void> {
+  if (pulling) {
+    pullAgain ||= force;
+    return pending ?? undefined;
+  }
+  pulling = true;
+  pending = (async () => {
+    try {
+      const rev = force || !state ? -1 : state.rev;
+      const res = await fetch(`/api/sim/estado?rev=${rev}`, { cache: "no-store", headers: codesHeader() });
+      if (res.status === 200) adopt(((await res.json()) as { state: SimState }).state, force);
+    } catch {
+      /* offline: keep the last state */
+    } finally {
+      pulling = false;
+      pending = null;
+    }
+  })();
+  await pending;
+  if (pullAgain) {
+    pullAgain = false;
+    await pull(true);
+  }
+}
+
+function startRemote() {
+  void pull(true);
+  const loop = () => {
+    void pull();
+    window.setTimeout(loop, document.visibilityState === "visible" ? 2500 : 15000);
+  };
+  window.setTimeout(loop, 2500);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void pull();
+  });
+}
+
+/** Shared mode: re-reads the state now (after signing in or out). */
+export function refreshShared() {
+  if (SHARED && isBrowser()) void pull(true);
+}
+
+/** Shared mode: lets this browser see the booking with this code (its ticket). */
+export function watchCode(code: string): Promise<void> {
+  if (!SHARED || !isBrowser() || !/^WIL-[A-Z0-9]{4}$/.test(code)) return Promise.resolve();
+  const codes = watchedCodes();
+  if (!codes.includes(code)) {
+    try {
+      window.localStorage.setItem(CODES_KEY, JSON.stringify([...codes, code].slice(-30)));
+    } catch {
+      /* private mode */
+    }
+  }
+  return pull(true);
+}
+
+const REMOTE_ACTIONS = [
+  "book",
+  "hold",
+  "releaseHold",
+  "settlePayment",
+  "cancelBooking",
+  "cancelByVisitor",
+  "checkIn",
+  "markNoShow",
+  "createDeparture",
+  "updateDeparture",
+  "cancelDeparture",
+  "weatherAlert",
+  "fillDeparture",
+  "applyFix",
+  "assign",
+  "setTourOverride",
+  "requestLoginCode",
+  "verifyLoginCode",
+  "saveCustomer",
+  "wilberSays",
+  "customerSays",
+  "updateSettings",
+  "setClock",
+  "markMessages",
+  "reset",
+] as const;
+
+async function remoteAction(name: (typeof REMOTE_ACTIONS)[number], args: unknown[]): Promise<unknown> {
+  let status = 0;
+  let body: { ok?: boolean; result?: unknown; state?: SimState; error?: string } = {};
+  try {
+    const res = await fetch("/api/sim/accion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...codesHeader() },
+      body: JSON.stringify({ name, args }),
+    });
+    status = res.status;
+    body = await res.json().catch(() => ({}));
+  } catch {
+    status = 0;
+  }
+  adopt(body.state);
+  if (status < 200 || status >= 300 || !body.ok) {
+    const error = body.error ?? (status === 0 ? "Sin conexión. Intentá de nuevo." : `Error ${status}`);
+    // Callers of book/hold expect a failure result, not an exception.
+    if (name === "book") return { ok: false, reason: "datos_invalidos", seatsLeft: 0, message: error };
+    if (name === "hold") return { ok: false, seatsLeft: 0 };
+    throw new Error(error);
+  }
+  const result = body.result as { ok?: boolean; booking?: { code: string } } | undefined;
+  if (name === "book" && result?.ok && result.booking) watchCode(result.booking.code);
+  return body.result;
+}
+
+// ---------------------------------------------------------------------------
+// Writes
+
+type CommitFn = <R>(mutate: (draft: Draft, now: number) => R) => Promise<R>;
+let backend: CommitFn | null = null;
+
+/** Server routes run the same actions against the shared state (compare-and-swap in Supabase). */
+export function setCommitBackend(fn: CommitFn) {
+  backend = fn;
+}
+
 async function commit<R>(mutate: (draft: Draft, now: number) => R): Promise<R> {
+  if (backend) return backend(mutate);
   boot();
   const run = () => {
     const base = read() ?? state!;
@@ -632,6 +791,7 @@ export const sim = {
   /** A customer writes to the business number. */
   async customerSays(phone: string, text: string) {
     return commit((d, now) => {
+      remember(d, phone);
       pushMessage(d, now, { channel: "whatsapp", kind: "entrante", direction: "entrante", from: phone, to: BUSINESS.whatsapp, body: text });
       const reply = handleCustomerMessage(text, phone, { tours: effectiveTours(d), departures: d.departures, bookings: d.bookings, holds: d.holds, now });
       queueWa(d, now, phone, "cliente_bot", { body: reply.text, buttons: reply.buttons });
@@ -703,3 +863,9 @@ export const sim = {
 };
 
 export const internals = { newId, KEY, svISO, HOUR };
+
+// Shared mode in the browser: every action runs on the server.
+if (SHARED && isBrowser()) {
+  const target = sim as unknown as Record<string, (...args: unknown[]) => Promise<unknown>>;
+  for (const name of REMOTE_ACTIONS) target[name] = (...args: unknown[]) => remoteAction(name, args);
+}

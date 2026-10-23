@@ -104,7 +104,7 @@ export default function WilberWhatsAppPage() {
           </table>
         </section>
 
-        <RealWhatsAppPanel className="max-w-xl" />
+        {process.env.NEXT_PUBLIC_DATA_MODE === "supabase" ? null : <RealWhatsAppPanel className="max-w-xl" />}
       </div>
     </div>
   );

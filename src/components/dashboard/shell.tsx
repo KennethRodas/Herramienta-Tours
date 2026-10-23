@@ -10,7 +10,7 @@ import { normalizeCode } from "@/lib/domain/availability";
 import { useConflicts } from "@/lib/sim/hooks";
 import { useCommandItems } from "./command";
 import { DashContext, useDash, type DashApi, type Overlay } from "./context";
-import { useEffectiveTheme, useIndex, useSession } from "./hooks";
+import { signOut, useEffectiveTheme, useIndex, useSession } from "./hooks";
 import { captureInstallPrompt } from "./install";
 import { LiveIsland } from "./live-island";
 import { MobileHeader, MobileTabBar, MoreSheet, Sidebar, TopBar, titleFor } from "./nav";
@@ -95,6 +95,15 @@ export function WilberShell({ children }: { children: ReactNode }) {
   const gate = pathname === "/wilber/entrar";
   useApplyTheme(theme, pathname);
   useEffect(() => captureInstallPrompt(), []);
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_DATA_MODE !== "supabase" || session !== true || gate) return;
+    void fetch("/api/sim/admin", { cache: "no-store" })
+      .then((r) => r.json() as Promise<{ admin?: boolean }>)
+      .then((j) => {
+        if (!j.admin) signOut();
+      })
+      .catch(() => undefined);
+  }, [session, gate]);
 
   useEffect(() => {
     if (session === false && !gate) router.replace(`/wilber/entrar?volver=${encodeURIComponent(pathname)}`);

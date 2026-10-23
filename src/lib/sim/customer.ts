@@ -3,9 +3,12 @@
 import { useSyncExternalStore } from "react";
 import type { Customer } from "@/lib/domain/types";
 import { useHydrated, useSimState } from "./hooks";
+import { refreshShared } from "./store";
 
 // Visitor session in this browser: the WhatsApp number that entered with a code.
 // The account itself (name, email) lives in the simulation state, shared by tabs.
+// In shared mode the server also keeps a signed cookie (set when the code is
+// verified) that decides which bookings this browser may see.
 
 const KEY = "wilber.cliente.v1";
 const listeners = new Set<() => void>();
@@ -36,6 +39,10 @@ export function setCustomerSession(phone: string | null) {
     /* private mode: session lasts this page only */
   }
   for (const l of listeners) l();
+  if (process.env.NEXT_PUBLIC_DATA_MODE === "supabase") {
+    if (phone) refreshShared();
+    else void fetch("/api/sim/sesion", { method: "DELETE" }).finally(refreshShared);
+  }
 }
 
 export function useCustomer(): { customer: Pick<Customer, "phone" | "name" | "email"> | null; ready: boolean; logout: () => void } {

@@ -1,5 +1,3 @@
-"use client";
-
 import type { Booking, BookingInput, Message } from "@/lib/domain/types";
 import { GUIDES, VEHICLES, meetingPointById } from "@/content/catalog";
 import { detectConflicts } from "@/lib/domain/conflicts";
@@ -23,7 +21,7 @@ let trafficAcc = 0;
 let lastTick = 0;
 const inFlight = new Set<string>();
 
-type Job =
+export type Job =
   | { kind: "r24"; bookingId: string }
   | { kind: "rday"; bookingId: string }
   | { kind: "review"; bookingId: string }
@@ -35,7 +33,7 @@ type Job =
 
 const live = (b: Booking) => b.status !== "cancelada" && b.status !== "no_show";
 
-function dueJobs(s: SimState, now: number): Job[] {
+export function dueJobs(s: SimState, now: number): Job[] {
   const jobs: Job[] = [];
   if (s.holds.some((h) => Date.parse(h.expiresAt) <= now)) jobs.push({ kind: "holds" });
   for (const d of s.departures) {
@@ -66,7 +64,8 @@ function dueJobs(s: SimState, now: number): Job[] {
   return jobs;
 }
 
-async function runJobs(jobs: Job[]) {
+/** In shared mode the server runs these with real attendance: Wilber takes it, nobody fakes it. */
+export async function runJobs(jobs: Job[], opts: { simulateAttendance?: boolean } = {}) {
   await sim.commit((d, now) => {
     const tours = effectiveTours(d);
     for (const job of jobs) {
@@ -85,7 +84,7 @@ async function runJobs(jobs: Job[]) {
         const dep = d.departures.find((x) => x.id === job.departureId);
         if (!dep || dep.status === "realizada" || dep.status === "cancelada") continue;
         dep.status = "realizada";
-        for (const b of d.bookings.filter((x) => x.departureId === dep.id && (x.status === "confirmada" || x.status === "pagada"))) {
+        for (const b of d.bookings.filter((x) => opts.simulateAttendance !== false && x.departureId === dep.id && (x.status === "confirmada" || x.status === "pagada"))) {
           // Wilber took attendance on the trail; the simulation fills it in.
           if (Math.random() < 0.92) {
             b.status = "check_in";

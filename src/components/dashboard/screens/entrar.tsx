@@ -8,6 +8,7 @@ import { LogoMark } from "@/components/brand/logo";
 import { OTPInput, type OTPStatus } from "@/components/motion/otp-input";
 import { useSettings } from "@/lib/sim/hooks";
 import { EASE_OUT } from "@/lib/ease";
+import { refreshShared } from "@/lib/sim/store";
 import { signIn, useSession } from "../hooks";
 
 const MAX_TRIES = 5;
@@ -37,9 +38,15 @@ export function EntrarScreen({ volver }: { volver?: string }) {
     return () => window.clearTimeout(t);
   }, [lockLeft]);
 
-  const check = (value: string) => {
+  const check = async (value: string) => {
     if (lockLeft > 0) return;
-    if (value === pin) {
+    const ok = demo
+      ? value === pin
+      : await fetch("/api/sim/admin", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pin: value }) })
+          .then((r) => r.ok)
+          .catch(() => false);
+    if (ok) {
+      if (!demo) refreshShared();
       setStatus("success");
       try {
         navigator.vibrate?.(10);

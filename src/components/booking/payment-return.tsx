@@ -64,7 +64,7 @@ export function PaymentReturn({ query }: { query: ReturnQuery }) {
   const approved = result.kind === "ok" && result.approved;
 
   // Keep the simulated booking in step with a real approval.
-  const settleId = approved && local && local.payment.status === "pendiente" ? local.id : null;
+  const settleId = approved && local && local.payment.status === "pendiente" && process.env.NEXT_PUBLIC_DATA_MODE !== "supabase" ? local.id : null;
   useEffect(() => {
     if (settleId) void sim.settlePayment(settleId, "aprobar");
   }, [settleId]);

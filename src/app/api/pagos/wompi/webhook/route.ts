@@ -1,14 +1,15 @@
-import { NextResponse } from "next/server";
-import { integrations } from "@/lib/integrations/config";
+import { after, NextResponse } from "next/server";
+import { integrations, siteUrlFromRequest } from "@/lib/integrations/config";
 import { verifyWebhookHash } from "@/lib/integrations/wompi";
-import { serviceClient } from "@/lib/supabase/bot-data";
+import { currentShared, dispatchQueued, serverSim } from "@/lib/shared/server-sim";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Wompi → our app after a successful payment. Header `wompi_hash` must match
- * HMAC-SHA256(raw body, client secret). With Supabase, the booking whose code
- * equals EnlacePago.IdentificadorEnlaceComercio is marked as paid.
+ * Wompi → our app after a payment. Header `wompi_hash` must match
+ * HMAC-SHA256(raw body, client secret). In shared mode the booking whose code
+ * equals EnlacePago.IdentificadorEnlaceComercio is marked as paid (or as a
+ * rejected deposit) and its confirmation goes out.
  */
 export async function POST(req: Request) {
   if (!integrations.wompi) return NextResponse.json({ ok: false }, { status: 503 });
@@ -23,22 +24,14 @@ export async function POST(req: Request) {
   };
   const code = event.EnlacePago?.IdentificadorEnlaceComercio;
   const approved = event.ResultadoTransaccion === "ExitosaAprobada";
-  const db = serviceClient();
-  if (db && code) {
-    await db
-      .from("bookings")
-      .update({
-        payment_status: approved ? "aprobado" : "rechazado",
-        payment_reference: event.IdTransaccion ?? null,
-        status: approved ? "pagada" : "confirmada",
-      })
-      .eq("code", code);
-    await db.from("events").insert({
-      type: approved ? "pago.aprobado" : "pago.rechazado",
-      actor: "sistema",
-      summary: `Wompi ${approved ? "aprobó" : "rechazó"} el pago de ${code} (${event.Monto ?? "?"} USD).`,
-      data: event,
-    });
+  if (integrations.dataMode === "supabase" && code) {
+    const { state } = await currentShared();
+    const booking = state.bookings.find((b) => b.code === code && b.payment.status === "pendiente");
+    if (booking) {
+      await serverSim.settlePayment(booking.id, approved ? "aprobar" : "rechazar");
+      const site = siteUrlFromRequest(req);
+      after(() => dispatchQueued(site).catch((e) => console.warn("dispatch:", (e as Error).message)));
+    }
   }
   return NextResponse.json({ ok: true });
 }

@@ -12,6 +12,7 @@ import { LogoMark } from "@/components/brand/logo";
 import { formatPhone, normalizePhone } from "@/lib/domain/format";
 import { setCustomerSession, useCustomer } from "@/lib/sim/customer";
 import { sim } from "@/lib/sim/store";
+import { BUSINESS } from "@/content/catalog";
 import { PHOTO_CREDITS } from "@/content/photo-credits";
 
 // Login and sign-up in one flow: WhatsApp number → 6-digit code → (first time) name and email.
@@ -60,7 +61,14 @@ export function LoginFlow() {
       return;
     }
     setBusy(true);
-    const { code: sent } = await sim.requestLoginCode(digits);
+    let sent: string | undefined;
+    try {
+      sent = (await sim.requestLoginCode(digits)).code;
+    } catch (e) {
+      setBusy(false);
+      setPhoneError((e as Error).message);
+      return;
+    }
     setBusy(false);
     setPhoneError(undefined);
     setCode("");
@@ -74,7 +82,15 @@ export function LoginFlow() {
 
   const verify = async (value: string) => {
     setBusy(true);
-    const r = await sim.verifyLoginCode(digits, value);
+    let r: Awaited<ReturnType<typeof sim.verifyLoginCode>>;
+    try {
+      r = await sim.verifyLoginCode(digits, value);
+    } catch (e) {
+      setBusy(false);
+      setCodeStatus("error");
+      toast((e as Error).message);
+      return;
+    }
     setBusy(false);
     if (!r.ok) {
       setCodeStatus("error");
@@ -203,7 +219,11 @@ export function LoginFlow() {
                   Cambiar número
                 </button>
               </div>
-              {SIMULATION && <p className="text-small text-ink-soft">Simulación: el código aparece arriba, en el aviso.</p>}
+              {SIMULATION ? (
+                <p className="text-small text-ink-soft">Simulación: el código aparece arriba, en el aviso.</p>
+              ) : (
+                <p className="text-small text-ink-soft">Llega por WhatsApp desde {BUSINESS.whatsappDisplay}.</p>
+              )}
             </motion.div>
           )}
 

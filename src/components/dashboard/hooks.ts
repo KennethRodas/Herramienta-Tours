@@ -5,7 +5,7 @@ import type { Booking, Tour } from "@/lib/domain/types";
 import { departureRef } from "@/lib/domain/refs";
 import { svParts } from "@/lib/domain/format";
 import { useNow, useSimState } from "@/lib/sim/hooks";
-import { effectiveTours } from "@/lib/sim/store";
+import { effectiveTours, refreshShared } from "@/lib/sim/store";
 import { THEME_KEY } from "./theme-script";
 
 // Client hooks shared by every screen of Wilber's panel.
@@ -115,6 +115,7 @@ export function signIn() {
 
 export function signOut() {
   writeKey(SESSION_KEY, null);
+  if (process.env.NEXT_PUBLIC_DATA_MODE === "supabase") void fetch("/api/sim/admin", { method: "DELETE" }).finally(refreshShared);
 }
 
 // --- Theme ------------------------------------------------------------------------

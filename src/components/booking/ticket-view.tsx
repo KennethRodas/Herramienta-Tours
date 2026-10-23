@@ -10,6 +10,7 @@ import { normalizeCode } from "@/lib/domain/availability";
 import { DAY, formatCountdown, formatDayLong, formatTime, formatUsd, waLink } from "@/lib/domain/format";
 import { contactWilberText, ticketUrl } from "@/lib/whatsapp/templates";
 import { useBookingByCode, useNow, useSimState, useTours } from "@/lib/sim/hooks";
+import { watchCode } from "@/lib/sim/store";
 import { MeetingPointMap } from "@/components/map";
 import { TextScramble } from "@/components/motion/text-scramble";
 import { buttonClass } from "@/components/ui/button";
@@ -39,7 +40,14 @@ function countdown(start: number, now: number) {
 
 export function TicketView({ code: rawCode, fresh, payment, worst = false, cancel = false }: { code: string; fresh: boolean; payment?: string; worst?: boolean; cancel?: boolean }) {
   const code = normalizeCode(decodeURIComponent(rawCode));
-  const live = useBookingByCode(code);
+  const found = useBookingByCode(code);
+  // Shared mode: the server only shows bookings this browser made, opened or owns.
+  const [asked, setAsked] = useState(process.env.NEXT_PUBLIC_DATA_MODE !== "supabase");
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_DATA_MODE !== "supabase") return;
+    void watchCode(code).then(() => setAsked(true));
+  }, [code]);
+  const live = found === null && !asked ? undefined : found;
   const s = useSimState();
   const tours = useTours({ includeInactive: true });
   // break-ui fixture (development only), swapped in where the data enters.

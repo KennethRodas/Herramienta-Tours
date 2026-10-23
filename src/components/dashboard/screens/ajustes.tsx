@@ -15,6 +15,8 @@ import { THEME_LABEL, signOut, useEffectiveTheme, useThemeMode } from "../hooks"
 import { ThemeChips } from "../nav";
 import { Btn, SectionTitle, btn } from "../ui";
 
+const SHARED = process.env.NEXT_PUBLIC_DATA_MODE === "supabase";
+
 type Integrations = { supabase?: boolean; kapso?: boolean; resend?: boolean; wompi?: boolean; mode?: string };
 
 function useEstado() {
@@ -105,7 +107,7 @@ export function AjustesScreen() {
       </div>
 
       <div className="flex flex-col gap-8">
-        <PinSection current={settings?.adminPin} />
+        {SHARED ? null : <PinSection current={settings?.adminPin} />}
 
         <section aria-labelledby="integraciones">
           <SectionTitle id="integraciones">Integraciones</SectionTitle>
@@ -114,7 +116,7 @@ export function AjustesScreen() {
               [
                 ["supabase", "Supabase", "Base de datos"],
                 ["kapso", "Kapso", "WhatsApp"],
-                ["resend", "Resend", "Correo"],
+                ["resend", "Correo", "Gmail o Resend"],
                 ["wompi", "Wompi", "Pagos en línea"],
               ] as const
             ).map(([key, name, role]) => {
@@ -143,12 +145,14 @@ export function AjustesScreen() {
         </section>
 
         <section className="flex flex-col gap-2">
-          <Link href="/simulador" className={cn(btn("quiet", "lg"), "justify-between")}>
-            <span className="inline-flex items-center gap-2">
-              <FlaskConical className="size-5" /> Simulador
-            </span>
-            <ArrowRight className="size-5" />
-          </Link>
+          {SHARED ? null : (
+            <Link href="/simulador" className={cn(btn("quiet", "lg"), "justify-between")}>
+              <span className="inline-flex items-center gap-2">
+                <FlaskConical className="size-5" /> Simulador
+              </span>
+              <ArrowRight className="size-5" />
+            </Link>
+          )}
           <Btn
             variant="outline"
             size="lg"
