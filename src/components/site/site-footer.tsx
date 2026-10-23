@@ -46,18 +46,6 @@ export function SiteFooter() {
                   </li>
                 ))}
               </ul>
-              <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-[17px] font-medium">
-                <li>
-                  <Link href="/wilber" className={linkClass}>
-                    Panel de Wilber
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/simulador" className={linkClass}>
-                    Simulador
-                  </Link>
-                </li>
-              </ul>
             </nav>
 
             <div className="flex items-start justify-between gap-8 lg:col-span-6 lg:col-start-7">

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import type { Tour } from "@/lib/domain/types";
 import { guideById, meetingPointById, tourById } from "@/content/catalog";
@@ -65,9 +65,9 @@ function Loaded({ dep, tour, prefill }: { dep: DepartureView; tour: Tour; prefil
         </div>
 
         {desktop ? (
-          <aside aria-label="Reserva" className="sticky top-24 lg:col-span-5">
+          <StickyAside>
             <BookingPanel flow={flow} variant="inline" />
-          </aside>
+          </StickyAside>
         ) : (
           <BottomSheet
             open={sheet}
@@ -223,5 +223,30 @@ function Missing() {
         Ver aventuras
       </Link>
     </div>
+  );
+}
+
+/**
+ * The booking panel follows the page while the left column scrolls. When a step
+ * is taller than the window it sticks by its bottom edge instead of its top, so
+ * the step's action is always reachable and nothing scrolls inside the panel.
+ */
+function StickyAside({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const place = () => {
+      el.style.top = `min(6rem, calc(100dvh - ${el.offsetHeight}px - 1.5rem))`;
+    };
+    place();
+    const ro = new ResizeObserver(place);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return (
+    <aside ref={ref} aria-label="Reserva" className="sticky top-24 self-start lg:col-span-5">
+      {children}
+    </aside>
   );
 }

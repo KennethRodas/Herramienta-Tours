@@ -27,7 +27,6 @@ export default function manifest(): MetadataRoute.Manifest {
       { name: "Hoy", short_name: "Hoy", url: "/wilber", icons: [{ src: "/icons/shortcut-96.png", sizes: "96x96" }] },
       { name: "Reservas", url: "/wilber/reservas", icons: [{ src: "/icons/shortcut-96.png", sizes: "96x96" }] },
       { name: "WhatsApp", url: "/wilber/whatsapp", icons: [{ src: "/icons/shortcut-96.png", sizes: "96x96" }] },
-      { name: "Simulador", url: "/simulador", icons: [{ src: "/icons/shortcut-96.png", sizes: "96x96" }] },
     ],
   };
 }

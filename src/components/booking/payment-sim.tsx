@@ -12,12 +12,17 @@ import { buttonClass } from "@/components/ui/button";
 import { cx } from "./cx";
 import { PaperStyles, Stamp } from "./paper";
 
-// /reserva/pago?reserva=<id>: the online deposit while Wompi has no keys.
-// Clearly a test: our own slip, our own buttons, no imitation of Wompi.
-// If the lead's /api/pagos/wompi/enlace answers with a link (keys present),
-// the real checkout is offered first.
+// /reserva/pago?reserva=<id>: the online deposit. With Wompi keys the slip has
+// one action, the Wompi checkout (test or live, as the Wompi app is set). Only
+// without keys (503) does it fall back to our own simulated approve / reject,
+// clearly marked as a test and never imitating Wompi.
 
 type Outcome = "aprobar" | "rechazar";
+type WompiLink =
+  | { state: "cargando" }
+  | { state: "listo"; url: string; productive: boolean }
+  | { state: "sin_llaves" }
+  | { state: "error"; message: string };
 
 export function PaymentSim({ bookingId }: { bookingId: string | undefined }) {
   const router = useRouter();
@@ -25,7 +30,8 @@ export function PaymentSim({ bookingId }: { bookingId: string | undefined }) {
   const settings = useSettings();
   const [busy, setBusy] = useState<Outcome | null>(null);
   const [done, setDone] = useState<Outcome | null>(null);
-  const [wompiUrl, setWompiUrl] = useState<string | null>(null);
+  const [link, setLink] = useState<WompiLink>({ state: "cargando" });
+  const [attempt, setAttempt] = useState(0);
 
   const booking = s ? (s.bookings.find((b) => b.id === bookingId) ?? null) : undefined;
   const departure = booking ? s?.departures.find((d) => d.id === booking.departureId) : undefined;
@@ -40,22 +46,24 @@ export function PaymentSim({ bookingId }: { bookingId: string | undefined }) {
         const res = await fetch("/api/pagos/wompi/enlace", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code: booking.code, tourId: booking.tourId, partySize: booking.partySize, email: booking.email }),
+          body: JSON.stringify({ code: booking.code, tourId: booking.tourId, partySize: booking.partySize, email: booking.email || undefined }),
         });
-        if (!res.ok) return;
-        const j = (await res.json()) as { ok?: boolean; url?: string };
-        if (alive && j.ok && j.url) setWompiUrl(j.url);
+        const j = (await res.json().catch(() => ({}))) as { ok?: boolean; url?: string; productive?: boolean; error?: string };
+        if (!alive) return;
+        if (res.status === 503) setLink({ state: "sin_llaves" });
+        else if (j.ok && j.url) setLink({ state: "listo", url: j.url, productive: Boolean(j.productive) });
+        else setLink({ state: "error", message: j.error ?? `error ${res.status}` });
       } catch {
-        /* simulated payment only */
+        if (alive) setLink({ state: "error", message: "sin conexión" });
       }
     };
     void run();
     return () => {
       alive = false;
     };
-    // One request per booking, not per re-render of the live state.
+    // One request per booking (and per retry), not per re-render of the live state.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pending, booking?.id]);
+  }, [pending, booking?.id, attempt]);
 
   if (booking === undefined) {
     return (
@@ -117,7 +125,9 @@ export function PaymentSim({ bookingId }: { bookingId: string | undefined }) {
     <Shell>
       <h1 className="font-display text-head font-bold uppercase">Anticipo</h1>
       <div className="paper edge-zigzag-b relative mt-6 px-6 pb-14 pt-8 sm:px-10">
-        <Stamp className="absolute right-6 top-7 sm:right-10">Pago de prueba</Stamp>
+        {link.state === "sin_llaves" || (link.state === "listo" && !link.productive) ? (
+          <Stamp className="absolute right-6 top-7 sm:right-10">Pago de prueba</Stamp>
+        ) : null}
         <p className="text-small font-semibold">A pagar ahora</p>
         <p className="tabular mt-1 font-display text-[min(var(--step-display),7rem)] font-bold leading-[0.85]">{formatUsd(deposit)}</p>
         <dl className="mt-8 flex flex-col gap-3">
@@ -132,11 +142,55 @@ export function PaymentSim({ bookingId }: { bookingId: string | undefined }) {
       </div>
 
       <div className="mt-6 flex flex-col gap-2.5">
-        {wompiUrl ? (
-          <a href={wompiUrl} className={buttonClass("primary", "lg", "w-full")}>
-            Pagar en Wompi
-          </a>
+        {link.state === "cargando" ? (
+          <span aria-busy="true" className={buttonClass("primary", "lg", "w-full opacity-70")}>
+            Preparando el pago en Wompi…
+          </span>
         ) : null}
+        {link.state === "listo" ? (
+          <>
+            <a href={link.url} className={buttonClass("primary", "lg", "w-full")}>
+              Pagar {formatUsd(deposit)} en Wompi
+            </a>
+            <p className="text-small text-ink-soft">
+              {link.productive ? "Pago con tarjeta en la pasarela de Wompi." : "Wompi en modo prueba: no se cobra."}
+            </p>
+          </>
+        ) : null}
+        {link.state === "error" ? (
+          <div role="status" className="flex flex-col gap-3 rounded-ticket bg-sand-300 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-body">No se pudo abrir Wompi ({link.message}).</p>
+            <button
+              type="button"
+              onClick={() => {
+                setLink({ state: "cargando" });
+                setAttempt((a) => a + 1);
+              }}
+              className={buttonClass("primary", "md", "shrink-0")}
+            >
+              Reintentar
+            </button>
+          </div>
+        ) : null}
+        {link.state === "sin_llaves" ? <SimulatedPayment busy={busy} preferred={preferred} stateFor={stateFor} settle={settle} /> : null}
+      </div>
+    </Shell>
+  );
+}
+
+function SimulatedPayment({
+  busy,
+  preferred,
+  stateFor,
+  settle,
+}: {
+  busy: Outcome | null;
+  preferred: Outcome;
+  stateFor: (o: Outcome) => ButtonState;
+  settle: (o: Outcome) => Promise<void>;
+}) {
+  return (
+    <>
         <div className={cx("grid gap-2.5 sm:grid-cols-2", busy && "pointer-events-none")}>
           {(["aprobar", "rechazar"] as const).map((o) => (
             <StatefulButton
@@ -156,9 +210,8 @@ export function PaymentSim({ bookingId }: { bookingId: string | undefined }) {
             </StatefulButton>
           ))}
         </div>
-        <p className="text-small text-ink-soft">Con las llaves de Wompi activas, este paso abre la pasarela de Wompi.</p>
-      </div>
-    </Shell>
+        <p className="text-small text-ink-soft">Pago simulado: este entorno no tiene llaves de Wompi.</p>
+    </>
   );
 }
 

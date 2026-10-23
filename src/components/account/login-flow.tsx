@@ -203,7 +203,7 @@ export function LoginFlow() {
                   Cambiar número
                 </button>
               </div>
-              {SIMULATION && <p className="text-small text-ink-soft">Simulación: el código aparece arriba y en el teléfono del visitante en /simulador.</p>}
+              {SIMULATION && <p className="text-small text-ink-soft">Simulación: el código aparece arriba, en el aviso.</p>}
             </motion.div>
           )}
 

@@ -17,6 +17,9 @@ import { SPEEDS, speedId } from "./clock-bar";
 // (placement "header"); it floats only over Wilber's panel and the offline page,
 // so it never sits on a headline.
 
+// Hidden from visitors unless NEXT_PUBLIC_SIM_CONTROLS=1; /simulador stays reachable by its URL.
+const SIM_CONTROLS = process.env.NEXT_PUBLIC_SIM_CONTROLS === "1";
+
 const OWN_CHROME = /^\/(wilber|simulador|offline)(\/|$)/;
 
 export function SimDock({ placement = "float" }: { placement?: "float" | "header" }) {
@@ -46,7 +49,7 @@ export function SimDock({ placement = "float" }: { placement?: "float" | "header
     };
   }, [open]);
 
-  if (!hydrated || process.env.NEXT_PUBLIC_DATA_MODE === "supabase" || pathname?.startsWith("/simulador")) return null;
+  if (!hydrated || !SIM_CONTROLS || process.env.NEXT_PUBLIC_DATA_MODE === "supabase" || pathname?.startsWith("/simulador")) return null;
   if (!header && !OWN_CHROME.test(pathname ?? "/")) return null;
   const departureId = pathname?.match(/^\/salidas\/([^/]+)/)?.[1];
   const active = speedId(clock);

@@ -55,9 +55,9 @@ export function BookingPanel({ flow, variant }: { flow: BookingFlow; variant: "i
   }, [view]);
 
   return (
-    // Inline, the panel never grows past the viewport: the step scrolls inside
-    // and its action strip stays pinned to the bottom of the slip.
-    <div className={cx("flex flex-col", inline ? "max-h-[calc(100dvh-12.5rem)] min-h-[26rem]" : "min-h-full")}>
+    // Inline, the panel grows to show the whole step at once (no inner scroll);
+    // the page column keeps it in view (see StickyAside in departure-booking).
+    <div className={cx("flex flex-col", inline ? "min-h-[26rem]" : "min-h-full")}>
       {flow.closed && view.startsWith("cerrada") ? null : <StepTabs flow={flow} />}
       <motion.div
         layout={morph}
@@ -68,11 +68,7 @@ export function BookingPanel({ flow, variant }: { flow: BookingFlow; variant: "i
         <motion.div
           ref={scroller}
           layout={morph ? "position" : false}
-          layoutScroll={inline}
-          className={cx(
-            "flex min-h-0 flex-1 flex-col px-4 pt-6 sm:px-7",
-            inline && "overflow-y-auto overscroll-contain [scrollbar-color:var(--cobalt-300)_transparent] [scrollbar-width:thin]",
-          )}
+          className="flex min-h-0 flex-1 flex-col px-4 pt-6 sm:px-7"
         >
           {/* Steps slide along the tabs' axis: forward comes in from the right,
               back ("Editar") from the left. Exit is quicker than entry. */}

@@ -10,7 +10,8 @@ const schema = z.object({
   code: z.string().regex(/^WIL-[A-Z0-9]{4}$/),
   tourId: z.string(),
   partySize: z.number().int().min(1).max(25),
-  email: z.string().email().optional(),
+  // Bookings without an email store "", which is not an error.
+  email: z.union([z.literal(""), z.string().email()]).optional(),
 });
 
 /**
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
       productName: `Anticipo ${tour.name} · ${parsed.data.code}`,
       redirectUrl: `${site}/reserva/pago/retorno`,
       webhookUrl: `${site}/api/pagos/wompi/webhook`,
-      customerEmail: parsed.data.email,
+      customerEmail: parsed.data.email || undefined,
     });
     return NextResponse.json({ ok: true, url: link.urlEnlace, idEnlace: link.idEnlace, productive: link.estaProductivo ?? false });
   } catch (e) {
