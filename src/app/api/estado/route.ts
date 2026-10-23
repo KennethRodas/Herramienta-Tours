@@ -10,7 +10,7 @@ export function GET() {
     supabase: integrations.supabase,
     kapso: integrations.kapso,
     kapsoWebhookSecret: integrations.kapsoWebhookSecret,
-    resend: integrations.resend,
+    resend: integrations.email,
     wompi: integrations.wompi,
     whatsappTestNumbers: whatsappTestNumbers().map((n) => `+${n.slice(0, 3)} ••••${n.slice(-4)}`),
     emailTestAddresses: emailTestAddresses().length,

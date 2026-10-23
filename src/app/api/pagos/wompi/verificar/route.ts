@@ -15,11 +15,24 @@ export async function GET(req: Request) {
   if (!id) return NextResponse.json({ ok: false, error: "Falta idTransaccion" }, { status: 400 });
   try {
     const tx = await getTransaction(id);
+    const hashValid = params.has("hash") ? verifyRedirectHash(params) : null;
+    const real = tx.esReal === true;
+    // Wompi's API is the proof of payment. Real money also needs the redirect hash to
+    // match (so a paid transaction cannot be replayed onto another booking); in Wompi's
+    // test mode no money moves, so the API's word is enough.
+    const approved = tx.esAprobada === true && (hashValid === true || !real);
+    if (hashValid === false) {
+      // Logged to tune verifyRedirectHash against a real redirect (the hash is a MAC, not a secret).
+      // Only the redirect query and the amount: the transaction also carries the payer's ID, phone and email.
+      console.warn("wompi: redirect hash mismatch", JSON.stringify({ query: Object.fromEntries(params), monto: tx.monto, esReal: real }));
+    }
     return NextResponse.json({
       ok: true,
-      hashValid: params.has("hash") ? verifyRedirectHash(params) : null,
-      approved: tx.esAprobada === true,
-      real: tx.esReal === true,
+      hashValid,
+      approved,
+      // Wompi approved it but the redirect could not be verified (real payments only).
+      blocked: tx.esAprobada === true && !approved,
+      real,
       amount: tx.monto ?? null,
       reference: params.get("identificadorEnlaceComercio"),
       message: tx.mensaje ?? null,

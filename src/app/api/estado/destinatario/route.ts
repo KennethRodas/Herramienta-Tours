@@ -14,6 +14,6 @@ export function GET(req: Request) {
   const isEmail = to.includes("@");
   return NextResponse.json({
     whatsapp: !isEmail && integrations.kapso && whatsappTestNumbers().includes(to.replace(/\D/g, "")),
-    email: isEmail && integrations.resend && emailTestAddresses().includes(to.toLowerCase()),
+    email: isEmail && integrations.email && emailTestAddresses().includes(to.toLowerCase()),
   });
 }

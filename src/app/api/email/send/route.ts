@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 /** Real email delivery for the simulator; only EMAIL_TEST_ADDRESSES can receive. */
 export async function POST(req: Request) {
-  if (!integrations.resend) return NextResponse.json({ ok: false, error: "Resend no está configurado" }, { status: 503 });
+  if (!integrations.email) return NextResponse.json({ ok: false, error: "Correo sin configurar" }, { status: 503 });
   const body = (await req.json().catch(() => null)) as { to?: string; kind?: EmailKind; booking?: Booking; departure?: Departure } | null;
   const to = body?.to?.trim().toLowerCase();
   if (!to || !body?.kind) return NextResponse.json({ ok: false, error: "Datos inválidos" }, { status: 400 });

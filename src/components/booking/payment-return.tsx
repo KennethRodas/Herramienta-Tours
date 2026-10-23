@@ -25,7 +25,7 @@ type Verify =
   | { kind: "missing" }
   | { kind: "off" }
   | { kind: "error"; status: number | null }
-  | { kind: "ok"; approved: boolean; amount: number | null; hashValid: boolean | null; reference: string | null; message: string | null };
+  | { kind: "ok"; approved: boolean; blocked: boolean; amount: number | null; reference: string | null; message: string | null };
 
 export function PaymentReturn({ query }: { query: ReturnQuery }) {
   const s = useSimState();
@@ -43,10 +43,10 @@ export function PaymentReturn({ query }: { query: ReturnQuery }) {
         if (!alive) return;
         if (res.status === 503) return setResult({ kind: "off" });
         if (!res.ok) return setResult({ kind: "error", status: res.status });
-        const j = (await res.json()) as { ok?: boolean; approved?: boolean; amount?: number | null; hashValid?: boolean | null; reference?: string | null; message?: string | null };
+        const j = (await res.json()) as { ok?: boolean; approved?: boolean; blocked?: boolean; amount?: number | null; reference?: string | null; message?: string | null };
         if (!alive) return;
         if (!j.ok) return setResult({ kind: "error", status: res.status });
-        setResult({ kind: "ok", approved: Boolean(j.approved), amount: j.amount ?? null, hashValid: j.hashValid ?? null, reference: j.reference ?? null, message: j.message ?? null });
+        setResult({ kind: "ok", approved: Boolean(j.approved), blocked: Boolean(j.blocked), amount: j.amount ?? null, reference: j.reference ?? null, message: j.message ?? null });
       } catch {
         if (alive) setResult({ kind: "error", status: null });
       }
@@ -60,7 +60,8 @@ export function PaymentReturn({ query }: { query: ReturnQuery }) {
   const reference = result.kind === "ok" && result.reference ? result.reference : query.identificadorEnlaceComercio;
   const code = reference && /^WIL-?[A-Z0-9]{4}$/i.test(reference) ? normalizeCode(reference) : null;
   const local = code && s ? s.bookings.find((b) => b.code === code) : undefined;
-  const approved = result.kind === "ok" && result.approved && result.hashValid !== false;
+  // The server decides: Wompi's API must approve it, and real payments also need a valid redirect hash.
+  const approved = result.kind === "ok" && result.approved;
 
   // Keep the simulated booking in step with a real approval.
   const settleId = approved && local && local.payment.status === "pendiente" ? local.id : null;
@@ -93,7 +94,7 @@ export function PaymentReturn({ query }: { query: ReturnQuery }) {
         ) : (
           <>
             <Stamp className="absolute right-6 top-7 sm:right-10">{approved ? "Pagado" : "Sin pagar"}</Stamp>
-            <p className="text-lead font-semibold">{approved ? "Pago aprobado." : result.hashValid === false ? "La respuesta de Wompi no pasó la verificación." : "Wompi no aprobó el pago."}</p>
+            <p className="text-lead font-semibold">{approved ? "Pago aprobado." : result.blocked ? "La respuesta de Wompi no pasó la verificación." : "Wompi no aprobó el pago."}</p>
             {amount !== null && Number.isFinite(amount) ? <p className="tabular font-display text-head font-bold leading-none">{formatUsd(amount)}</p> : null}
             {code ? <p className="text-body">Boleto {code}</p> : null}
             {!approved && result.message ? <p className="text-body">{result.message}</p> : null}

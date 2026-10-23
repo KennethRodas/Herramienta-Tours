@@ -200,7 +200,7 @@ export interface Message {
   location?: { lat: number; lng: number; name: string; address: string };
   bookingId?: string;
   departureId?: string;
-  status: "en_cola" | "simulado" | "enviado" | "entregado" | "leido" | "fallido";
+  status: "en_cola" | "enviando" | "simulado" | "enviado" | "entregado" | "leido" | "fallido";
   /** True when it really went out through Kapso / Resend. */
   real: boolean;
   createdAt: string;

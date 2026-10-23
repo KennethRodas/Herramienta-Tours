@@ -8,10 +8,12 @@ const list = (v?: string) =>
 
 export const integrations = {
   dataMode: (process.env.NEXT_PUBLIC_DATA_MODE === "supabase" ? "supabase" : "simulacion") as "supabase" | "simulacion",
-  supabase: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY),
+  supabase: Boolean((process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) && process.env.SUPABASE_SERVICE_ROLE_KEY),
   kapso: Boolean(process.env.KAPSO_API_KEY && process.env.KAPSO_PHONE_NUMBER_ID),
   kapsoWebhookSecret: Boolean(process.env.KAPSO_WEBHOOK_SECRET),
   resend: Boolean(process.env.RESEND_API_KEY),
+  /** Any email provider: Gmail SMTP (no domain needed) or Resend. */
+  email: Boolean((process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) || process.env.RESEND_API_KEY),
   wompi: Boolean(process.env.WOMPI_CLIENT_ID && process.env.WOMPI_CLIENT_SECRET),
 };
 
